@@ -1,8 +1,11 @@
+'use client'
+
 import React from 'react'
 import Container from './Container'
 import Logo from './Logo'
 import HeaderMenu from './HeaderMenu'
 import MobileMenu from './MobileMenu'
+import AuthButtons from './AuthButtons'
 
 const Header = () => {
   return (
@@ -11,7 +14,8 @@ const Header = () => {
         <Logo />
         <HeaderMenu />
         <div className="flex items-center gap-5 justify-end">
-        <MobileMenu />
+          <AuthButtons />
+          <MobileMenu />
         </div>
       </Container>
       

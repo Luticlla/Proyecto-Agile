@@ -4,6 +4,7 @@ import { JetBrains_Mono, Press_Start_2P } from "next/font/google";
 import { cn } from "@/lib/utils";
 import Header from "@/components/Header";
 import Footer  from "@/components/Footer";
+import { AuthProvider } from "@/hooks";
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
 const pressStart2P = Press_Start_2P({
@@ -25,11 +26,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-mono", jetbrainsMono.variable, pressStart2P.variable)}>
       <body className="font-poppins antialiased bg-white">
-        <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        </div>
+        <AuthProvider>
+          <div className="min-h-screen flex flex-col">
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );

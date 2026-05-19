@@ -1,0 +1,105 @@
+'use client'
+
+import { useState } from 'react'
+import { useAuth } from '@/hooks'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+
+export default function LoginPage() {
+  const { signIn } = useAuth()
+  const router = useRouter()
+  
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    const { error } = await signIn(email, password)
+    
+    if (error) {
+      setError(error.message)
+      setLoading(false)
+    } else {
+      router.push('/')
+    }
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-zinc-950 px-4">
+      <Card className="w-full max-w-md bg-zinc-900 border-zinc-800">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold text-white">Bienvenido de nuevo</CardTitle>
+          <CardDescription className="text-zinc-400">
+            Inicia sesión para acceder a tu cuenta
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="p-3 text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded">
+                {error}
+              </div>
+            )}
+            
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm text-zinc-300">Email</label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="tu@email.com"
+                required
+                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-sm text-zinc-300">Contraseña</label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-yellow-400 text-zinc-950 hover:bg-yellow-300"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Iniciando sesión...
+                </>
+              ) : (
+                'Iniciar Sesión'
+              )}
+            </Button>
+          </form>
+
+          <div className="mt-4 text-center text-sm text-zinc-400">
+            ¿No tienes cuenta?{' '}
+            <Link href="/register" className="text-yellow-400 hover:underline">
+              Regístrate aquí
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
