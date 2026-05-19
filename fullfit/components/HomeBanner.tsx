@@ -6,13 +6,13 @@ import banner1 from '@/Images/Home/Banner.png'
 const HomeBanner = () => {
   return (
     <section className="w-full py-4 md:py-8 flex justify-center px-2 md:px-4">
-      <div className="relative w-full max-w-[1600px]">
+      <div className="relative w-full max-w-[1600px] h-[50vh] sm:h-[60vh] md:h-[75vh] lg:h-[70vh]">
         <Image 
           src={banner1} 
           alt="banner1"
-          width={1600}
-          height={700}
-          className="w-full h-[50vh] sm:h-[60vh] md:h-[75vh] lg:h-[70vh] object-cover rounded-2xl md:rounded-[2rem] shadow-xl"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1600px) 100vw, 1600px"
+          className="object-cover rounded-2xl md:rounded-[2rem] shadow-xl"
           priority
         />  
         <Link 
