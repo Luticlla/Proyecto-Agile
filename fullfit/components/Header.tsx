@@ -14,7 +14,6 @@ const Header = () => {
         <Logo />
         <HeaderMenu />
         <div className="flex items-center gap-5 justify-end">
-          <AuthButtons />
           <MobileMenu />
         </div>
       </Container>

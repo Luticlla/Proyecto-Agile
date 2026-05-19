@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import SocialMedia from './SocialMedia';
 import { useOutsideClick } from '@/hooks';
+import AuthButtons from './AuthButtons';
 
 interface SidebarProps{
     isOpen:boolean;
@@ -44,11 +45,16 @@ const SideMenu:FC<SidebarProps> = ({isOpen, onClose}) => {
         <div className='flex flex-col space-y-4 font-arcade tracking-wide'>
           {headerData?.map((item)=>(
           <Link href={item?.href} key={item?.title}
+          onClick={onClose}
           className={`hover:text-gym-logo-claro hoverEffect ${pathname === item?.href && "text-gym-logo-claro"}`}>
           {item?.title}
           </Link>
           ))}
-
+        </div>
+        <div className='flex flex-col gap-3 text-xs font-arcade text-white w-full overflow-hidden'>
+            <div className="flex flex-col gap-3 w-full [&>div]:flex-col [&>div]:items-start [&>div]:w-full [&_a]:w-full [&_a]:text-center">
+            <AuthButtons />
+            </div>
         </div>
         <SocialMedia />
       </div>

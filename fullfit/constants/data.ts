@@ -9,7 +9,4 @@ export const headerData=
 },{
     title:"Sedes",
     href:"/sedes"
-},{
-    title:"Inicio sesion",
-    href:"#"
 }]
