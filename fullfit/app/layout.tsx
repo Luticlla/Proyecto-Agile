@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={cn("font-mono", jetbrainsMono.variable, pressStart2P.variable)}>
-      <body className="font-poppins antialiased bg-white">
+      <body className="font-poppins antialiased bg-black">
         <AuthProvider>
           <div className="min-h-screen flex flex-col">
           <Header />

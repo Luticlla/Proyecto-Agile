@@ -10,7 +10,7 @@ const Home = () => {
       <HomeBanner />
       <section className="w-full py-2 flex justify-center px-2">
         <h2 className="font-arcade text-yellow-400 text-center text-sm sm:text-base md:text-xl lg:text-2xl leading-relaxed">
-          Encuentra tu mejor <span className="text-black">versión</span> con nosotros
+          Encuentra tu mejor <span className="text-white">versión</span> con nosotros
         </h2>
       </section>
       <InfiniteScroll />

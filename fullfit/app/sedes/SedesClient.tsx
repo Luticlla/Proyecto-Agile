@@ -146,25 +146,18 @@ const SedeCard = ({
         </div>
 
         {/* CTAs */}
-        <div className="flex gap-2 mt-4 pt-3 border-t border-white/10">
+        <div className="mt-4 pt-3 border-t border-white/10">
           {mapsUrl && (
             <a
               href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 flex items-center justify-center gap-1.5 border border-white/20 text-white/70 hover:border-gym-logo hover:text-gym-logo hoverEffect py-2 text-[8px] font-arcade uppercase tracking-wider"
+              className="flex flex items-center justify-center gap-2 w-full border border-white/20 text-white/70 hover:border-gym-logo hover:text-gym-logo hoverEffect py-4 text-sm font-arcade uppercase tracking-wider"
             >
-              <MapPin className="w-3 h-3" />
+              <MapPin className="w-5 h-5" />
               Cómo llegar
             </a>
           )}
-          
-            href={`tel:${sede.telefono}`}
-            className="flex-1 flex items-center justify-center gap-1.5 bg-gym-logo text-black hover:bg-gym-logo-claro hoverEffect py-2 text-[8px] font-arcade uppercase tracking-wider"
-          <a>
-            <MessageCircle className="w-3 h-3" />
-            Llamar
-          </a>
         </div>
       </div>
     </article>
@@ -195,7 +188,7 @@ const SedesClient = ({ sedes }: SedesClientProps) => {
     <>
       <section className="py-12 md:py-20">
         <Container>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          <div className="flex flex-wrap justify-center gap-6 md:gap-8 max-w-4xl mx-auto">
             {sedes.map(sede => (
               <SedeCard
                 key={sede.id}

@@ -98,6 +98,32 @@ export type Database = {
           creado_en: string
         }
       }
+      sedes: {
+        Row: {
+          id: number
+          nombre: string
+          direccion: string
+          latitud: number | null
+          longitud: number | null
+          telefono: string
+          email: string
+          imagen_url: string | null
+          apertura_lv: string
+          cierre_lv: string
+          apertura_sab: string
+          cierre_sab: string
+          estado: string
+          creado_en: string
+          actualizado_en: string
+        }
+      }
+      roles: {
+        Row: {
+          id: number
+          nombre: string
+          descripcion: string | null
+        }
+      }
     }
   }
 }
@@ -106,3 +132,7 @@ export type Profile = Database['public']['Tables']['profiles']['Row']
 export type PlanMembresia = Database['public']['Tables']['planes_membresia']['Row']
 export type Suscripcion = Database['public']['Tables']['suscripciones']['Row']
 export type Pago = Database['public']['Tables']['pagos']['Row']
+export type Sede = Database['public']['Tables']['sedes']['Row']
+export type Rol = Database['public']['Tables']['roles']['Row']
+
+export type RolNombre = 'admin' | 'recepcionista' | 'miembro'
