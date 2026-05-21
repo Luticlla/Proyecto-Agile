@@ -1,17 +1,14 @@
 import Image from 'next/image'
-import before1 from '@/Images/Before_gym/Before_1.png'
 import before2 from '@/Images/Before_gym/Before_2.png'
 import before3 from '@/Images/Before_gym/Before_3.png'
 import before4 from '@/Images/Before_gym/Before_4.png'
 import before5 from '@/Images/Before_gym/Before_5.png'
-import after1 from '@/Images/After_gym/After_1.png'
 import after2 from '@/Images/After_gym/After_2.png'
 import after3 from '@/Images/After_gym/After_3.png'
 import after4 from '@/Images/After_gym/After_4.png'
 import after5 from '@/Images/After_gym/After_5.png'
 
 const photos = [
-  { before: before1, after: after1 },
   { before: before2, after: after2 },
   { before: before3, after: after3 },
   { before: before4, after: after4 },
