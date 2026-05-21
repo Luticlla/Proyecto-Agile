@@ -16,7 +16,7 @@ const HomeBanner = () => {
           priority
         />  
         <Link 
-          href="/membresias"
+          href="/sedes"
           className="absolute top-3 right-3 sm:top-6 sm:right-6 md:top-10 md:right-10 lg:top-12 lg:right-12 
                      bg-red-600 hover:bg-primary hover:text-black text-white font-arcade 
                      text-[8px] sm:text-xs md:text-base lg:text-lg uppercase tracking-wider
