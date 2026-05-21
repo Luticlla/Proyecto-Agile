@@ -57,7 +57,7 @@ export default function AuthButtons() {
       <Button
         asChild
         variant="outline"
-        className="border-zinc-700 text-zinc-300 hover:border-yellow-400/60 hover:text-yellow-400"
+        className="border-zinc-700 text-zinc-950 hover:border-yellow-400/60 hover:text-yellow-400"
       >
         <a href="/login">Iniciar Sesión</a>
       </Button>

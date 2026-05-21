@@ -105,7 +105,7 @@ const MembresiasPage = async () => {
               <span className="text-gym-logo/80">Sin contratos largos, cancela cuando quieras.</span>
             </p>
 
-            <div className="flex items-center gap-8 md:gap-16 mt-4 pt-4 border-t border-white/10 w-full max-w-sm md:max-w-md justify-center">
+            <div className="flex items-center gap-8 md:gap-16 mt-4 pt-4 border-t border-white/10 w-full max-w-xs justify-center">
               <div className="flex flex-col items-center gap-1">
                 <span className="font-arcade text-gym-logo text-lg md:text-2xl">{planes.length}</span>
                 <span className="text-white/40 text-[8px] md:text-[10px] font-arcade uppercase tracking-wider">Planes</span>
@@ -114,11 +114,6 @@ const MembresiasPage = async () => {
               <div className="flex flex-col items-center gap-1">
                 <span className="font-arcade text-gym-logo text-lg md:text-2xl">100%</span>
                 <span className="text-white/40 text-[8px] md:text-[10px] font-arcade uppercase tracking-wider">Flexible</span>
-              </div>
-              <div className="h-8 w-px bg-white/10" />
-              <div className="flex flex-col items-center gap-1">
-                <span className="font-arcade text-gym-logo text-lg md:text-2xl">0</span>
-                <span className="text-white/40 text-[8px] md:text-[10px] font-arcade uppercase tracking-wider">Matrícula</span>
               </div>
             </div>
           </div>
