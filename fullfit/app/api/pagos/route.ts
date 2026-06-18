@@ -2,6 +2,7 @@ import { Preference } from 'mercadopago'
 import { NextRequest, NextResponse } from 'next/server'
 import { getMercadoPagoClient } from '@/lib/mercadopago'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { getFechaLima, parsearFechaLima } from '@/lib/utils'
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,21 +51,22 @@ export async function POST(request: NextRequest) {
       .limit(1)
       .maybeSingle()
 
-    let fechaInicio = new Date()
-    let fechaFin = new Date()
+    let fechaInicio = getFechaLima()
+    let fechaFin = getFechaLima()
     let diasRestantes = 0
 
     if (membresiaActiva) {
-      const hoy = new Date()
-      const fechaFinActual = new Date(membresiaActiva.fecha_fin)
+      const hoy = parsearFechaLima(getFechaLima())
+      const fechaFinActual = parsearFechaLima(membresiaActiva.fecha_fin)
       const diffMs = fechaFinActual.getTime() - hoy.getTime()
       const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
 
       if (diffDias > 0) {
         diasRestantes = diffDias
-        fechaInicio = new Date(fechaFinActual)
-        fechaFin = new Date(fechaFinActual)
-        fechaFin.setDate(fechaFin.getDate() + plan.duracion_dias)
+        const nuevaFin = new Date(fechaFinActual)
+        nuevaFin.setDate(nuevaFin.getDate() + plan.duracion_dias)
+        fechaInicio = membresiaActiva.fecha_fin
+        fechaFin = nuevaFin.toISOString().split('T')[0]
       }
     }
 
@@ -82,8 +84,8 @@ export async function POST(request: NextRequest) {
         metadata: {
           plan_id: String(plan.id),
           user_id: userId,
-          fecha_inicio: fechaInicio.toISOString(),
-          fecha_fin: fechaFin.toISOString(),
+          fecha_inicio: fechaInicio,
+          fecha_fin: fechaFin,
           dias_restantes: String(diasRestantes),
         },
         back_urls: {

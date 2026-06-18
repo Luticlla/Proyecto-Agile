@@ -2,6 +2,7 @@ import { supabase } from '../client'
 import type { ProfileUpdate, ProfileWithEmail } from '../types'
 import type { ClienteFilters, ClienteListResult, ClienteConMembresia } from './clientes.types'
 import { addEmail, enrichConMembresia, applyBusquedaFilter } from './clientes.transformations'
+import { getFechaLima } from '@/lib/utils'
 
 export type { EstadoSuscripcion, ClienteFilters, ClienteListResult, ClienteConMembresia } from './clientes.types'
 
@@ -180,7 +181,7 @@ async function listarClientesPorEstadoMembresia(filtros: {
   const from = (page - 1) * limit
   const to = from + limit - 1
 
-  const hoy = new Date().toISOString().split('T')[0]
+  const hoy = getFechaLima()
 
   let suscripcionQuery = supabase
     .from('suscripciones')

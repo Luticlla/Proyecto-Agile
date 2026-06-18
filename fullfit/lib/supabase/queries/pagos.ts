@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { formatearFechaLima, getFechaLima, parsearFechaLima } from '@/lib/utils'
 
 type PaymentData = {
   id: string | number
@@ -13,10 +14,6 @@ type ProcessResult = {
   message?: string
   subscription_id?: number
   error?: string
-}
-
-function formatearFecha(date: Date): string {
-  return date.toISOString().split('T')[0]
 }
 
 export async function processPaymentActivation(
@@ -90,13 +87,13 @@ export async function processPaymentActivation(
     .maybeSingle()
 
   if (membresiaActiva) {
-    const fechaFinActual = new Date(membresiaActiva.fecha_fin)
+    const fechaFinActual = parsearFechaLima(membresiaActiva.fecha_fin)
     const nuevaFechaFin = new Date(fechaFinActual)
     nuevaFechaFin.setDate(nuevaFechaFin.getDate() + plan.duracion_dias)
 
     const { error: updateError } = await supabaseAdmin
       .from('suscripciones')
-      .update({ fecha_fin: formatearFecha(nuevaFechaFin) })
+      .update({ fecha_fin: formatearFechaLima(nuevaFechaFin) })
       .eq('id', membresiaActiva.id)
 
     if (updateError) {
@@ -118,14 +115,14 @@ export async function processPaymentActivation(
       usuario_id: userId,
       tipo: 'bienvenida',
       titulo: '¡Membresía extendida!',
-      mensaje: `Tu membresía ${plan.nombre} ahora está activa hasta el ${formatearFecha(nuevaFechaFin)}.`,
+      mensaje: `Tu membresía ${plan.nombre} ahora está activa hasta el ${formatearFechaLima(nuevaFechaFin)}.`,
     })
 
     return { success: true, subscription_id: membresiaActiva.id }
   }
 
-  const fechaInicio = new Date()
-  const fechaFin = new Date()
+  const hoy = parsearFechaLima(getFechaLima())
+  const fechaFin = new Date(hoy)
   fechaFin.setDate(fechaFin.getDate() + plan.duracion_dias)
 
   const { data: suscripcion, error: subError } = await supabaseAdmin
@@ -133,8 +130,8 @@ export async function processPaymentActivation(
     .insert({
       usuario_id: userId,
       plan_id: plan.id,
-      fecha_inicio: formatearFecha(fechaInicio),
-      fecha_fin: formatearFecha(fechaFin),
+      fecha_inicio: getFechaLima(),
+      fecha_fin: formatearFechaLima(fechaFin),
       estado: 'activa',
       creado_por: userId,
     })
@@ -160,7 +157,7 @@ export async function processPaymentActivation(
     usuario_id: userId,
     tipo: 'bienvenida',
     titulo: '¡Membresía activada!',
-    mensaje: `Tu membresía ${plan.nombre} está activa hasta el ${formatearFecha(fechaFin)}.`,
+    mensaje: `Tu membresía ${plan.nombre} está activa hasta el ${formatearFechaLima(fechaFin)}.`,
   })
 
   return { success: true, subscription_id: suscripcion.id }

@@ -1,6 +1,7 @@
 import { supabase } from '../client'
 import type { ProfileWithEmail } from '../types'
 import type { ClienteConMembresia } from './clientes.types'
+import { getFechaLima } from '@/lib/utils'
 
 export function addEmail(profile: Record<string, unknown>): ProfileWithEmail {
   return {
@@ -23,7 +24,7 @@ export async function enrichConMembresia(clientes: ProfileWithEmail[]): Promise<
   if (clientes.length === 0) return []
 
   const ids = clientes.map(c => c.id)
-  const hoy = new Date().toISOString().split('T')[0]
+  const hoy = getFechaLima()
 
   const { data: suscripciones } = await supabase
     .from('suscripciones')
