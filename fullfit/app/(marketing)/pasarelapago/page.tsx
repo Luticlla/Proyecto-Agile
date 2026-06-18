@@ -44,13 +44,60 @@ function PaymentSummary({ plan, prices, features }: {
   )
 }
 
-function PaymentStatus({ status }: { status: string }) {
+function PaymentStatus({ status, verificationResult, verificationLoading }: { 
+  status: string
+  verificationResult: { success: boolean; message?: string; error?: string } | null
+  verificationLoading: boolean
+}) {
   const config: Record<string, { title: string; desc: string; color: string }> = {
     approved: { title: '¡Pago aprobado!', desc: 'Tu membresía está activa.', color: 'text-green-400' },
     rejected: { title: 'Pago no procesado', desc: 'El pago no pudo ser completado.', color: 'text-red-400' },
     pending: { title: 'Pago pendiente', desc: 'Tu pago está siendo procesado.', color: 'text-yellow-400' },
   }
   const { title, desc, color } = config[status] || config.pending
+
+  if (verificationLoading) {
+    return (
+      <Card className="w-full max-w-md bg-zinc-900 border-zinc-800">
+        <CardContent className="flex flex-col items-center gap-4 pt-6">
+          <Loader2 className="w-8 h-8 text-gym-logo animate-spin" />
+          <p className="text-white/60 text-sm font-mono text-center">Verificando tu pago...</p>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (verificationResult && !verificationResult.success) {
+    return (
+      <Card className="w-full max-w-md bg-zinc-900 border-zinc-800">
+        <CardContent className="flex flex-col items-center gap-4 pt-6">
+          <h2 className="font-arcade text-xl text-red-400">Error al activar membresía</h2>
+          <p className="text-white/60 text-sm font-mono text-center">{verificationResult.error || 'No se pudo procesar el pago'}</p>
+          <Link href="/membresias">
+            <Button className="font-arcade bg-gym-logo text-black hover:bg-gym-logo/80">
+              Volver a planes
+            </Button>
+          </Link>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (verificationResult && verificationResult.success) {
+    return (
+      <Card className="w-full max-w-md bg-zinc-900 border-zinc-800">
+        <CardContent className="flex flex-col items-center gap-4 pt-6">
+          <h2 className="font-arcade text-xl text-green-400">¡Membresía activada!</h2>
+          <p className="text-white/60 text-sm font-mono text-center">{verificationResult.message || 'Tu membresía está activa.'}</p>
+          <Link href="/">
+            <Button className="font-arcade bg-gym-logo text-black hover:bg-gym-logo/80">
+              Volver al inicio
+            </Button>
+          </Link>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card className="w-full max-w-md bg-zinc-900 border-zinc-800">
@@ -74,10 +121,13 @@ function PasarelaPagoContent() {
 
   const planId = searchParams.get('plan')
   const status = searchParams.get('status')
+  const paymentId = searchParams.get('payment_id')
 
   const [plan, setPlan] = useState<{ id: number; nombre: string; precio: number; duracion_dias: number; descripcion?: string } | null>(null)
   const [paymentLoading, setPaymentLoading] = useState(false)
   const [planLoading, setPlanLoading] = useState(true)
+  const [verificationLoading, setVerificationLoading] = useState(false)
+  const [verificationResult, setVerificationResult] = useState<{ success: boolean; message?: string; error?: string } | null>(null)
 
   useEffect(() => {
     let isMounted = true
@@ -114,6 +164,31 @@ function PasarelaPagoContent() {
     fetchPlan()
   }, [planId])
 
+  // Verificar el pago cuando regresa de MercadoPago con status=approved y payment_id
+  useEffect(() => {
+    if (status === 'approved' && paymentId && !verificationResult) {
+      const verificarPago = async () => {
+        setVerificationLoading(true)
+        try {
+          const response = await fetch('/api/pagos/verificar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ payment_id: paymentId }),
+          })
+
+          const data = await response.json()
+          setVerificationResult(data)
+        } catch (error) {
+          setVerificationResult({ success: false, error: 'Error al verificar el pago' })
+        } finally {
+          setVerificationLoading(false)
+        }
+      }
+
+      verificarPago()
+    }
+  }, [status, paymentId, verificationResult])
+
   const handlePayment = useCallback(async () => {
     if (!plan || !user) return
     setPaymentLoading(true)
@@ -149,7 +224,11 @@ function PasarelaPagoContent() {
     return (
       <main className="min-h-screen bg-black">
         <Container className="py-20 flex flex-col items-center">
-          <PaymentStatus status={status} />
+          <PaymentStatus 
+            status={status} 
+            verificationResult={verificationResult} 
+            verificationLoading={verificationLoading}
+          />
         </Container>
       </main>
     )

@@ -99,9 +99,9 @@ export async function POST(request: NextRequest) {
           dias_restantes: String(diasRestantes),
         },
         back_urls: {
-          success: `${process.env.NEXT_PUBLIC_SITE_URL}/pasarelapago?status=approved`,
-          failure: `${process.env.NEXT_PUBLIC_SITE_URL}/pasarelapago?status=rejected`,
-          pending: `${process.env.NEXT_PUBLIC_SITE_URL}/pasarelapago?status=pending`,
+          success: `${process.env.NEXT_PUBLIC_SITE_URL}/pasarelapago?status=approved&payment_id={{payment_id}}`,
+          failure: `${process.env.NEXT_PUBLIC_SITE_URL}/pasarelapago?status=rejected&payment_id={{payment_id}}`,
+          pending: `${process.env.NEXT_PUBLIC_SITE_URL}/pasarelapago?status=pending&payment_id={{payment_id}}`,
         },
         auto_return: 'approved',
       },
