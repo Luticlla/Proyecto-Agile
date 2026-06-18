@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       const diffMs = fechaFinActual.getTime() - hoy.getTime()
       const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
 
-      if (diffDias <= 7 && diffDias > 0) {
+      if (diffDias > 0) {
         diasRestantes = diffDias
         fechaInicio = new Date(fechaFinActual)
         fechaFin = new Date(fechaFinActual)

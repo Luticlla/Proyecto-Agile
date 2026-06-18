@@ -83,37 +83,50 @@ export async function processPaymentActivation(
 
   const { data: membresiaActiva } = await supabaseAdmin
     .from('suscripciones')
-    .select('id')
+    .select('id, fecha_fin')
     .eq('usuario_id', userId)
     .eq('estado', 'activa')
+    .order('fecha_fin', { ascending: false })
     .maybeSingle()
 
   if (membresiaActiva) {
+    const fechaFinActual = new Date(membresiaActiva.fecha_fin)
+    const nuevaFechaFin = new Date(fechaFinActual)
+    nuevaFechaFin.setDate(nuevaFechaFin.getDate() + plan.duracion_dias)
+
+    const { error: updateError } = await supabaseAdmin
+      .from('suscripciones')
+      .update({ fecha_fin: formatearFecha(nuevaFechaFin) })
+      .eq('id', membresiaActiva.id)
+
+    if (updateError) {
+      return { success: false, error: 'Failed to extend subscription' }
+    }
+
     await supabaseAdmin.from('pagos').insert({
-      suscripcion_id: null,
+      suscripcion_id: membresiaActiva.id,
       usuario_id: userId,
       monto: payment.transaction_amount || 0,
       metodo_pago: 'mercadopago',
       estado: 'completado',
       referencia,
-      observaciones: 'Ya posee membresía activa - pago registrado sin suscripción',
+      observaciones: `Extensión de membresía - ${plan.duracion_dias} días añadidos`,
       registrado_por: userId,
     })
-    return { success: true, message: 'Active membership exists' }
+
+    await supabaseAdmin.from('notificaciones').insert({
+      usuario_id: userId,
+      tipo: 'bienvenida',
+      titulo: '¡Membresía extendida!',
+      mensaje: `Tu membresía ${plan.nombre} ahora está activa hasta el ${formatearFecha(nuevaFechaFin)}.`,
+    })
+
+    return { success: true, subscription_id: membresiaActiva.id }
   }
 
-  const diasRestantes = Number(metadata.dias_restantes) || 0
-  let fechaInicio = new Date()
+  const fechaInicio = new Date()
   const fechaFin = new Date()
-
-  if (diasRestantes > 0) {
-    const fechaFinReferencia = new Date(metadata.fecha_fin)
-    fechaInicio = new Date(fechaFinReferencia)
-    fechaFin.setTime(fechaFinReferencia.getTime())
-    fechaFin.setDate(fechaFin.getDate() + plan.duracion_dias)
-  } else {
-    fechaFin.setDate(fechaFin.getDate() + plan.duracion_dias)
-  }
+  fechaFin.setDate(fechaFin.getDate() + plan.duracion_dias)
 
   const { data: suscripcion, error: subError } = await supabaseAdmin
     .from('suscripciones')
@@ -132,30 +145,22 @@ export async function processPaymentActivation(
     return { success: false, error: 'Failed to create subscription' }
   }
 
-  const { error: pagoError } = await supabaseAdmin.from('pagos').insert({
+  await supabaseAdmin.from('pagos').insert({
     suscripcion_id: suscripcion.id,
     usuario_id: userId,
     monto: payment.transaction_amount || 0,
     metodo_pago: 'mercadopago',
     estado: 'completado',
     referencia,
-    observaciones: `MercadoPago - ${payment.payment_type_id}${diasRestantes > 0 ? ` - ${diasRestantes} días acumulados` : ''}`,
+    observaciones: `MercadoPago - ${payment.payment_type_id}`,
     registrado_por: userId,
   })
-
-  if (pagoError) {
-    console.error('Error creating payment record:', pagoError)
-  }
-
-  const mensaje = diasRestantes > 0
-    ? `Tu membresía ${plan.nombre} está activa hasta el ${formatearFecha(fechaFin)} (${diasRestantes} días de tu membresía anterior fueron acumulados).`
-    : `Tu membresía ${plan.nombre} está activa hasta el ${formatearFecha(fechaFin)}.`
 
   await supabaseAdmin.from('notificaciones').insert({
     usuario_id: userId,
     tipo: 'bienvenida',
     titulo: '¡Membresía activada!',
-    mensaje,
+    mensaje: `Tu membresía ${plan.nombre} está activa hasta el ${formatearFecha(fechaFin)}.`,
   })
 
   return { success: true, subscription_id: suscripcion.id }
