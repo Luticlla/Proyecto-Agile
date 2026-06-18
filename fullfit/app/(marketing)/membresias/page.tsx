@@ -1,5 +1,5 @@
 import React from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { createAnonServerClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Container from '@/components/layout/Container'
 import { Button } from '@/components/ui/button'
@@ -13,10 +13,7 @@ export const metadata = {
 }
 
 async function getPlanes() {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  const supabase = createAnonServerClient()
 
   const { data, error } = await supabase
     .from('planes_membresia')

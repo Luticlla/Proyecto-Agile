@@ -1,5 +1,5 @@
 import React from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { createAnonServerClient } from '@/lib/supabase/server'
 import Container from '@/components/layout/Container'
 import SedesClient from '@/components/features/sedes/SedesClient'
 
@@ -8,12 +8,8 @@ export const metadata = {
   description: 'Encuentra tu Full Forma más cercano. Múltiples sedes en Trujillo con equipamiento de primera.',
 }
 
-// Server-side data fetching
 async function getSedes() {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  const supabase = createAnonServerClient()
 
   const { data, error } = await supabase
     .from('sedes')

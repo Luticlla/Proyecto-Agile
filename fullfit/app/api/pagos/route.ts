@@ -1,25 +1,12 @@
-import { MercadoPagoConfig, Preference } from 'mercadopago'
-import { createServerClient } from '@supabase/ssr'
+import { Preference } from 'mercadopago'
 import { NextRequest, NextResponse } from 'next/server'
-
-const client = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN!,
-})
+import { getMercadoPagoClient } from '@/lib/mercadopago'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll()
-          },
-          setAll() {},
-        },
-      }
-    )
+    let supabaseResponse = NextResponse.next({ request })
+    const supabase = createServerSupabaseClient(request, supabaseResponse)
 
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
@@ -81,6 +68,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const client = getMercadoPagoClient()
     const preference = new Preference(client)
     const result = await preference.create({
       body: {

@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Loader2, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase/client'
+import { buscarEmailPorDni } from '@/lib/supabase/queries/auth'
 
 function LoginForm() {
   const { signIn } = useAuth()
@@ -39,16 +39,15 @@ function LoginForm() {
         return
       }
       
-      // Buscar email por DNI usando función RPC segura
-      const { data: emailData, error: rpcError } = await supabase.rpc('get_email_by_dni' as never, { p_dni: email } as never)
-      
-      if (rpcError || !emailData) {
+      const emailFromDni = await buscarEmailPorDni(email)
+
+      if (!emailFromDni) {
         setError('DNI no encontrado')
         setLoading(false)
         return
       }
-      
-      loginEmail = emailData as string
+
+      loginEmail = emailFromDni
     }
 
     const { error } = await signIn(loginEmail, password)

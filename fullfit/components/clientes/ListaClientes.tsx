@@ -1,16 +1,11 @@
 'use client'
 
-import { ProfileWithEmail } from '@/lib/supabase/types'
+import type { ClienteConMembresia } from '@/lib/supabase/queries/clientes.types'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Eye, Edit } from 'lucide-react'
 import Link from 'next/link'
-
-type ClienteConMembresia = ProfileWithEmail & {
-  membresia_estado?: string
-  membresia_fecha_fin?: string
-}
 
 type ListaClientesProps = {
   clientes: ClienteConMembresia[]

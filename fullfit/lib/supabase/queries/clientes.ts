@@ -1,77 +1,67 @@
 import { supabase } from '../client'
 import type { ProfileUpdate, ProfileWithEmail } from '../types'
+import type { ClienteFilters, ClienteListResult, ClienteConMembresia } from './clientes.types'
+import { addEmail, enrichConMembresia, applyBusquedaFilter } from './clientes.transformations'
 
-export type EstadoSuscripcion = 'todos' | 'activos' | 'vencidos' | 'sin_membresia'
+export type { EstadoSuscripcion, ClienteFilters, ClienteListResult, ClienteConMembresia } from './clientes.types'
 
-export type ClienteFilters = {
+const MIEMBRO_ROLE_ID = 3
+
+function buildBaseQuery(filtros: {
   busqueda?: string
   activo?: boolean
-  rol_id?: number
-  estado_suscripcion?: EstadoSuscripcion
-  page?: number
-  limit?: number
-}
+  rol_id: number
+  idsExcluidos?: string[]
+  idsIncluidos?: string[]
+}) {
+  const { busqueda, activo, rol_id, idsExcluidos, idsIncluidos } = filtros
 
-export type ClienteListResult = {
-  data: ProfileWithEmail[]
-  count: number
-  page: number
-  totalPages: number
-}
+  let query = supabase
+    .from('profiles')
+    .select('*', { count: 'exact' })
+    .eq('rol_id', rol_id)
 
-type ClienteConMembresia = ProfileWithEmail & {
-  membresia_estado?: string
-  membresia_fecha_fin?: string
-}
-
-function addEmail(profile: Record<string, unknown>): ProfileWithEmail {
-  return {
-    id: profile.id as string,
-    rol_id: profile.rol_id as number,
-    nombre: profile.nombre as string,
-    apellido: profile.apellido as string,
-    dni: profile.dni as string | null,
-    email: (profile.email as string) || '',
-    telefono: profile.telefono as string | null,
-    fecha_nacimiento: profile.fecha_nacimiento as string | null,
-    genero: profile.genero as string | null,
-    activo: profile.activo as boolean,
-    creado_en: profile.creado_en as string,
-    actualizado_en: profile.actualizado_en as string
-  }
-}
-
-async function enrichConMembresia(clientes: ProfileWithEmail[]): Promise<ClienteConMembresia[]> {
-  if (clientes.length === 0) return []
-
-  const ids = clientes.map(c => c.id)
-  const hoy = new Date().toISOString().split('T')[0]
-
-  const { data: suscripciones } = await supabase
-    .from('suscripciones')
-    .select('usuario_id, estado, fecha_fin')
-    .in('usuario_id', ids)
-    .order('fecha_fin', { ascending: false })
-
-  const membresiaMap = new Map<string, { estado: string; fecha_fin: string }>()
-  for (const sub of (suscripciones || []) as { usuario_id: string; estado: string; fecha_fin: string }[]) {
-    if (!membresiaMap.has(sub.usuario_id)) {
-      let estadoVisual = sub.estado
-      if (sub.estado === 'activa' && sub.fecha_fin < hoy) {
-        estadoVisual = 'vencida'
-      }
-      membresiaMap.set(sub.usuario_id, { estado: estadoVisual, fecha_fin: sub.fecha_fin })
-    }
+  if (idsIncluidos && idsIncluidos.length > 0) {
+    query = query.in('id', idsIncluidos)
+  } else if (idsExcluidos && idsExcluidos.length > 0) {
+    query = query.not('id', 'in', `(${idsExcluidos.join(',')})`)
   }
 
-  return clientes.map(c => {
-    const membresia = membresiaMap.get(c.id)
-    return {
-      ...c,
-      membresia_estado: membresia?.estado,
-      membresia_fecha_fin: membresia?.fecha_fin,
-    }
-  })
+  if (busqueda) {
+    query = applyBusquedaFilter(query, busqueda)
+  }
+
+  if (activo !== undefined) {
+    query = query.eq('activo', activo)
+  }
+
+  return query
+}
+
+function paginateAndEnrich(
+  data: Record<string, unknown>[],
+  count: number | null,
+  page: number,
+  limit: number,
+  enriquecer = true
+): Promise<ClienteListResult> {
+  const clientes = (data || []).map(addEmail)
+
+  if (!enriquecer) {
+    return Promise.resolve({
+      data: clientes,
+      count: count || 0,
+      page,
+      totalPages: Math.ceil((count || 0) / limit)
+    })
+  }
+
+  return enrichConMembresia(clientes).then(clientesEnriquecidos => ({
+    data: clientesEnriquecidos,
+    count: count || 0,
+    page,
+    totalPages: Math.ceil((count || 0) / limit)
+  }))
 }
 
 export async function buscarClientes(busqueda: string): Promise<ProfileWithEmail[]> {
@@ -120,11 +110,10 @@ export async function actualizarCliente(id: string, datos: ProfileUpdate): Promi
 }
 
 export async function listarClientes(filtros: ClienteFilters = {}): Promise<ClienteListResult> {
-  const { busqueda, activo, rol_id = 3, estado_suscripcion = 'todos', page = 1, limit = 10 } = filtros
+  const { busqueda, activo, rol_id = MIEMBRO_ROLE_ID, estado_suscripcion = 'todos', page = 1, limit = 10 } = filtros
   const from = (page - 1) * limit
   const to = from + limit - 1
 
-  // Para filtros de membresía, necesitamos un approach diferente
   if (estado_suscripcion === 'sin_membresia') {
     return listarClientesSinMembresia({ busqueda, activo, rol_id, page, limit })
   }
@@ -133,38 +122,15 @@ export async function listarClientes(filtros: ClienteFilters = {}): Promise<Clie
     return listarClientesPorEstadoMembresia({ busqueda, activo, rol_id, estado_suscripcion, page, limit })
   }
 
-  // Query original para 'todos'
-  let query = supabase
-    .from('profiles')
-    .select('*', { count: 'exact' })
-    .eq('rol_id', rol_id)
-
-  if (busqueda) {
-    query = query.or(`nombre.ilike.%${busqueda}%,apellido.ilike.%${busqueda}%,dni.eq.${busqueda},telefono.ilike.%${busqueda}%`)
-  }
-
-  if (activo !== undefined) {
-    query = query.eq('activo', activo)
-  }
-
-  const { data, count, error } = await query
-    .order('nombre')
-    .range(from, to)
+  const query = buildBaseQuery({ busqueda, activo, rol_id })
+  const { data, count, error } = await query.order('nombre').range(from, to)
 
   if (error) {
     console.error('Error listando clientes:', error)
     return { data: [], count: 0, page, totalPages: 0 }
   }
 
-  const clientes = (data || []).map(addEmail)
-  const clientesEnriquecidos = await enrichConMembresia(clientes)
-
-  return {
-    data: clientesEnriquecidos,
-    count: count || 0,
-    page,
-    totalPages: Math.ceil((count || 0) / limit)
-  }
+  return paginateAndEnrich(data, count, page, limit)
 }
 
 async function listarClientesSinMembresia(filtros: {
@@ -174,11 +140,10 @@ async function listarClientesSinMembresia(filtros: {
   page: number
   limit: number
 }): Promise<ClienteListResult> {
-  const { busqueda, activo, rol_id = 3, page, limit } = filtros
+  const { busqueda, activo, rol_id = MIEMBRO_ROLE_ID, page, limit } = filtros
   const from = (page - 1) * limit
   const to = from + limit - 1
 
-  // Primero obtenemos los IDs de clientes CON membresía
   const { data: clientesConMembresia } = await supabase
     .from('suscripciones')
     .select('usuario_id')
@@ -186,41 +151,21 @@ async function listarClientesSinMembresia(filtros: {
   const idsConMembresia = (clientesConMembresia || []).map((s: { usuario_id: string }) => s.usuario_id)
   const idsUnicos = [...new Set(idsConMembresia)]
 
-  let query = supabase
-    .from('profiles')
-    .select('*', { count: 'exact' })
-    .eq('rol_id', rol_id)
+  const query = buildBaseQuery({
+    busqueda,
+    activo,
+    rol_id,
+    idsExcluidos: idsUnicos.length > 0 ? idsUnicos : undefined
+  })
 
-  if (idsUnicos.length > 0) {
-    query = query.not('id', 'in', `(${idsUnicos.join(',')})`)
-  }
-
-  if (busqueda) {
-    query = query.or(`nombre.ilike.%${busqueda}%,apellido.ilike.%${busqueda}%,dni.eq.${busqueda},telefono.ilike.%${busqueda}%`)
-  }
-
-  if (activo !== undefined) {
-    query = query.eq('activo', activo)
-  }
-
-  const { data, count, error } = await query
-    .order('nombre')
-    .range(from, to)
+  const { data, count, error } = await query.order('nombre').range(from, to)
 
   if (error) {
     console.error('Error listando clientes sin membresía:', error)
     return { data: [], count: 0, page, totalPages: 0 }
   }
 
-  const clientes = (data || []).map(addEmail)
-  const clientesEnriquecidos = await enrichConMembresia(clientes)
-
-  return {
-    data: clientesEnriquecidos,
-    count: count || 0,
-    page,
-    totalPages: Math.ceil((count || 0) / limit)
-  }
+  return paginateAndEnrich(data, count, page, limit)
 }
 
 async function listarClientesPorEstadoMembresia(filtros: {
@@ -231,7 +176,7 @@ async function listarClientesPorEstadoMembresia(filtros: {
   page: number
   limit: number
 }): Promise<ClienteListResult> {
-  const { busqueda, activo, rol_id = 3, estado_suscripcion, page, limit } = filtros
+  const { busqueda, activo, rol_id = MIEMBRO_ROLE_ID, estado_suscripcion, page, limit } = filtros
   const from = (page - 1) * limit
   const to = from + limit - 1
 
@@ -256,38 +201,21 @@ async function listarClientesPorEstadoMembresia(filtros: {
     return { data: [], count: 0, page, totalPages: 0 }
   }
 
-  let query = supabase
-    .from('profiles')
-    .select('*', { count: 'exact' })
-    .eq('rol_id', rol_id)
-    .in('id', idsUnicos)
+  const query = buildBaseQuery({
+    busqueda,
+    activo,
+    rol_id,
+    idsIncluidos: idsUnicos
+  })
 
-  if (busqueda) {
-    query = query.or(`nombre.ilike.%${busqueda}%,apellido.ilike.%${busqueda}%,dni.eq.${busqueda},telefono.ilike.%${busqueda}%`)
-  }
-
-  if (activo !== undefined) {
-    query = query.eq('activo', activo)
-  }
-
-  const { data, count, error } = await query
-    .order('nombre')
-    .range(from, to)
+  const { data, count, error } = await query.order('nombre').range(from, to)
 
   if (error) {
     console.error('Error listando clientes por estado membresía:', error)
     return { data: [], count: 0, page, totalPages: 0 }
   }
 
-  const clientes = (data || []).map(addEmail)
-  const clientesEnriquecidos = await enrichConMembresia(clientes)
-
-  return {
-    data: clientesEnriquecidos,
-    count: count || 0,
-    page,
-    totalPages: Math.ceil((count || 0) / limit)
-  }
+  return paginateAndEnrich(data, count, page, limit)
 }
 
 export async function contarClientesPorEstado(): Promise<{
@@ -299,12 +227,12 @@ export async function contarClientesPorEstado(): Promise<{
     supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true })
-      .eq('rol_id', 3)
+      .eq('rol_id', MIEMBRO_ROLE_ID)
       .eq('activo', true),
     supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true })
-      .eq('rol_id', 3)
+      .eq('rol_id', MIEMBRO_ROLE_ID)
       .eq('activo', false)
   ])
 
