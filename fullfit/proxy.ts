@@ -29,32 +29,62 @@ export async function proxy(request: NextRequest) {
     }
   )
 
+  // Obtener usuario una sola vez
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Protected routes that require authentication
-  const protectedRoutes = ['/pasarelapago']
-  const isProtectedRoute = protectedRoutes.some(route => 
-    request.nextUrl.pathname.startsWith(route)
-  )
+  const pathname = request.nextUrl.pathname
 
-  // Auth routes that should redirect to home if already logged in
-  const authRoutes = ['/login', '/register']
-  const isAuthRoute = authRoutes.some(route => 
-    request.nextUrl.pathname.startsWith(route)
-  )
+  // Obtener profile UNA sola vez si hay usuario (reutilizar en todas las condiciones)
+  let profile: { rol_id: number } | null = null
+  if (user) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('rol_id')
+      .eq('id', user.id)
+      .single()
+    profile = data
+  }
 
-  if (isProtectedRoute && !user) {
+  const isRecepcionista = profile && (profile.rol_id === 1 || profile.rol_id === 2)
+
+  // 1. Proteger rutas de recepcionista
+  if (pathname.startsWith('/recepcionista')) {
+    if (!user) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      url.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(url)
+    }
+    if (!isRecepcionista) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/'
+      return NextResponse.redirect(url)
+    }
+    return supabaseResponse
+  }
+
+  // 2. Proteger rutas que requieren auth (excepto returns de MercadoPago)
+  if (pathname.startsWith('/pasarelapago') && !user) {
+    const hasStatusParam = request.nextUrl.searchParams.has('status')
+    if (hasStatusParam) {
+      return supabaseResponse
+    }
+    return NextResponse.redirect(new URL('/membresias', request.url))
+  }
+
+  // 3. Redirect de auth pages si ya está logueado
+  if ((pathname === '/login' || pathname === '/register') && user) {
     const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    url.searchParams.set('redirect', request.nextUrl.pathname)
+    url.pathname = isRecepcionista ? '/recepcionista' : '/'
     return NextResponse.redirect(url)
   }
 
-  if (isAuthRoute && user) {
+  // 4. Redirect recepcionistas desde la página principal
+  if (pathname === '/' && user && isRecepcionista) {
     const url = request.nextUrl.clone()
-    url.pathname = '/'
+    url.pathname = '/recepcionista'
     return NextResponse.redirect(url)
   }
 
@@ -63,6 +93,10 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/recepcionista/:path*',
+    '/pasarelapago/:path*',
+    '/login',
+    '/register',
+    '/',
   ],
 }

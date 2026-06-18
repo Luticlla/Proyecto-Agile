@@ -2,10 +2,23 @@ export { supabase } from './supabase/client'
 export type {
   Database,
   Profile,
-  PlanMembresia,
-  Suscripcion,
-  Pago,
-  Sede,
+  ProfileInsert,
+  ProfileUpdate,
   Rol,
-  RolNombre
+  RolNombre,
+  PlanMembresia,
+  PlanMembresiaInsert,
+  Suscripcion,
+  SuscripcionInsert,
+  Pago,
+  PagoInsert,
+  Acceso,
+  AccesoInsert,
+  Notificacion,
+  NotificacionInsert,
+  Auditoria,
+  AuditoriaInsert,
+  Sede,
+  SedeInsert,
+  SedeUpdate
 } from './supabase/types'

@@ -16,6 +16,7 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
+    dni: '',
     email: '',
     telefono: '',
     password: '',
@@ -45,12 +46,18 @@ export default function RegisterPage() {
       return
     }
 
+    if (!/^\d{8}$/.test(formData.dni)) {
+      setError('El DNI debe tener exactamente 8 dígitos')
+      return
+    }
+
     setLoading(true)
 
     const { error } = await signUp(formData.email, formData.password, {
       nombre: formData.nombre,
       apellido: formData.apellido,
-      telefono: formData.telefono
+      telefono: formData.telefono,
+      dni: formData.dni
     })
     
     if (error) {
@@ -108,6 +115,21 @@ export default function RegisterPage() {
                   className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="dni" className="text-sm text-zinc-300">DNI</label>
+              <Input
+                id="dni"
+                name="dni"
+                value={formData.dni}
+                onChange={handleChange}
+                placeholder="12345678"
+                required
+                maxLength={8}
+                pattern="[0-9]{8}"
+                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
+              />
             </div>
 
             <div className="space-y-2">

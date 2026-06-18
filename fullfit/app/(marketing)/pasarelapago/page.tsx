@@ -80,11 +80,13 @@ function PasarelaPagoContent() {
   const [planLoading, setPlanLoading] = useState(true)
 
   useEffect(() => {
-    if (!loading && !user) {
+    let isMounted = true
+    if (!loading && !user && !status && isMounted) {
       const currentPath = window.location.pathname + window.location.search
       router.replace(`/login?redirect=${encodeURIComponent(currentPath)}`)
     }
-  }, [user, loading, router])
+    return () => { isMounted = false }
+  }, [user, loading, router, status])
 
   useEffect(() => {
     document.title = 'Pasarela de Pago | Full Forma'
@@ -97,11 +99,7 @@ function PasarelaPagoContent() {
     }
 
     const fetchPlan = async () => {
-      const { createClient } = await import('@supabase/supabase-js')
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      )
+      const { supabase } = await import('@/lib/supabase/client')
       const { data } = await supabase
         .from('planes_membresia')
         .select('*')
@@ -147,8 +145,6 @@ function PasarelaPagoContent() {
     )
   }
 
-  if (!user) return null
-
   if (status) {
     return (
       <main className="min-h-screen bg-black">
@@ -158,6 +154,8 @@ function PasarelaPagoContent() {
       </main>
     )
   }
+
+  if (!user) return null
 
   if (!plan) {
     return (

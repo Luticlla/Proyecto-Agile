@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Loader2, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { supabase } from '@/lib/supabase/client'
 
 function LoginForm() {
   const { signIn } = useAuth()
@@ -20,18 +21,47 @@ function LoginForm() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const isEmail = (input: string) => input.includes('@')
+  const isDNI = (input: string) => /^\d{8}$/.test(input)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
 
-    const { error } = await signIn(email, password)
+    let loginEmail = email
+
+    // Si no es email, buscar por DNI
+    if (!isEmail(email)) {
+      if (!isDNI(email)) {
+        setError('Ingrese un email válido o DNI de 8 dígitos')
+        setLoading(false)
+        return
+      }
+      
+      // Buscar email por DNI usando función RPC segura
+      const { data: emailData, error: rpcError } = await supabase.rpc('get_email_by_dni' as never, { p_dni: email } as never)
+      
+      if (rpcError || !emailData) {
+        setError('DNI no encontrado')
+        setLoading(false)
+        return
+      }
+      
+      loginEmail = emailData as string
+    }
+
+    const { error } = await signIn(loginEmail, password)
     
     if (error) {
       setError(error.message)
       setLoading(false)
     } else {
-      router.push(redirectTo || '/')
+      if (redirectTo) {
+        router.replace(redirectTo)
+        return
+      }
+      router.replace('/')
     }
   }
 
@@ -57,13 +87,13 @@ function LoginForm() {
             )}
             
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm text-zinc-300">Email</label>
+              <label htmlFor="email" className="text-sm text-zinc-300">Email o DNI</label>
               <Input
                 id="email"
-                type="email"
+                type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu@email.com"
+                placeholder="tu@email.com o 12345678"
                 required
                 className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
               />

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react'
+import { useState, useEffect, createContext, useContext, ReactNode, useRef } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import type { Profile } from '@/lib/supabase/types'
 import type { User, Session } from '@supabase/supabase-js'
@@ -11,7 +11,7 @@ type AuthContextType = {
   profile: Profile | null
   loading: boolean
   isRecovery: boolean
-  signUp: (email: string, password: string, metadata: { nombre: string; apellido: string; telefono?: string }) => Promise<{ error: Error | null }>
+  signUp: (email: string, password: string, metadata: { nombre: string; apellido: string; telefono?: string; dni?: string }) => Promise<{ error: Error | null }>
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<{ error: Error | null }>
@@ -27,8 +27,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [isRecovery, setIsRecovery] = useState(false)
+  const lastFetchedUserId = useRef<string | null>(null)
 
   const fetchProfile = async (userId: string) => {
+    // Evitar fetch duplicado para el mismo usuario
+    if (lastFetchedUserId.current === userId && profile) {
+      return profile
+    }
+
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -39,37 +45,74 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Error fetching profile:', error)
       return null
     }
+
+    lastFetchedUserId.current = userId
     return data as Profile
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      if (session?.user) {
-        fetchProfile(session.user.id).then(setProfile)
-      }
-      setLoading(false)
-    })
+    let isMounted = true
+
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        if (!isMounted) return
+        setSession(session)
+        setUser(session?.user ?? null)
+        setLoading(false)
+        if (session?.user) {
+          fetchProfile(session.user.id).then(profileData => {
+            if (isMounted) setProfile(profileData)
+          })
+        }
+      })
+      .catch(() => {
+        if (!isMounted) return
+        setLoading(false)
+      })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
+      setLoading(false)
+
       if (event === 'PASSWORD_RECOVERY') {
         setIsRecovery(true)
       }
+
       if (session?.user) {
-        fetchProfile(session.user.id).then(setProfile)
+        if (session.user.id !== lastFetchedUserId.current) {
+          fetchProfile(session.user.id).then(profileData => setProfile(profileData))
+        }
       } else {
         setProfile(null)
+        lastFetchedUserId.current = null
       }
-      setLoading(false)
     })
 
-    return () => subscription.unsubscribe()
+    const handlePageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (!isMounted) return
+          setSession(session)
+          setUser(session?.user ?? null)
+          if (session?.user) {
+            fetchProfile(session.user.id).then(profileData => {
+              if (isMounted) setProfile(profileData)
+            })
+          }
+        })
+      }
+    }
+    window.addEventListener('pageshow', handlePageShow)
+
+    return () => {
+      isMounted = false
+      subscription.unsubscribe()
+      window.removeEventListener('pageshow', handlePageShow)
+    }
   }, [])
 
-  const signUp = async (email: string, password: string, metadata: { nombre: string; apellido: string; telefono?: string }) => {
+  const signUp = async (email: string, password: string, metadata: { nombre: string; apellido: string; telefono?: string; dni?: string }) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -107,10 +150,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut()
     setProfile(null)
     setIsRecovery(false)
+    lastFetchedUserId.current = null
   }
 
   const refreshProfile = async () => {
     if (user) {
+      lastFetchedUserId.current = null // Forzar refresh
       const profileData = await fetchProfile(user.id)
       setProfile(profileData)
     }
