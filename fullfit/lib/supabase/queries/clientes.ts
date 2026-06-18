@@ -19,6 +19,11 @@ export type ClienteListResult = {
   totalPages: number
 }
 
+type ClienteConMembresia = ProfileWithEmail & {
+  membresia_estado?: string
+  membresia_fecha_fin?: string
+}
+
 function addEmail(profile: Record<string, unknown>): ProfileWithEmail {
   return {
     id: profile.id as string,
@@ -34,6 +39,39 @@ function addEmail(profile: Record<string, unknown>): ProfileWithEmail {
     creado_en: profile.creado_en as string,
     actualizado_en: profile.actualizado_en as string
   }
+}
+
+async function enrichConMembresia(clientes: ProfileWithEmail[]): Promise<ClienteConMembresia[]> {
+  if (clientes.length === 0) return []
+
+  const ids = clientes.map(c => c.id)
+  const hoy = new Date().toISOString().split('T')[0]
+
+  const { data: suscripciones } = await supabase
+    .from('suscripciones')
+    .select('usuario_id, estado, fecha_fin')
+    .in('usuario_id', ids)
+    .order('fecha_fin', { ascending: false })
+
+  const membresiaMap = new Map<string, { estado: string; fecha_fin: string }>()
+  for (const sub of (suscripciones || []) as { usuario_id: string; estado: string; fecha_fin: string }[]) {
+    if (!membresiaMap.has(sub.usuario_id)) {
+      let estadoVisual = sub.estado
+      if (sub.estado === 'activa' && sub.fecha_fin < hoy) {
+        estadoVisual = 'vencida'
+      }
+      membresiaMap.set(sub.usuario_id, { estado: estadoVisual, fecha_fin: sub.fecha_fin })
+    }
+  }
+
+  return clientes.map(c => {
+    const membresia = membresiaMap.get(c.id)
+    return {
+      ...c,
+      membresia_estado: membresia?.estado,
+      membresia_fecha_fin: membresia?.fecha_fin,
+    }
+  })
 }
 
 export async function buscarClientes(busqueda: string): Promise<ProfileWithEmail[]> {
@@ -118,8 +156,11 @@ export async function listarClientes(filtros: ClienteFilters = {}): Promise<Clie
     return { data: [], count: 0, page, totalPages: 0 }
   }
 
+  const clientes = (data || []).map(addEmail)
+  const clientesEnriquecidos = await enrichConMembresia(clientes)
+
   return {
-    data: (data || []).map(addEmail),
+    data: clientesEnriquecidos,
     count: count || 0,
     page,
     totalPages: Math.ceil((count || 0) / limit)
@@ -171,8 +212,11 @@ async function listarClientesSinMembresia(filtros: {
     return { data: [], count: 0, page, totalPages: 0 }
   }
 
+  const clientes = (data || []).map(addEmail)
+  const clientesEnriquecidos = await enrichConMembresia(clientes)
+
   return {
-    data: (data || []).map(addEmail),
+    data: clientesEnriquecidos,
     count: count || 0,
     page,
     totalPages: Math.ceil((count || 0) / limit)
@@ -235,8 +279,11 @@ async function listarClientesPorEstadoMembresia(filtros: {
     return { data: [], count: 0, page, totalPages: 0 }
   }
 
+  const clientes = (data || []).map(addEmail)
+  const clientesEnriquecidos = await enrichConMembresia(clientes)
+
   return {
-    data: (data || []).map(addEmail),
+    data: clientesEnriquecidos,
     count: count || 0,
     page,
     totalPages: Math.ceil((count || 0) / limit)

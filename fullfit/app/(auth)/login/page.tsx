@@ -61,7 +61,7 @@ function LoginForm() {
         router.replace(redirectTo)
         return
       }
-      router.replace('/')
+      window.location.href = '/'
     }
   }
 
