@@ -166,19 +166,25 @@ function PasarelaPagoContent() {
 
   // Verificar el pago cuando regresa de MercadoPago con status=approved y payment_id
   useEffect(() => {
+    console.log('[PASARELA] useEffect verificación - status:', status, 'paymentId:', paymentId, 'verificationResult:', verificationResult)
     if (status === 'approved' && paymentId && !verificationResult) {
+      console.log('[PASARELA] Condiciones cumplidas. Llamando a /api/pagos/verificar...')
       const verificarPago = async () => {
         setVerificationLoading(true)
         try {
+          console.log('[PASARELA] Enviando POST a /api/pagos/verificar con payment_id:', paymentId)
           const response = await fetch('/api/pagos/verificar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ payment_id: paymentId }),
           })
 
+          console.log('[PASARELA] Respuesta HTTP:', response.status, response.statusText)
           const data = await response.json()
+          console.log('[PASARELA] Body de respuesta:', data)
           setVerificationResult(data)
         } catch (error) {
+          console.error('[PASARELA] Error en fetch de verificación:', error)
           setVerificationResult({ success: false, error: 'Error al verificar el pago' })
         } finally {
           setVerificationLoading(false)
@@ -186,6 +192,8 @@ function PasarelaPagoContent() {
       }
 
       verificarPago()
+    } else {
+      console.log('[PASARELA] Condiciones NO cumplidas. No se llama al endpoint.')
     }
   }, [status, paymentId, verificationResult])
 

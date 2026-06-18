@@ -16,76 +16,106 @@ function formatearFecha(date: Date): string {
 }
 
 export async function POST(request: NextRequest) {
+  console.log('=== VERIFICAR PAGO: INICIO ===')
+
   try {
     const { payment_id } = await request.json()
+    console.log('1. payment_id recibido:', payment_id)
 
     if (!payment_id) {
+      console.log('1a. ERROR: payment_id es null/undefined')
       return NextResponse.json(
         { error: 'payment_id es requerido' },
         { status: 400 }
       )
     }
 
+    console.log('2. Consultando MercadoPago API...')
     const payment = await new Payment(client).get({ id: String(payment_id) })
+    console.log('2a. MercadoPago response:', {
+      id: payment.id,
+      status: payment.status,
+      status_detail: payment.status_detail,
+      transaction_amount: payment.transaction_amount,
+      metadata: payment.metadata,
+    })
 
     if (payment.status !== 'approved') {
+      console.log('2b. Pago NO aprobado. Status:', payment.status)
       return NextResponse.json(
         { error: 'Pago no aprobado', status: payment.status },
         { status: 400 }
       )
     }
 
-    const { data: existingPago } = await supabaseAdmin
+    console.log('3. Pago aprobado. Verificando si ya fue procesado...')
+    const { data: existingPago, error: existingError } = await supabaseAdmin
       .from('pagos')
       .select('id')
       .eq('referencia', String(payment.id))
       .maybeSingle()
 
+    console.log('3a. Resultado deduplicación:', { existingPago, existingError })
+
     if (existingPago) {
+      console.log('3b. Pago YA procesado. ID:', existingPago.id)
       return NextResponse.json({ success: true, message: 'Already processed' })
     }
 
     const metadata = payment.metadata as Record<string, string> | undefined
+    console.log('4. Metadata del pago:', metadata)
+
     if (!metadata?.user_id || !metadata?.plan_id) {
-      console.error('Missing metadata in payment:', payment.id)
+      console.error('4a. ERROR: Metadata incompleta. user_id:', metadata?.user_id, 'plan_id:', metadata?.plan_id)
       return NextResponse.json({ error: 'Invalid metadata' }, { status: 400 })
     }
 
     const userId = metadata.user_id
     const planId = Number(metadata.plan_id)
+    console.log('4b. userId:', userId, 'planId:', planId)
 
-    const { data: perfil } = await supabaseAdmin
+    console.log('5. Buscando perfil del usuario...')
+    const { data: perfil, error: perfilError } = await supabaseAdmin
       .from('profiles')
       .select('id')
       .eq('id', userId)
       .maybeSingle()
 
+    console.log('5a. Resultado perfil:', { perfil, perfilError })
+
     if (!perfil) {
-      console.error('User not found:', userId)
+      console.error('5b. ERROR: Usuario no encontrado en profiles:', userId)
       return NextResponse.json({ error: 'User not found' }, { status: 400 })
     }
 
-    const { data: plan } = await supabaseAdmin
+    console.log('6. Buscando plan de membresía...')
+    const { data: plan, error: planError } = await supabaseAdmin
       .from('planes_membresia')
       .select('*')
       .eq('id', planId)
       .eq('activo', true)
       .maybeSingle()
 
+    console.log('6a. Resultado plan:', { plan, planError })
+
     if (!plan) {
-      console.error('Plan not found or inactive:', planId)
+      console.error('6b. ERROR: Plan no encontrado o inactivo:', planId)
       return NextResponse.json({ error: 'Plan not found' }, { status: 400 })
     }
 
-    const { data: membresiaActiva } = await supabaseAdmin
+    console.log('7. Verificando membresía activa existente...')
+    const { data: membresiaActiva, error: membresiaError } = await supabaseAdmin
       .from('suscripciones')
       .select('id')
       .eq('usuario_id', userId)
       .eq('estado', 'activa')
       .maybeSingle()
 
+    console.log('7a. Membresía activa:', { membresiaActiva, membresiaError })
+
     if (membresiaActiva) {
-      await supabaseAdmin.from('pagos').insert({
+      console.log('7b. Usuario YA tiene membresía activa. Registrando pago sin suscripción...')
+      const { error: pagoExistenteError } = await supabaseAdmin.from('pagos').insert({
         suscripcion_id: null,
         usuario_id: userId,
         monto: payment.transaction_amount || 0,
@@ -95,6 +125,7 @@ export async function POST(request: NextRequest) {
         observaciones: 'Ya posee membresía activa - pago registrado sin suscripción',
         registrado_por: userId,
       })
+      console.log('7c. Resultado insert pago existente:', { pagoExistenteError })
       return NextResponse.json({ success: true, message: 'Active membership exists' })
     }
 
@@ -111,6 +142,14 @@ export async function POST(request: NextRequest) {
       fechaFin.setDate(fechaFin.getDate() + plan.duracion_dias)
     }
 
+    console.log('8. Creando suscripción...', {
+      userId,
+      planId: plan.id,
+      fechaInicio: formatearFecha(fechaInicio),
+      fechaFin: formatearFecha(fechaFin),
+      diasRestantes,
+    })
+
     const { data: suscripcion, error: subError } = await supabaseAdmin
       .from('suscripciones')
       .insert({
@@ -124,11 +163,14 @@ export async function POST(request: NextRequest) {
       .select('id')
       .single()
 
+    console.log('8a. Resultado insert suscripción:', { suscripcion, subError })
+
     if (subError) {
-      console.error('Error creating subscription:', subError)
+      console.error('8b. ERROR creando suscripción:', subError)
       return NextResponse.json({ error: 'Failed to create subscription' }, { status: 500 })
     }
 
+    console.log('9. Creando registro de pago...')
     const { error: pagoError } = await supabaseAdmin.from('pagos').insert({
       suscripcion_id: suscripcion.id,
       usuario_id: userId,
@@ -140,25 +182,31 @@ export async function POST(request: NextRequest) {
       registrado_por: userId,
     })
 
+    console.log('9a. Resultado insert pago:', { pagoError })
+
     if (pagoError) {
-      console.error('Error creating payment record:', pagoError)
+      console.error('9b. ERROR creando pago:', pagoError)
     }
 
     const mensaje = diasRestantes > 0
       ? `Tu membresía ${plan.nombre} está activa hasta el ${formatearFecha(fechaFin)} (${diasRestantes} días de tu membresía anterior fueron acumulados).`
       : `Tu membresía ${plan.nombre} está activa hasta el ${formatearFecha(fechaFin)}.`
 
-    await supabaseAdmin.from('notificaciones').insert({
+    console.log('10. Creando notificación...')
+    const { error: notifError } = await supabaseAdmin.from('notificaciones').insert({
       usuario_id: userId,
       tipo: 'bienvenida',
       titulo: '¡Membresía activada!',
       mensaje,
     })
 
+    console.log('10a. Resultado insert notificación:', { notifError })
+
+    console.log('=== VERIFICAR PAGO: ÉXITO ===')
     return NextResponse.json({ success: true, subscription_id: suscripcion.id })
 
   } catch (error) {
-    console.error('Verificación de pago error:', error)
+    console.error('=== VERIFICAR PAGO: ERROR GENERAL ===', error)
     return NextResponse.json({ error: 'Verification handler failed' }, { status: 500 })
   }
 }
