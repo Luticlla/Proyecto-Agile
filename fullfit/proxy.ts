@@ -62,6 +62,14 @@ export async function proxy(request: NextRequest) {
       url.pathname = '/'
       return NextResponse.redirect(url)
     }
+
+    // Proteger gestión de usuarios (solo admin)
+    if (pathname.startsWith('/recepcionista/usuarios') && profile?.rol_id !== 1) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/recepcionista'
+      return NextResponse.redirect(url)
+    }
+
     return supabaseResponse
   }
 

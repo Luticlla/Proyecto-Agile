@@ -91,6 +91,14 @@ export default function RecepcionistaLayout({
                     Reportes
                   </Button>
                 </Link>
+                {profile.rol_id === 1 && (
+                  <Link href="/recepcionista/usuarios">
+                    <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800">
+                      <Users className="size-4 mr-2" />
+                      Personal
+                    </Button>
+                  </Link>
+                )}
               </nav>
             </div>
             <div className="flex items-center gap-4">
