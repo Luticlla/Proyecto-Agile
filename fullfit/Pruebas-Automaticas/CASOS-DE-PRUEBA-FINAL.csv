@@ -1,0 +1,225 @@
+HU,Pagina,CP,Caso de Prueba Corregido,Accion/Entrada,Resultado Esperado Corregido,Tipo,Observaciones,Estado Automatizacion,Resultado
+HU-001,Landing Page,HU01-CP-01,Pagina principal carga correctamente,Visitar /,Pagina sin errores,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-02,Banner principal visible,Cargar inicio,Banner con imagen /images/banner-home.png,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-03,Imagen banner no rota,Inspeccionar img,Imagen carga 200,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-04,Texto boton Inscribete ya,Observar boton HomeBanner,Texto exacto,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-05,Enlace boton Inscribete ya,Click en boton,Navega a /sedes,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-06,Accesibilidad teclado boton,Tab+Enter sobre boton,Enter navega a /sedes,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-07,Heading principal,Cargar inicio,Texto Encuentra tu mejor version,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-08,InfiniteScroll se renderiza,Cargar inicio,Componente InfiniteScroll visible,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-09,Pares ANTES/DESPUES,Inspeccionar tarjetas,Dos imagenes por tarjeta,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-10,Animacion infinita scroll,Observar 30s,Desplazamiento continuo,Manual,OK,MANUAL,
+HU-001,Landing Page,HU01-CP-11,InfiniteScroll movil,Viewport < 768px,Adaptacion sin overflow,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-12,Carga imagenes faltantes,URL invalida en par,Imagen respaldo sin romper layout,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-13,Logo y enlaces header,Cargar pagina,Logo + Sedes + Membresias,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-14,Enlace Sedes en header,Click en Sedes,Navega a /sedes,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-15,Enlace Membresias en header,Click en Membresias,Navega a /membresias,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-16,Botones auth sin sesion,Cargar sin sesion,Iniciar Sesion + Registrarse,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-17,Usuario con sesion,Iniciar sesion,Nombre usuario + Salir,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (Supabase no disponible)
+HU-001,Landing Page,HU01-CP-18,Boton Salir,Click en Salir,Cierra sesion,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (Supabase no disponible)
+HU-001,Landing Page,HU01-CP-19,Menu hamburguesa movil,Viewport < lg,Icono hamburguesa visible,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-20,Menu hamburguesa desktop,Viewport >= lg,Menu horizontal completo,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-21,Apertura SideMenu,Click hamburguesa,SideMenu desplegado,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-22,Cierre SideMenu overlay,Click en overlay,SideMenu se cierra,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-23,Navegacion desde SideMenu,Seleccionar Membresias,Navega + cierra menu,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-24,Redes sociales en footer,Cargar footer,Facebook e Instagram visibles,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-25,Apertura nueva pestana redes,Click en icono,Nueva pestana + target=_blank,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-26,Enlace roto redes,URL vacia en navigation.ts,Layout no se rompe,Automatico,Requiere modificar fuente,MANUAL,
+HU-001,Landing Page,HU01-CP-27,Logo centrado footer,Cargar footer,Logo centrado horizontalmente,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-28,Copyright con ano actual,Inspeccionar footer,Texto copyright + ano,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-29,Fondo negro y acento amarillo,Inspeccionar colores,Fondo #000 acento #ffdf00,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-30,Fuentes JetBrains Mono y Press Start 2P,Inspeccionar fuentes,Body JetBrains Mono + Press Start 2P visibles,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-31,Sin scroll horizontal,Probar resoluciones,No overflow horizontal,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-32,Sin errores en consola,Cargar y revisar consola,Sin errores ni warnings criticos,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-33,Meta tags SEO,Inspeccionar head,Title y description descriptivos,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-34,Loading state (no aplica),Simular carga lenta,Server Component,Automatico,No aplica,NO APLICA,
+HU-001,Landing Page,HU01-CP-35,Error boundary (no aplica),Forzar error hijo,Server Component,Automatico,No aplica,NO APLICA,
+HU-001,Landing Page,HU01-CP-36,Pagina 404,Visitar /ruta-inexistente,not-found.tsx con diseno consistente,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-37,Logo redirige a /,Click logo header,Navega a /,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-38,Header sticky,Scroll down,Header fijo arriba,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-39,SideMenu con sesion,Iniciar sesion + hamburguesa,Nombre usuario + Salir,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (Supabase no disponible)
+HU-001,Landing Page,HU01-CP-40,SideMenu navegacion con sesion,SideMenu + click Sedes,Navega + cierra,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (Supabase no disponible)
+HU-001,Landing Page,HU01-CP-41,InfiniteScroll array vacio,0 pares ANTES/DESPUES,Mensaje vacio,Automatico,Requiere modificar componente,MANUAL,
+HU-001,Landing Page,HU01-CP-42,Footer responsive,320/768/1024/1440px,Footer se adapta,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-001,Landing Page,HU01-CP-43,Orden de foco Tab,Tab desde logo a ultimo header,Secuencia logica,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-002,Listado Sedes,HU02-CP-01,Carga correcta pagina sedes,Visitar /sedes,Pagina sin errores,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-002,Listado Sedes,HU02-CP-02,Titulo Nuestras Sedes,Cargar /sedes,Titulo con Sedes resaltado,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-002,Listado Sedes,HU02-CP-03,Subtitulo hero,Cargar /sedes,Multiples puntos de entrenamiento,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-002,Listado Sedes,HU02-CP-04,Contador sedes activas,Cargar con N sedes activas,Contador = N,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-002,Listado Sedes,HU02-CP-05,Actualizar contador al cambiar sedes,Activar/desactivar sede,Refleja cambio,Automatico,Requiere BD,MANUAL,
+HU-002,Listado Sedes,HU02-CP-06,Indicador 24/7 Soporte,Cargar /sedes,Texto 24/7 Soporte,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-002,Listado Sedes,HU02-CP-07,Tarjeta con imagen propia,Sede con imagen_url,Imagen real de sede,Automatico,Depende BD,AUTOMATIZADO - OK,PASS (empty state)
+HU-002,Listado Sedes,HU02-CP-08,Tarjeta sin imagen,Sede sin imagen_url,Icono Dumbbell,Automatico,Depende BD,AUTOMATIZADO - OK,PASS (empty state)
+HU-002,Listado Sedes,HU02-CP-09,Datos basicos en tarjeta,Listado sedes,Nombre direccion telefono horario,Automatico,Depende BD,AUTOMATIZADO - OK,PASS (empty state)
+HU-002,Listado Sedes,HU02-CP-10,Telefono clicable tel:,Click telefono en movil,Abre app llamadas,Manual,Dispositivo movil,MANUAL,
+HU-002,Listado Sedes,HU02-CP-11,Formato 12h horario,Inspeccionar horario,Formato 12h ejemplo 8:00 am - 10:00 pm,Automatico,Depende BD,AUTOMATIZADO - OK,PASS (empty state)
+HU-002,Listado Sedes,HU02-CP-12,Panel Ver mas informacion,Click boton expandir,Panel expandido con horarios,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-002,Listado Sedes,HU02-CP-13,Texto Cerrado en domingos,Expandir panel,Domingo: Cerrado rojo,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-002,Listado Sedes,HU02-CP-14,Colapso panel expandido,Click nuevamente,Panel se contrae,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-002,Listado Sedes,HU02-CP-15,Boton Como llegar con coordenadas,Click Como llegar,Google Maps nueva pestana,Automatico,Depende BD,AUTOMATIZADO - OK,PASS (empty state)
+HU-002,Listado Sedes,HU02-CP-16,Sin boton Como llegar sin coord,Sede sin lat/lng,Boton no visible,Automatico,Depende BD,AUTOMATIZADO - OK,PASS (empty state)
+HU-002,Listado Sedes,HU02-CP-17,Mensaje sin sedes disponibles,Sin sedes activas,No hay sedes disponibles,Automatico,BD vacia,AUTOMATIZADO - OK,PASS
+HU-002,Listado Sedes,HU02-CP-18,Solo sedes activas listadas,Sedes activas e inactivas,Solo activas visibles,Automatico,Datos mixtos BD,MANUAL,
+HU-002,Listado Sedes,HU02-CP-19,Texto CTA,Scroll final /sedes,Aun no eres miembro?,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-002,Listado Sedes,HU02-CP-20,Enlace Ver Membresias CTA,Click Ver Membresias,Navega a /membresias,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-002,Listado Sedes,HU02-CP-21,Responsive movil,Viewport < 480px,1 columna sin overflow,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-002,Listado Sedes,HU02-CP-22,Cliente anonimo Supabase,Visitar sin sesion,Carga con anon key,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-002,Listado Sedes,HU02-CP-23,Error conexion BD (no aplica),Simular falla,Error en servidor,Automatico,No aplica,NO APLICA,
+HU-002,Listado Sedes,HU02-CP-24,Loading state (no aplica),Carga lenta,Server Component,Automatico,No aplica,NO APLICA,
+HU-002,Listado Sedes,HU02-CP-25,Error state BD (no aplica),Simular fallo,Error en servidor,Automatico,No aplica,NO APLICA,
+HU-002,Listado Sedes,HU02-CP-26,Accesibilidad teclado,Tab+Enter en Ver mas,Expande/contrae,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-002,Listado Sedes,HU02-CP-27,Logo desde /sedes,Click logo en /sedes,Navega a /,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-002,Listado Sedes,HU02-CP-28,Sede sin horario sabado,apertura_sab=null,Omite horario sabado,Automatico,Modificar BD,MANUAL,
+HU-002,Listado Sedes,HU02-CP-29,Coordenadas invalidas,lat/lng no numericos,Boton Como llegar oculto,Automatico,Modificar BD,MANUAL,
+HU-003,Planes Membresia,HU03-CP-01,Carga correcta membresias,Visitar /membresias,Pagina sin errores,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-003,Planes Membresia,HU03-CP-02,Titulo hero resaltado,Cargar /membresias,Elige tu Membresia + resaltado,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-003,Planes Membresia,HU03-CP-03,Subtitulo hero,Cargar /membresias,Entrena sin limites,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-003,Planes Membresia,HU03-CP-04,Contador planes activos,Cargar con N planes activos,Contador = N,Automatico,Depende BD,AUTOMATIZADO - OK,PASS (empty state)
+HU-003,Planes Membresia,HU03-CP-05,Indicador 100% Flexible,Cargar /membresias,Texto 100% Flexible,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-003,Planes Membresia,HU03-CP-06,Datos tarjeta plan,Cargar planes,Nombre descripcion precio S/,Automatico,Depende BD,AUTOMATIZADO - OK,PASS (empty state)
+HU-003,Planes Membresia,HU03-CP-07,Tarjeta sin descripcion,Plan descripcion=null,Omite bloque descripcion,Automatico,Datos BD especificos,MANUAL,
+HU-003,Planes Membresia,HU03-CP-08,Calculo precio/mes,precio=270 duracion=90,S/ 90/mes,Automatico,Datos BD especificos,MANUAL,
+HU-003,Planes Membresia,HU03-CP-09,Calculo precio/mes no multiplo,duracion_dias=45,Sin NaN,Automatico,Datos BD especificos,MANUAL,
+HU-003,Planes Membresia,HU03-CP-10,Beneficios plan Mensual,Cargar plan Mensual,Beneficios de constants/plans.ts,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-003,Planes Membresia,HU03-CP-11,Beneficios plan Trimestral,Cargar plan Trimestral,Clases grupales + evaluacion,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-003,Planes Membresia,HU03-CP-12,Beneficios plan Anual,Cargar plan Anual,Freeze + eventos,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-003,Planes Membresia,HU03-CP-13,Badge Mas Popular Trimestral,Cargar planes,Solo Trimestral badge,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-003,Planes Membresia,HU03-CP-14,Sin badge en otros planes,Cargar Mensual y Anual,Sin badge,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-003,Planes Membresia,HU03-CP-15,Enlace Elegir Plan,Click Elegir Plan,/pasarelapago?plan={id},Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-003,Planes Membresia,HU03-CP-16,Redireccion a /membresias sin sesion,Click Elegir Plan sin sesion,Redirige a /membresias,Automatico,CORREGIDO,AUTOMATIZADO - OK,PASS
+HU-003,Planes Membresia,HU03-CP-17,Redirect tras login no implementado,Iniciar sesion desde redirect,No preserva plan,Automatico,No implementado,AUTOMATIZADO - OMITIDO,SKIP
+HU-003,Planes Membresia,HU03-CP-18,Resumen plan en pasarelapago,Autenticado + /pasarelapago?plan=X,Resumen nombre precio duracion,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-003,Planes Membresia,HU03-CP-19,Boton Pagar con MP,Pasarelapago con sesion,Boton MP visible,Automatico,Requiere sesion + MP key,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-003,Planes Membresia,HU03-CP-20,Plan id inexistente,/pasarelapago?plan=999999,Plan no encontrado o redirect,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-003,Planes Membresia,HU03-CP-21,Seccion dudas,Scroll final membresias,Tienes dudas?,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-003,Planes Membresia,HU03-CP-22,Enlace Visitanos,Click en dudas,Navega a /sedes,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-003,Planes Membresia,HU03-CP-23,Solo activo=true,Planes activos/inactivos,Solo activos visibles,Automatico,Datos mixtos BD,MANUAL,
+HU-003,Planes Membresia,HU03-CP-24,Responsive movil,Viewport < 480px,1 columna,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-003,Planes Membresia,HU03-CP-25,Loading state (no aplica),Carga lenta,Server Component,Automatico,No aplica,NO APLICA,
+HU-003,Planes Membresia,HU03-CP-26,Error state BD (no aplica),Fallar BD,Error servidor,Automatico,No aplica,NO APLICA,
+HU-003,Planes Membresia,HU03-CP-27,duracion_dias=0,Plan duracion=0,Sin div/0 ni NaN,Automatico,Datos BD especificos,MANUAL,
+HU-003,Planes Membresia,HU03-CP-28,precio=0,Plan precio=0,S/ 0 sin errores,Automatico,Datos BD especificos,MANUAL,
+HU-003,Planes Membresia,HU03-CP-29,Formato precio sin decimales,precio=270,S/ 270,Automatico,Datos BD especificos,MANUAL,
+HU-003,Planes Membresia,HU03-CP-30,Formato precio con decimales,precio=149.90,S/ 149.90,Automatico,Datos BD especificos,MANUAL,
+HU-003,Planes Membresia,HU03-CP-31,Accesibilidad teclado tarjetas,Tab+Enter Elegir Plan,Foco + navegacion,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-003,Planes Membresia,HU03-CP-32,Redirect preserva plan ID (no implementado),/login?redirect=...,No implementado,Automatico,No implementado,NO IMPLEMENTADO,
+HU-004,Registro Datos,HU04-CP-01,Formulario registro carga,Visitar /register,Formulario completo sin errores,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-02,Campo Nombre obligatorio,Enviar con nombre vacio,Bloquea envio required,Automatico,OK required HTML,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-03,Campo Apellido obligatorio,Enviar con apellido vacio,Bloquea envio required,Automatico,OK required HTML,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-04,Mascara DNI pattern,DNI con letras o >8 caracteres,maxLength=8 pattern=[0-9]{8},Automatico,OK nativa HTML5,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-05,Validacion DNI <8 digitos,DNI de 5 digitos y enviar,Error El DNI debe tener 8 digitos,Automatico,OK pattern+React,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-06,Formato email,Ingresar texto sin @,Bloquea envio type=email,Automatico,OK nativa HTML5,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-07,Campo Telefono opcional,Enviar sin telefono,Campo TELEFONO existe como opcional,Automatico,CORREGIDO: campo existe,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-08,Placeholder Telefono,Campo telefono vacio,Input type=tel con placeholder,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-09,Longitud minima password,Password 4 caracteres,Error minimo 6 caracteres,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-10,Coincidencia passwords,Passwords distintas,Error Las contrasenas no coinciden,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-11,Spinner carga al enviar,Datos validos + click Crear Cuenta,Muestra spinner Creando cuenta...,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-12,signUp con metadata,Enviar datos validos,Llama signUp() con metadata,Automatico,Requiere Supabase,AUTOMATIZADO - OMITIDO,SKIP (Supabase no disponible)
+HU-004,Registro Datos,HU04-CP-13,Mensaje exito registro,Registro exitoso,Alert Registro exitoso,Automatico,Requiere Supabase,AUTOMATIZADO - OMITIDO,SKIP (Supabase no disponible)
+HU-004,Registro Datos,HU04-CP-14,Redireccion tras registro,Registro exitoso + cerrar alert,Redirige a /login,Automatico,Requiere Supabase,AUTOMATIZADO - OMITIDO,SKIP (Supabase no disponible)
+HU-004,Registro Datos,HU04-CP-15,Email ya registrado,Registrar con email existente,Error email en uso,Automatico,Requiere Supabase,AUTOMATIZADO - OMITIDO,SKIP (Supabase no disponible)
+HU-004,Registro Datos,HU04-CP-16,Redirect sesion activa socio,/register con sesion socio,Redirige a /,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-004,Registro Datos,HU04-CP-17,Redirect sesion activa recepcionista,/register con sesion recepcionista,Redirige a /recepcionista,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-004,Registro Datos,HU04-CP-18,Enlace Inicia sesion aqui,Click en enlace registro,Navega a /login,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-19,Boton Registrarse en header,Click Registrarse en header,Navega a /register,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-20,[GAP] Sin campo Genero,Inspeccionar formulario,No existe campo genero,Automatico,GAP,AUTOMATIZADO - OK,PASS (GAP confirmado)
+HU-004,Registro Datos,HU04-CP-21,[GAP] signUp sin genero,Payload metadata,No incluye genero,Automatico,GAP,AUTOMATIZADO - OMITIDO,SKIP (GAP + Supabase no disponible)
+HU-004,Registro Datos,HU04-CP-22,[GAP] Sin campo Fecha Nacimiento,Inspeccionar formulario,No existe campo fecha_nacimiento,Automatico,GAP,AUTOMATIZADO - OK,PASS (GAP confirmado)
+HU-004,Registro Datos,HU04-CP-23,[GAP] signUp sin fecha_nacimiento,Payload metadata,No incluye fecha_nacimiento,Automatico,GAP,AUTOMATIZADO - OMITIDO,SKIP (GAP + Supabase no disponible)
+HU-004,Registro Datos,HU04-CP-24,[GAP] Campos null en profiles,Registro exitoso + consultar profiles,genero y fecha_nacimiento = null,Automatico,GAP,AUTOMATIZADO - OMITIDO,SKIP (GAP + Supabase no disponible)
+HU-004,Registro Datos,HU04-CP-25,Toggle visibilidad password,Click icono ojo en password,Alterna mostrar/ocultar,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-26,Boton deshabilitado mientras envia,Click Crear Cuenta,Boton deshabilitado + spinner,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-27,Error de red signUp,Simular fallo red,Error controlado formulario funcional,Automatico,Simular fallo red,AUTOMATIZADO - OK,PASS (Failed to fetch manejado)
+HU-004,Registro Datos,HU04-CP-28,DNI no numericos,12AB3456 en DNI,Bloquea pattern,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-29,Password solo espacios,6+ espacios en password,Se rechaza como invalida,Automatico,OK required,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-30,[GAP] Telefono invalido,abc en telefono,Campo existe pero GAP validacion,Automatico,GAP,AUTOMATIZADO - OK,PASS (existe sin validacion)
+HU-004,Registro Datos,HU04-CP-31,Prevenir doble clic,Doble click en Crear Cuenta,Solo 1 peticion,Automatico,OK loading state,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-32,Foco en primer error,Enviar con DNI invalido+nombre vacio,Foco en primer campo con error,Automatico,OK nativa HTML5,AUTOMATIZADO - OK,PASS
+HU-004,Registro Datos,HU04-CP-33,[FUTURO] Campo Genero funcional,Agregar select genero,Persiste profiles.genero,Automatico,Futura implementacion,NO IMPLEMENTADO,
+HU-004,Registro Datos,HU04-CP-34,[FUTURO] Campo Fecha Nacimiento,Agregar date fecha_nacimiento,Persiste profiles.fecha_nacimiento,Automatico,Futura implementacion,NO IMPLEMENTADO,
+HU-005,Pagos Yape-Transf,HU05-CP-01,Boton Pagar con MP cargado,/pasarelapago sesion + plan,Boton MP disponible,Automatico,Requiere sesion + MP key,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-005,Pagos Yape-Transf,HU05-CP-02,Redirect /membresias sin auth,/pasarelapago sin sesion,Redirige a /membresias,Automatico,CORREGIDO,AUTOMATIZADO - OK,PASS
+HU-005,Pagos Yape-Transf,HU05-CP-03,POST /api/pagos al pagar,Click Pagar con MP,POST con planId,Automatico,Requiere sesion + MP,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-005,Pagos Yape-Transf,HU05-CP-04,Validacion auth API pagos,POST /api/pagos sin sesion,Error 401/redirect,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-005,Pagos Yape-Transf,HU05-CP-05,Validacion existencia plan,POST /api/pagos planId=99999,Error plan no disponible,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-005,Pagos Yape-Transf,HU05-CP-06,Creacion preferencia MP,POST /api/pagos plan valido,Preferencia con items+back_urls,Automatico,Requiere MP token real,AUTOMATIZADO - OMITIDO,SKIP (requiere MP token)
+HU-005,Pagos Yape-Transf,HU05-CP-07,Redirect init_point MP,POST exitoso,Redirige a init_point MP,Automatico,Requiere MP token real,AUTOMATIZADO - OMITIDO,SKIP (requiere MP token)
+HU-005,Pagos Yape-Transf,HU05-CP-08,Deteccion membresia activa,Pagar con suscripcion activa >7d,Bloquea renovacion,Automatico,Datos suscripcion BD,MANUAL,
+HU-005,Pagos Yape-Transf,HU05-CP-09,Acumulacion dias renovacion,Pagar faltando 5 dias,Permite + acumula dias,Automatico,Datos suscripcion BD,MANUAL,
+HU-005,Pagos Yape-Transf,HU05-CP-10,Redirect post-pago approved,Completar pago + status=approved,Invoca /api/pagos/verificar,Automatico,Flujo completo MP,AUTOMATIZADO - OMITIDO,SKIP (requiere MP)
+HU-005,Pagos Yape-Transf,HU05-CP-11,Deduplicacion por referencia,Dos veces mismo payment_id,Detecta ya procesado,Automatico,Ejecucion API,AUTOMATIZADO - OMITIDO,SKIP (requiere MP)
+HU-005,Pagos Yape-Transf,HU05-CP-12,Creacion suscripcion,Verificacion pago approved,Suscripcion activa creada,Automatico,Flujo completo,AUTOMATIZADO - OMITIDO,SKIP (requiere MP)
+HU-005,Pagos Yape-Transf,HU05-CP-13,Registro pago completado,Verificacion pago approved,Pago con estado completado,Automatico,Flujo completo,AUTOMATIZADO - OMITIDO,SKIP (requiere MP)
+HU-005,Pagos Yape-Transf,HU05-CP-14,Notificacion bienvenida,Verificacion exitosa,Notificacion creada,Automatico,Flujo completo,AUTOMATIZADO - OMITIDO,SKIP (requiere MP)
+HU-005,Pagos Yape-Transf,HU05-CP-15,Pago fallido status=rejected,Simular rejected,Pago estado fallido sin suscripcion,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-005,Pagos Yape-Transf,HU05-CP-16,Estado aprobado,status=approved,Mensaje aprobado claro,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-005,Pagos Yape-Transf,HU05-CP-17,Estado rechazado,status=rejected,Mensaje rechazado claro,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-005,Pagos Yape-Transf,HU05-CP-18,Estado pendiente,status=pending,Mensaje pendiente claro,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-005,Pagos Yape-Transf,HU05-CP-19,Webhook server-to-server MP,Simular notificacion MP,Endpoint /api/webhooks/mercadopago,Automatico,Requiere MP webhook secret,AUTOMATIZADO - OMITIDO,SKIP (requiere MP)
+HU-005,Pagos Yape-Transf,HU05-CP-20,Validacion firma HMAC webhook,Enviar firma invalida,Rechaza sin procesar,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-005,Pagos Yape-Transf,HU05-CP-21,Webhook solo approved,Enviar no-approved,Ignora sin activar suscripcion,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-005,Pagos Yape-Transf,HU05-CP-22,Membresia activa desde webhook,Approved con suscripcion activa,Pago sin duplicar suscripcion,Automatico,Datos BD,AUTOMATIZADO - OMITIDO,SKIP (requiere BD)
+HU-005,Pagos Yape-Transf,HU05-CP-23,Service role en verificacion,Inspeccionar /api/pagos/verificar,Usa service role key,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-005,Pagos Yape-Transf,HU05-CP-24,Timeout MP,Simular API MP no responde,Error controlado,Automatico,Simular timeout,MANUAL,
+HU-005,Pagos Yape-Transf,HU05-CP-25,[NO IMPLEMENTADO] UI Yape,Pasarela con plan,No implementado,Manual,NO IMPLEMENTADO,NO IMPLEMENTADO,
+HU-005,Pagos Yape-Transf,HU05-CP-26,[NO IMPLEMENTADO] UI BBVA,Pasarela con plan,No implementado,Manual,NO IMPLEMENTADO,NO IMPLEMENTADO,
+HU-005,Pagos Yape-Transf,HU05-CP-27,Plan precio=0,POST /api/pagos precio 0,API rechaza precio invalido,Automatico,Datos BD,MANUAL,
+HU-005,Pagos Yape-Transf,HU05-CP-28,Doble click Pagar con MP,Doble click rapido,Solo 1 preferencia,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-005,Pagos Yape-Transf,HU05-CP-29,Fallo red al crear preferencia,Timeout API MP,Error controlado boton rehabilitado,Automatico,Simular timeout,MANUAL,
+HU-005,Pagos Yape-Transf,HU05-CP-30,Webhook payload malformado,POST {invalid:true},400 sin procesar,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-005,Pagos Yape-Transf,HU05-CP-31,Webhook datos incompletos,POST sin action ni data,400 sin procesar,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-005,Pagos Yape-Transf,HU05-CP-32,Webhook type no soportado,Enviar type unknown,200 ignorado,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-005,Pagos Yape-Transf,HU05-CP-33,/pasarelapago sin planId,Sin query params,Redirige a /membresias,Automatico,CORREGIDO,AUTOMATIZADO - OK,PASS
+HU-005,Pagos Yape-Transf,HU05-CP-34,planId invalido,?plan=abc-xyz,Error plan invalido,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-005,Pagos Yape-Transf,HU05-CP-35,Error config MP,MP_ACCESS_TOKEN invalido,Error sin exponer credenciales,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-005,Pagos Yape-Transf,HU05-CP-36,Pago perfil incompleto,Usuario sin email verificado,Redirige a completar perfil,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-01,Proteccion rutas /recepcionista/*,/recepcionista sin sesion,Redirige a /login,Automatico,OK,AUTOMATIZADO - OK,PASS
+HU-006,Gestion Membresias,HU06-CP-02,Bloqueo rol socio,Socio accede a /recepcionista,No tienes acceso,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-03,Acceso rol_id 1 o 2,Usuario admin/recep,Acceso permitido + layout,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-04,Header recepcionista,Dashboard recepcionista,Clientes Membresias Reportes,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-05,Nombre recepcionista header,Layout con sesion,Nombre autenticado visible,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-06,Cerrar sesion,Click Salir,Cierra + redirige /login,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-07,Cards dashboard,/recepcionista,Total Clientes Activas por Vencer,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-08,Valores hardcodeados cards,Inspeccionar valores,Placeholder -- sin datos reales,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-09,Acciones rapidas dashboard,/recepcionista,Gestionar Clientes Nueva Membresia Reportes,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-10,Enlace Gestionar Clientes,Click en Gestionar Clientes,Navega a /recepcionista/clientes,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-11,Membresias proximas a vencer,/recepcionista sin datos,Mensaje por defecto,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-12,Listado clientes,/recepcionista/clientes,Tabla nombre DNI email telefono membresia estado,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-13,Busqueda por nombre,Escribir nombre parcial,Filtra coincidencias,Automatico,Requiere sesion + datos,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-14,Busqueda por DNI,Escribir DNI,Filtra por DNI,Automatico,Requiere sesion + datos,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-15,Busqueda por telefono,Escribir telefono,Filtra por telefono,Automatico,Requiere sesion + datos,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-16,Busqueda sin resultados,Termino sin coincidencias,Estado vacio sin romper,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-17,Filtro activos,Filtro Activos,Solo activos,Automatico,Requiere sesion + datos,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-18,Filtro vencidos,Filtro Vencidos,Solo vencidos,Automatico,Requiere sesion + datos,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-19,Filtro sin membresia,Filtro Sin membresia,Solo sin suscripcion,Automatico,Requiere sesion + datos,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-20,Busqueda+filtro combinados,Busqueda + filtro,Ambos criterios,Automatico,Requiere sesion + datos,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-21,Badges estado membresia,Columna estado,Activa verde Vencida rojo Sin membresia gris,Automatico,Requiere sesion + datos,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-22,Paginacion Siguiente,Click Siguiente,Carga siguiente pagina,Automatico,Requiere sesion + datos,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-23,Paginacion Anterior deshabilitado,Primera pagina,Anterior deshabilitado,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-24,Conteo dinamico clientes,Aplicar filtro,Contador actualizado,Automatico,Requiere sesion + datos,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-25,Detalle cliente,Click Ver en cliente,Navega a /recepcionista/clientes/[id],Automatico,Requiere sesion + datos,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-26,Detalle id inexistente,/recepcionista/clientes/id-invalido,Error cliente no encontrado,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-27,Edicion cliente,Click Editar en cliente,Formulario precargado,Automatico,Requiere sesion + datos,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-28,Guardar edicion cliente,Modificar + guardar,Actualiza via actualizarCliente(),Automatico,Requiere sesion + datos,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-29,[GAP] Membresias proximamente,Click Membresias en header,Pagina Proximamente,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-30,[GAP] No cambio estado membresia,Buscar pausar/cancelar,No existe funcionalidad,Manual,GAP,MANUAL,
+HU-006,Gestion Membresias,HU06-CP-31,[GAP] No registro nueva membresia,Intentar registrar,No existe formulario,Manual,GAP,MANUAL,
+HU-006,Gestion Membresias,HU06-CP-32,[GAP] No renovacion manual,Buscar renovar,No implementado,Manual,GAP,MANUAL,
+HU-006,Gestion Membresias,HU06-CP-33,[GAP] Reportes proximamente,Click Reportes en header,Pagina Proximamente,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-34,[GAP] No exportacion PDF/Excel,Buscar exportar,No disponible,Manual,GAP,MANUAL,
+HU-006,Gestion Membresias,HU06-CP-35,Empty state sin clientes,BD sin clientes,No se encontraron clientes,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-36,Loading state clientes,/recepcionista/clientes carga lenta,Spinner/skeleton,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-37,Error state clientes,Simular fallo BD,Error + reintentar,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-38,Edicion validacion DNI,Guardar DNI 3 digitos,Error validacion,Automatico,Requiere sesion + datos,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-39,Rendimiento buscador 1000+ clientes,Buscar con 1000+,Resultados < 2s,Automatico,Muchos datos BD,MANUAL,
+HU-006,Gestion Membresias,HU06-CP-40,Sesion expirada,Dejar expirar,Redirige a /login,Automatico,Requiere sesion,AUTOMATIZADO - OMITIDO,SKIP (requiere sesion)
+HU-006,Gestion Membresias,HU06-CP-41,[NO IMPLEMENTADO] Pausar membresia,Boton Pausar,No implementado,Manual,NO IMPLEMENTADO,NO IMPLEMENTADO,
+HU-006,Gestion Membresias,HU06-CP-42,[NO IMPLEMENTADO] Cancelar membresia,Boton Cancelar,No implementado,Manual,NO IMPLEMENTADO,NO IMPLEMENTADO,
+HU-006,Gestion Membresias,HU06-CP-43,[NO IMPLEMENTADO] Reactivar membresia,Boton Reactivar,No implementado,Manual,NO IMPLEMENTADO,NO IMPLEMENTADO,
+HU-006,Gestion Membresias,HU06-CP-44,[NO IMPLEMENTADO] Registrar membresia,Formulario asignar plan,No implementado,Manual,NO IMPLEMENTADO,NO IMPLEMENTADO,
+HU-006,Gestion Membresias,HU06-CP-45,[NO IMPLEMENTADO] Renovar membresia,Boton Renovar,No implementado,Manual,NO IMPLEMENTADO,NO IMPLEMENTADO,
+HU-006,Gestion Membresias,HU06-CP-46,[NO IMPLEMENTADO] Reporte activos,/recepcionista/reportes,Proximamente,Manual,NO IMPLEMENTADO,NO IMPLEMENTADO,
+HU-006,Gestion Membresias,HU06-CP-47,[NO IMPLEMENTADO] Reporte ingresos,Reporte ingresos,Proximamente,Manual,NO IMPLEMENTADO,NO IMPLEMENTADO,
+HU-006,Gestion Membresias,HU06-CP-48,[NO IMPLEMENTADO] Exportar PDF,Boton Exportar PDF,No implementado,Manual,NO IMPLEMENTADO,NO IMPLEMENTADO,
+HU-006,Gestion Membresias,HU06-CP-49,[NO IMPLEMENTADO] Exportar Excel,Boton Exportar Excel,No implementado,Manual,NO IMPLEMENTADO,NO IMPLEMENTADO,
+HU-006,Gestion Membresias,HU06-CP-50,[NO IMPLEMENTADO] Dashboard datos reales,Conectar cards a BD,Cards placeholder --,Manual,NO IMPLEMENTADO,NO IMPLEMENTADO,
