@@ -19,7 +19,7 @@ export default function RecepcionistaLayout({
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-950">
-        <Loader2 className="w-8 h-8 text-zinc-400 animate-spin" />
+        <Loader2 className="size-8 text-zinc-400 animate-spin" />
       </div>
     )
   }
@@ -75,19 +75,19 @@ export default function RecepcionistaLayout({
               <nav className="flex items-center gap-4">
                 <Link href="/recepcionista/clientes">
                   <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800">
-                    <Users className="w-4 h-4 mr-2" />
+                    <Users className="size-4 mr-2" />
                     Clientes
                   </Button>
                 </Link>
                 <Link href="/recepcionista/membresias">
                   <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800">
-                    <CreditCard className="w-4 h-4 mr-2" />
+                    <CreditCard className="size-4 mr-2" />
                     Membresías
                   </Button>
                 </Link>
                 <Link href="/recepcionista/reportes">
                   <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800">
-                    <BarChart3 className="w-4 h-4 mr-2" />
+                    <BarChart3 className="size-4 mr-2" />
                     Reportes
                   </Button>
                 </Link>
@@ -103,7 +103,7 @@ export default function RecepcionistaLayout({
                 onClick={handleSignOut}
                 className="text-zinc-400 hover:text-white"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="size-4" />
               </Button>
             </div>
           </div>

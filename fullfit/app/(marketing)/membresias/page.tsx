@@ -2,10 +2,7 @@ import React from 'react'
 import { createAnonServerClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Container from '@/components/layout/Container'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Check } from 'lucide-react'
-import { planFeatures, formatPrice } from '@/constants/plans'
+import { ListaPlanesMembresia } from '@/components/membresias'
 
 export const metadata = {
   title: 'Membresías | Full Forma',
@@ -84,84 +81,7 @@ const MembresiasPage = async () => {
 
       <section className="py-12 md:py-20">
         <Container>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
-            {planes.map((plan, index) => {
-              const prices = formatPrice(plan.precio, plan.duracion_dias)
-              const isPopular = plan.nombre === 'Trimestral'
-              const features = planFeatures[plan.nombre] || []
-
-              return (
-                <div
-                  key={plan.id}
-                  className={`
-                    relative flex flex-col p-6 md:p-8 rounded-2xl border-2
-                    transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-gym-logo/10
-                    ${isPopular 
-                      ? 'border-gym-logo bg-gym-logo/5' 
-                      : 'border-white/10 bg-white/5 hover:border-gym-logo/50'
-                    }
-                  `}
-                >
-                  {isPopular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <Badge className="bg-gym-logo text-black font-arcade text-[8px] md:text-[10px] px-3 py-1 uppercase tracking-wider">
-                        Más Popular
-                      </Badge>
-                    </div>
-                  )}
-
-                  <div className="text-center mb-6">
-                    <h3 className="font-arcade text-white text-lg md:text-xl uppercase tracking-wider mb-2">
-                      {plan.nombre}
-                    </h3>
-                    {plan.descripcion && (
-                      <p className="text-white/50 text-xs md:text-sm font-mono">
-                        {plan.descripcion}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="text-center mb-6">
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="font-arcade text-gym-logo text-3xl md:text-4xl">
-                        {prices.total}
-                      </span>
-                    </div>
-                    <span className="text-white/40 text-xs font-mono">
-                      {plan.duracion_dias === 365 ? 'al año' : prices.perMonth}
-                    </span>
-                  </div>
-
-                  <div className="flex-1 mb-6">
-                    <ul className="space-y-3">
-                      {features.map((feature, i) => (
-                        <li key={i} className="flex items-start gap-3">
-                          <Check className="w-4 h-4 text-gym-logo shrink-0 mt-0.5" />
-                          <span className="text-white/70 text-xs md:text-sm font-mono">
-                            {feature}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <Link href={`/pasarelapago?plan=${plan.id}`} className="mt-auto">
-                    <Button
-                      className={`
-                        w-full font-arcade text-[10px] md:text-xs uppercase tracking-wider py-3 md:py-4
-                        ${isPopular 
-                          ? 'bg-gym-logo text-black hover:bg-gym-logo/80' 
-                          : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
-                        }
-                      `}
-                    >
-                      Elegir Plan
-                    </Button>
-                  </Link>
-                </div>
-              )
-            })}
-          </div>
+          <ListaPlanesMembresia planes={planes} />
         </Container>
       </section>
 

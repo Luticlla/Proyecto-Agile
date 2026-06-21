@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, createContext, useContext, ReactNode, useRef } from 'react'
+import { useState, useEffect, createContext, useContext, ReactNode, useRef, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import type { Profile } from '@/lib/supabase/types'
 import type { User, Session } from '@supabase/supabase-js'
@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isRecovery, setIsRecovery] = useState(false)
   const lastFetchedUserId = useRef<string | null>(null)
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = useCallback(async (userId: string) => {
     // Evitar fetch duplicado para el mismo usuario
     if (lastFetchedUserId.current === userId && profile) {
       return profile
@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     lastFetchedUserId.current = userId
     return data as Profile
-  }
+  }, [profile])
 
   useEffect(() => {
     let isMounted = true
@@ -110,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       subscription.unsubscribe()
       window.removeEventListener('pageshow', handlePageShow)
     }
-  }, [])
+  }, [fetchProfile])
 
   const signUp = async (email: string, password: string, metadata: { nombre: string; apellido: string; telefono?: string; dni?: string }) => {
     const { error } = await supabase.auth.signUp({

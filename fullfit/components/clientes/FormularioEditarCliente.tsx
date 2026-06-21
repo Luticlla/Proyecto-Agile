@@ -165,7 +165,7 @@ export function FormularioEditarCliente({ cliente, onSave, onCancel }: Formulari
               name="activo"
               checked={formData.activo}
               onChange={handleChange}
-              className="w-4 h-4 rounded bg-zinc-800 border-zinc-700"
+              className="size-4 rounded bg-zinc-800 border-zinc-700"
             />
             <Label htmlFor="activo" className="text-zinc-300">Cliente activo</Label>
           </div>
@@ -178,7 +178,7 @@ export function FormularioEditarCliente({ cliente, onSave, onCancel }: Formulari
               disabled={loading}
               className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
             >
-              <X className="w-4 h-4 mr-2" />
+              <X className="size-4 mr-2" />
               Cancelar
             </Button>
             <Button
@@ -187,9 +187,9 @@ export function FormularioEditarCliente({ cliente, onSave, onCancel }: Formulari
               className="bg-yellow-400 text-zinc-950 hover:bg-yellow-300"
             >
               {loading ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 className="size-4 mr-2 animate-spin" />
               ) : (
-                <Save className="w-4 h-4 mr-2" />
+                <Save className="size-4 mr-2" />
               )}
               Guardar Cambios
             </Button>

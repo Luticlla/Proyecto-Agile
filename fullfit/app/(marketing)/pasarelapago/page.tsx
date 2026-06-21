@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState, useCallback, Suspense } from 'react'
+import { useEffect, useState, useCallback, useRef, Suspense } from 'react'
 import { useAuth } from '@/hooks'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Loader2, ArrowLeft, Check, CreditCard } from 'lucide-react'
+import { Loader2, ArrowLeft, Check, CreditCard, Lock } from 'lucide-react'
 import Link from 'next/link'
 import Container from '@/components/layout/Container'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -34,7 +34,7 @@ function PaymentSummary({ plan, prices, features }: {
         <div className="flex flex-col gap-3">
           {features.map((feature, i) => (
             <div key={i} className="flex items-start gap-3">
-              <Check className="w-4 h-4 text-gym-logo shrink-0 mt-0.5" />
+              <Check className="size-4 text-gym-logo shrink-0 mt-0.5" />
               <span className="text-white/70 text-sm font-mono">{feature}</span>
             </div>
           ))}
@@ -60,7 +60,7 @@ function PaymentStatus({ status, verificationResult, verificationLoading }: {
     return (
       <Card className="w-full max-w-md bg-zinc-900 border-zinc-800">
         <CardContent className="flex flex-col items-center gap-4 pt-6">
-          <Loader2 className="w-8 h-8 text-gym-logo animate-spin" />
+          <Loader2 className="size-8 text-gym-logo animate-spin" />
           <p className="text-white/60 text-sm font-mono text-center">Verificando tu pago...</p>
         </CardContent>
       </Card>
@@ -128,6 +128,10 @@ function PasarelaPagoContent() {
   const [planLoading, setPlanLoading] = useState(true)
   const [verificationLoading, setVerificationLoading] = useState(false)
   const [verificationResult, setVerificationResult] = useState<{ success: boolean; message?: string; error?: string } | null>(null)
+  const [membresiaBloqueada, setMembresiaBloqueada] = useState(false)
+  const [diasRestantes, setDiasRestantes] = useState(0)
+  const [checkingMembresia, setCheckingMembresia] = useState(true)
+  const membresiaCheckedRef = useRef(false)
 
   useEffect(() => {
     let isMounted = true
@@ -141,6 +145,30 @@ function PasarelaPagoContent() {
   useEffect(() => {
     document.title = 'Pasarela de Pago | Full Forma'
   }, [])
+
+  useEffect(() => {
+    if (!user || membresiaCheckedRef.current) return
+
+    const checkMembresia = async () => {
+      membresiaCheckedRef.current = true
+      try {
+        const response = await fetch('/api/membresias/estado')
+        if (response.ok) {
+          const data = await response.json()
+          if (data.tieneMembresiaActiva && !data.puedeComprar) {
+            setMembresiaBloqueada(true)
+            setDiasRestantes(data.diasRestantes)
+          }
+        }
+      } catch {
+        // Si hay error, permitir continuar
+      } finally {
+        setCheckingMembresia(false)
+      }
+    }
+
+    checkMembresia()
+  }, [user])
 
   useEffect(() => {
     if (!planId) {
@@ -166,25 +194,20 @@ function PasarelaPagoContent() {
 
   // Verificar el pago cuando regresa de MercadoPago con status=approved y payment_id
   useEffect(() => {
-    console.log('[PASARELA] useEffect verificación - status:', status, 'paymentId:', paymentId, 'verificationResult:', verificationResult)
     if (status === 'approved' && paymentId && !verificationResult) {
-      console.log('[PASARELA] Condiciones cumplidas. Llamando a /api/pagos/verificar...')
       const verificarPago = async () => {
         setVerificationLoading(true)
         try {
-          console.log('[PASARELA] Enviando POST a /api/pagos/verificar con payment_id:', paymentId)
           const response = await fetch('/api/pagos/verificar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ payment_id: paymentId }),
           })
 
-          console.log('[PASARELA] Respuesta HTTP:', response.status, response.statusText)
           const data = await response.json()
-          console.log('[PASARELA] Body de respuesta:', data)
           setVerificationResult(data)
         } catch (error) {
-          console.error('[PASARELA] Error en fetch de verificación:', error)
+          console.error('Error verifying payment:', error)
           setVerificationResult({ success: false, error: 'Error al verificar el pago' })
         } finally {
           setVerificationLoading(false)
@@ -192,8 +215,6 @@ function PasarelaPagoContent() {
       }
 
       verificarPago()
-    } else {
-      console.log('[PASARELA] Condiciones NO cumplidas. No se llama al endpoint.')
     }
   }, [status, paymentId, verificationResult])
 
@@ -220,10 +241,10 @@ function PasarelaPagoContent() {
     }
   }, [plan, user])
 
-  if (loading || planLoading) {
+  if (loading || planLoading || checkingMembresia) {
     return (
       <main className="min-h-screen bg-black flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-gym-logo animate-spin" />
+        <Loader2 className="size-8 text-gym-logo animate-spin" />
       </main>
     )
   }
@@ -243,6 +264,39 @@ function PasarelaPagoContent() {
   }
 
   if (!user) return null
+
+  if (membresiaBloqueada) {
+    return (
+      <main className="min-h-screen bg-black">
+        <Container className="py-20 flex flex-col items-center gap-8">
+          <Link href="/membresias" className="flex items-center gap-2 text-zinc-400 hover:text-white hoverEffect">
+            <ArrowLeft className="size-4" />
+            <span className="font-arcade text-xs">Volver a planes</span>
+          </Link>
+
+          <Card className="w-full max-w-md bg-zinc-900 border-zinc-800">
+            <CardContent className="flex flex-col items-center gap-4 pt-6">
+              <div className="size-12 rounded-full bg-yellow-400/10 flex items-center justify-center">
+                <Lock className="size-6 text-yellow-400" />
+              </div>
+              <h2 className="font-arcade text-xl text-yellow-400">Membresía Activa</h2>
+              <p className="text-white/60 text-sm font-mono text-center">
+                Tu membresía está activa y vence en <span className="text-white font-bold">{diasRestantes} días</span>.
+              </p>
+              <p className="text-white/40 text-xs font-mono text-center">
+                Podrás renovar cuando falten 7 días o menos.
+              </p>
+              <Link href="/membresias" className="mt-4">
+                <Button className="font-arcade bg-gym-logo text-black hover:bg-gym-logo/80">
+                  Volver a planes
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </Container>
+      </main>
+    )
+  }
 
   if (!plan) {
     return (
@@ -264,7 +318,7 @@ function PasarelaPagoContent() {
     <main className="min-h-screen bg-black">
       <Container className="py-20 flex flex-col items-center gap-8">
         <Link href="/membresias" className="flex items-center gap-2 text-zinc-400 hover:text-white hoverEffect">
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="size-4" />
           <span className="font-arcade text-xs">Volver a planes</span>
         </Link>
 
@@ -276,10 +330,10 @@ function PasarelaPagoContent() {
           className="font-arcade bg-gym-logo text-black hover:bg-gym-logo/80 w-full max-w-md py-6"
         >
           {paymentLoading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
+            <Loader2 className="size-5 animate-spin" />
           ) : (
             <>
-              <CreditCard className="w-5 h-5 mr-2" />
+              <CreditCard className="size-5 mr-2" />
               Pagar con Mercado Pago
             </>
           )}
@@ -293,7 +347,7 @@ export default function PasarelaPagoPage() {
   return (
     <Suspense fallback={
       <main className="min-h-screen bg-black flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-gym-logo animate-spin" />
+        <Loader2 className="size-8 text-gym-logo animate-spin" />
       </main>
     }>
       <PasarelaPagoContent />

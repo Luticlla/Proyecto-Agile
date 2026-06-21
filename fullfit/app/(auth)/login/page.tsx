@@ -67,7 +67,7 @@ function LoginForm() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-950 px-4">
       <Link href="/" className="flex items-center gap-2 text-zinc-400 hover:text-white mb-6 hoverEffect">
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeft className="size-4" />
         <span className="font-arcade text-xs">Volver al inicio</span>
       </Link>
       <Card className="w-full max-w-md bg-zinc-900 border-zinc-800">
@@ -148,7 +148,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-zinc-950">
-        <Loader2 className="w-8 h-8 text-zinc-400 animate-spin" />
+        <Loader2 className="size-8 text-zinc-400 animate-spin" />
       </div>
     }>
       <LoginForm />

@@ -2,6 +2,7 @@ import { supabase } from '../client'
 import type { ProfileWithEmail } from '../types'
 import type { ClienteConMembresia } from './clientes.types'
 import { getFechaLima } from '@/lib/utils'
+import { calcularDiasRestantes } from '@/lib/utils/dates'
 
 export function addEmail(profile: Record<string, unknown>): ProfileWithEmail {
   return {
@@ -28,18 +29,43 @@ export async function enrichConMembresia(clientes: ProfileWithEmail[]): Promise<
 
   const { data: suscripciones } = await supabase
     .from('suscripciones')
-    .select('usuario_id, estado, fecha_fin')
+    .select('usuario_id, estado, fecha_fin, fecha_inicio, planes_membresia!suscripciones_plan_id_fkey(nombre, precio)')
     .in('usuario_id', ids)
     .order('fecha_fin', { ascending: false })
 
-  const membresiaMap = new Map<string, { estado: string; fecha_fin: string }>()
-  for (const sub of (suscripciones || []) as { usuario_id: string; estado: string; fecha_fin: string }[]) {
+  type SuscripcionRow = {
+    usuario_id: string
+    estado: string
+    fecha_fin: string
+    fecha_inicio: string
+    planes_membresia: { nombre: string; precio: number } | null
+  }
+
+  const membresiaMap = new Map<string, {
+    estado: string
+    fecha_fin: string
+    fecha_inicio: string
+    dias_restantes: number
+    plan_nombre: string
+    precio: number
+  }>()
+
+  for (const sub of (suscripciones || []) as SuscripcionRow[]) {
     if (!membresiaMap.has(sub.usuario_id)) {
       let estadoVisual = sub.estado
       if (sub.estado === 'activa' && sub.fecha_fin < hoy) {
         estadoVisual = 'vencida'
       }
-      membresiaMap.set(sub.usuario_id, { estado: estadoVisual, fecha_fin: sub.fecha_fin })
+      const diasRestantes = calcularDiasRestantes(sub.fecha_fin, hoy)
+      const plan = sub.planes_membresia
+      membresiaMap.set(sub.usuario_id, {
+        estado: estadoVisual,
+        fecha_fin: sub.fecha_fin,
+        fecha_inicio: sub.fecha_inicio,
+        dias_restantes: diasRestantes,
+        plan_nombre: plan?.nombre ?? '',
+        precio: plan?.precio ?? 0,
+      })
     }
   }
 
@@ -49,6 +75,10 @@ export async function enrichConMembresia(clientes: ProfileWithEmail[]): Promise<
       ...c,
       membresia_estado: membresia?.estado,
       membresia_fecha_fin: membresia?.fecha_fin,
+      membresia_fecha_inicio: membresia?.fecha_inicio,
+      membresia_dias_restantes: membresia?.dias_restantes,
+      membresia_plan_nombre: membresia?.plan_nombre,
+      membresia_precio: membresia?.precio,
     }
   })
 }
@@ -58,6 +88,6 @@ export function applyBusquedaFilter(
   busqueda: string
 ) {
   return query.or(
-    `nombre.ilike.%${busqueda}%,apellido.ilike.%${busqueda}%,dni.eq.${busqueda},telefono.ilike.%${busqueda}%`
+    `nombre.ilike.%${busqueda}%,apellido.ilike.%${busqueda}%,dni.ilike.%${busqueda}%,telefono.ilike.%${busqueda}%`
   )
 }

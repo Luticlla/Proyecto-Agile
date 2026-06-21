@@ -72,7 +72,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-950 px-4 py-8">
       <Link href="/" className="flex items-center gap-2 text-zinc-400 hover:text-white mb-6 hoverEffect">
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeft className="size-4" />
         <span className="font-arcade text-xs">Volver al inicio</span>
       </Link>
       <Card className="w-full max-w-md bg-zinc-900 border-zinc-800">

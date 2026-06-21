@@ -67,7 +67,7 @@ const SedeCard = ({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Dumbbell className="w-16 h-16 text-gym-logo/30" />
+            <Dumbbell className="size-16 text-gym-logo/30" />
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
@@ -154,7 +154,7 @@ const SedeCard = ({
               rel="noopener noreferrer"
               className="flex flex items-center justify-center gap-2 w-full border border-white/20 text-white/70 hover:border-gym-logo hover:text-gym-logo hoverEffect py-4 text-sm font-arcade uppercase tracking-wider"
             >
-              <MapPin className="w-5 h-5" />
+              <MapPin className="size-5" />
               Cómo llegar
             </a>
           )}
@@ -175,7 +175,7 @@ const SedesClient = ({ sedes }: SedesClientProps) => {
     return (
       <Container className="py-20">
         <div className="text-center">
-          <Dumbbell className="w-16 h-16 text-gym-logo/20 mx-auto mb-4" />
+          <Dumbbell className="size-16 text-gym-logo/20 mx-auto mb-4" />
           <p className="font-arcade text-white/40 text-xs uppercase tracking-wider">
             No hay sedes disponibles en este momento
           </p>

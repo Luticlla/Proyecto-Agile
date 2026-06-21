@@ -16,12 +16,12 @@ export default function ReportesPage() {
       <Card className="bg-zinc-900 border-zinc-800">
         <CardHeader className="text-center">
           <CardTitle className="text-lg text-white flex items-center justify-center gap-2">
-            <Construction className="w-5 h-5 text-yellow-400" />
+            <Construction className="size-5 text-yellow-400" />
             Próximamente
           </CardTitle>
         </CardHeader>
         <CardContent className="text-center space-y-4">
-          <BarChart3 className="w-16 h-16 text-zinc-600 mx-auto" />
+          <BarChart3 className="size-16 text-zinc-600 mx-auto" />
           <p className="text-zinc-400">
             Esta sección está en desarrollo. Pronto podrás:
           </p>

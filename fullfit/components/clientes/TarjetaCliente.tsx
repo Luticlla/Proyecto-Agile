@@ -30,23 +30,23 @@ export function TarjetaCliente({ cliente }: TarjetaClienteProps) {
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="flex items-center gap-3 text-zinc-300">
-          <CreditCard className="w-4 h-4 text-zinc-500" />
+          <CreditCard className="size-4 text-zinc-500" />
           <span className="text-sm">DNI: {cliente.dni || 'No registrado'}</span>
         </div>
         <div className="flex items-center gap-3 text-zinc-300">
-          <Mail className="w-4 h-4 text-zinc-500" />
+          <Mail className="size-4 text-zinc-500" />
           <span className="text-sm">Email: {cliente.email || 'No registrado'}</span>
         </div>
         <div className="flex items-center gap-3 text-zinc-300">
-          <Phone className="w-4 h-4 text-zinc-500" />
+          <Phone className="size-4 text-zinc-500" />
           <span className="text-sm">Teléfono: {cliente.telefono || 'No registrado'}</span>
         </div>
         <div className="flex items-center gap-3 text-zinc-300">
-          <User className="w-4 h-4 text-zinc-500" />
+          <User className="size-4 text-zinc-500" />
           <span className="text-sm">Género: {cliente.genero || 'No especificado'}</span>
         </div>
         <div className="flex items-center gap-3 text-zinc-300">
-          <Calendar className="w-4 h-4 text-zinc-500" />
+          <Calendar className="size-4 text-zinc-500" />
           <span className="text-sm">
             Fecha nacimiento: {cliente.fecha_nacimiento || 'No registrada'}
           </span>

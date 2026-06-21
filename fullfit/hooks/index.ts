@@ -19,3 +19,5 @@ export function useOutsideClick<T extends HTMLElement>(calback: () => void) {
 }
 
 export { AuthProvider, useAuth } from './useAuth'
+export { useDebounce } from './useDebounce'
+export { usePaginatedFetch } from './usePaginatedFetch'

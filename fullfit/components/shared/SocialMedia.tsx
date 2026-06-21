@@ -12,8 +12,8 @@ interface Props {
 }
 
 const iconMap: Record<string, React.ReactNode> = {
-  Facebook: <Facebook className="w-5 h-5" />,
-  Instagram: <Instagram className="w-5 h-5" />,
+  Facebook: <Facebook className="size-5" />,
+  Instagram: <Instagram className="size-5" />,
 }
 
 const SocialMedia = ({ className, iconClassName, tooltipPosition }: Props) => {

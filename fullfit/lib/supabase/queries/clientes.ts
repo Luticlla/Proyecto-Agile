@@ -1,10 +1,11 @@
 import { supabase } from '../client'
 import type { ProfileUpdate, ProfileWithEmail } from '../types'
-import type { ClienteFilters, ClienteListResult, ClienteConMembresia } from './clientes.types'
+import type { ClienteFilters, ClienteListResult, ClienteConMembresia, ClienteConMembresiaCompleta, PagoResumen } from './clientes.types'
 import { addEmail, enrichConMembresia, applyBusquedaFilter } from './clientes.transformations'
 import { getFechaLima } from '@/lib/utils'
+import { calcularDiasRestantes } from '@/lib/utils/dates'
 
-export type { EstadoSuscripcion, ClienteFilters, ClienteListResult, ClienteConMembresia } from './clientes.types'
+export type { EstadoSuscripcion, ClienteFilters, ClienteListResult, ClienteConMembresia, ClienteConMembresiaCompleta, MembresiaDetalle, PagoResumen } from './clientes.types'
 
 const MIEMBRO_ROLE_ID = 3
 
@@ -186,12 +187,15 @@ async function listarClientesPorEstadoMembresia(filtros: {
   let suscripcionQuery = supabase
     .from('suscripciones')
     .select('usuario_id')
-    .eq('estado', 'activa')
 
   if (estado_suscripcion === 'activos') {
-    suscripcionQuery = suscripcionQuery.gte('fecha_fin', hoy)
+    suscripcionQuery = suscripcionQuery
+      .eq('estado', 'activa')
+      .gte('fecha_fin', hoy)
   } else {
-    suscripcionQuery = suscripcionQuery.lt('fecha_fin', hoy)
+    suscripcionQuery = suscripcionQuery.or(
+      `estado.eq.vencida,and(estado.eq.activa,fecha_fin.lt.${hoy})`
+    )
   }
 
   const { data: suscripciones } = await suscripcionQuery
@@ -219,6 +223,79 @@ async function listarClientesPorEstadoMembresia(filtros: {
   return paginateAndEnrich(data, count, page, limit)
 }
 
+export async function obtenerClienteConMembresia(id: string): Promise<ClienteConMembresiaCompleta | null> {
+  const cliente = await obtenerCliente(id)
+  if (!cliente) return null
+
+  const hoy = getFechaLima()
+
+  const { data: suscripcion } = await supabase
+    .from('suscripciones')
+    .select(`
+      id,
+      fecha_inicio,
+      fecha_fin,
+      estado,
+      planes_membresia!suscripciones_plan_id_fkey (nombre, precio, duracion_dias)
+    `)
+    .eq('usuario_id', id)
+    .order('fecha_fin', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  const rawSuscripcion = suscripcion as Record<string, unknown> | null
+  let membresia = null
+  if (rawSuscripcion) {
+    const plan = rawSuscripcion.planes_membresia as Record<string, unknown> | null
+    const fechaFin = rawSuscripcion.fecha_fin as string
+    let estado = rawSuscripcion.estado as string
+    if (estado === 'activa' && fechaFin < hoy) {
+      estado = 'vencida'
+    }
+    membresia = {
+      id: rawSuscripcion.id as number,
+      plan_nombre: (plan?.nombre as string) || '',
+      plan_precio: (plan?.precio as number) || 0,
+      plan_duracion_dias: (plan?.duracion_dias as number) || 0,
+      fecha_inicio: rawSuscripcion.fecha_inicio as string,
+      fecha_fin: fechaFin,
+      estado,
+      dias_restantes: Math.max(0, calcularDiasRestantes(fechaFin, hoy))
+    }
+  }
+
+  return { ...cliente, membresia }
+}
+
+export async function obtenerHistorialPagos(
+  usuarioId: string,
+  limit = 5
+): Promise<PagoResumen[]> {
+  const { data, error } = await supabase
+    .from('pagos')
+    .select('id, monto, metodo_pago, estado, referencia, fecha_pago')
+    .eq('usuario_id', usuarioId)
+    .order('fecha_pago', { ascending: false })
+    .limit(limit)
+
+  if (error) {
+    console.error('Error obteniendo historial de pagos:', error)
+    return []
+  }
+
+  return (data || []).map((p) => {
+    const row = p as Record<string, unknown>
+    return {
+      id: row.id as number,
+      monto: row.monto as number,
+      metodo_pago: row.metodo_pago as string,
+      estado: row.estado as string,
+      referencia: row.referencia as string | null,
+      fecha_pago: row.fecha_pago as string
+    }
+  })
+}
+
 export async function contarClientesPorEstado(): Promise<{
   activos: number
   inactivos: number
@@ -242,4 +319,61 @@ export async function contarClientesPorEstado(): Promise<{
     inactivos: inactivos.count || 0,
     total: (activos.count || 0) + (inactivos.count || 0)
   }
+}
+
+export async function contarMembresiasPorEstado(): Promise<{
+  activas: number
+  vencidas: number
+  por_vencer: number
+  sin_membresia: number
+}> {
+  const hoy = getFechaLima()
+  const hoyDate = new Date(hoy)
+  const fechaLimite = new Date(hoyDate)
+  fechaLimite.setDate(fechaLimite.getDate() + 7)
+  const fechaLimiteStr = fechaLimite.toISOString().split('T')[0]
+
+  const [activasResult, vencidasResult, porVencerResult, conMembresiaResult, totalMiembrosResult] = await Promise.all([
+    // Membresías activas (no por vencer pronto)
+    supabase
+      .from('suscripciones')
+      .select('*', { count: 'exact', head: true })
+      .eq('estado', 'activa')
+      .gte('fecha_fin', hoy),
+    // Vencidas: estado=vencida o estado=activa pero fecha_fin pasó
+    supabase
+      .from('suscripciones')
+      .select('usuario_id')
+      .or(`estado.eq.vencida,and(estado.eq.activa,fecha_fin.lt.${hoy})`),
+    // Por vencer en los próximos 7 días
+    supabase
+      .from('suscripciones')
+      .select('*', { count: 'exact', head: true })
+      .eq('estado', 'activa')
+      .gte('fecha_fin', hoy)
+      .lte('fecha_fin', fechaLimiteStr),
+    // Todos los usuarios que tienen AL MENOS una suscripción
+    supabase
+      .from('suscripciones')
+      .select('usuario_id'),
+    // Total de miembros
+    supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('rol_id', MIEMBRO_ROLE_ID)
+  ])
+
+  const activas = activasResult.count || 0
+  const por_vencer = porVencerResult.count || 0
+
+  // Para vencidas: contar usuarios únicos con membresía vencida
+  const idsVencidas = new Set((vencidasResult.data || []).map((r: { usuario_id: string }) => r.usuario_id))
+  const vencidas = idsVencidas.size
+
+  // Sin membresía: total miembros - usuarios con alguna suscripción
+  const idsConMembresia = new Set((conMembresiaResult.data || []).map((r: { usuario_id: string }) => r.usuario_id))
+  const totalMiembros = totalMiembrosResult.count || 0
+  const sin_membresia = Math.max(0, totalMiembros - idsConMembresia.size)
+
+  return { activas, vencidas, por_vencer, sin_membresia }
 }

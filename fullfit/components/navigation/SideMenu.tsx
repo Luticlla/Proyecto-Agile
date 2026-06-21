@@ -38,7 +38,7 @@ const SideMenu:FC<SidebarProps> = ({isOpen, onClose}) => {
             onClick={onClose}
             className="hover:text-gym-logo-claro hoverEffect"
           >
-            <X className="w-6 h-6" />
+            <X className="size-6" />
           </button>
         </div>
 

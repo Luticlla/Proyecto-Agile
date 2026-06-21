@@ -1,124 +1,236 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { BuscadorCliente, ListaClientes, FiltroMembresia } from '@/components/clientes'
-import { listarClientes, ClienteListResult, EstadoSuscripcion } from '@/lib/supabase/queries/clientes'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { useRouter } from 'next/navigation'
+import { BuscadorCliente, ListaClientes, FiltroMembresia, ResumenEstadistico, ExportarCSV } from '@/components/clientes'
+import { listarClientes, ClienteListResult, EstadoSuscripcion, ClienteConMembresia } from '@/lib/supabase/queries/clientes'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+
+const OPCIONES_LIMITE = [10, 25, 50, 100]
+const DEBOUNCE_MS = 300
 
 export default function ClientesPage() {
+  const router = useRouter()
   const [result, setResult] = useState<ClienteListResult>({
     data: [],
     count: 0,
     page: 1,
-    totalPages: 0
+    totalPages: 0,
   })
   const [loading, setLoading] = useState(true)
   const [busqueda, setBusqueda] = useState('')
   const [filtroMembresia, setFiltroMembresia] = useState<EstadoSuscripcion>('todos')
+  const [limite, setLimite] = useState(10)
+  const [paginaInput, setPaginaInput] = useState('1')
 
-  useEffect(() => {
-    let cancelled = false
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const latestRequestRef = useRef(0)
 
-    async function loadInitialData() {
-      const data = await listarClientes({ page: 1, limit: 10, estado_suscripcion: filtroMembresia })
-      if (!cancelled) {
-        setResult(data)
-        setLoading(false)
-      }
-    }
-
-    loadInitialData()
-
-    return () => {
-      cancelled = true
-    }
-  }, [filtroMembresia])
-
-  const handleSearch = useCallback(async (value: string) => {
-    setBusqueda(value)
+  // ── Carga central de datos ───────────────────────────────────────────────
+  const cargarClientes = useCallback(async (opts: {
+    busqueda?: string
+    filtro?: EstadoSuscripcion
+    page?: number
+    limit?: number
+  }) => {
+    const requestId = ++latestRequestRef.current
     setLoading(true)
-    const data = await listarClientes({
-      busqueda: value || undefined,
-      page: 1,
-      limit: 10,
-      estado_suscripcion: filtroMembresia
-    })
-    setResult(data)
-    setLoading(false)
-  }, [filtroMembresia])
 
-  const handleFiltroChange = useCallback(async (nuevoFiltro: EstadoSuscripcion) => {
-    setFiltroMembresia(nuevoFiltro)
-    setBusqueda('')
-    setLoading(true)
     const data = await listarClientes({
-      page: 1,
-      limit: 10,
-      estado_suscripcion: nuevoFiltro
+      busqueda: opts.busqueda || undefined,
+      page: opts.page ?? 1,
+      limit: opts.limit ?? 10,
+      estado_suscripcion: opts.filtro ?? 'todos',
     })
+
+    // Ignorar respuestas de requests anteriores (race condition)
+    if (requestId !== latestRequestRef.current) return
+
     setResult(data)
+    setPaginaInput(String(data.page))
     setLoading(false)
   }, [])
 
-  const handlePageChange = useCallback(async (newPage: number) => {
-    setLoading(true)
-    const data = await listarClientes({
-      busqueda: busqueda || undefined,
-      page: newPage,
-      limit: 10,
-      estado_suscripcion: filtroMembresia
-    })
-    setResult(data)
-    setLoading(false)
-  }, [busqueda, filtroMembresia])
+  // ── Carga inicial ────────────────────────────────────────────────────────
+  useEffect(() => {
+    cargarClientes({ filtro: filtroMembresia, limit: limite })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  const showMembresia = filtroMembresia !== 'todos'
+  // ── Búsqueda con debounce ────────────────────────────────────────────────
+  const handleSearch = useCallback((value: string) => {
+    setBusqueda(value)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      cargarClientes({ busqueda: value, filtro: filtroMembresia, page: 1, limit: limite })
+    }, DEBOUNCE_MS)
+  }, [filtroMembresia, limite, cargarClientes])
+
+  // ── Cambio de filtro de membresía ────────────────────────────────────────
+  const handleFiltroChange = useCallback((nuevoFiltro: EstadoSuscripcion) => {
+    setFiltroMembresia(nuevoFiltro)
+    setBusqueda('')
+    cargarClientes({ filtro: nuevoFiltro, page: 1, limit: limite })
+  }, [limite, cargarClientes])
+
+  // ── Cambio de página ─────────────────────────────────────────────────────
+  const handlePageChange = useCallback((newPage: number) => {
+    cargarClientes({ busqueda, filtro: filtroMembresia, page: newPage, limit: limite })
+  }, [busqueda, filtroMembresia, limite, cargarClientes])
+
+  // ── Cambio de límite por página ──────────────────────────────────────────
+  const handleLimiteChange = useCallback((val: string) => {
+    const newLimit = Number(val)
+    setLimite(newLimit)
+    cargarClientes({ busqueda, filtro: filtroMembresia, page: 1, limit: newLimit })
+  }, [busqueda, filtroMembresia, cargarClientes])
+
+  // ── Salto directo de página ──────────────────────────────────────────────
+  const handlePaginaInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPaginaInput(e.target.value)
+  }
+
+  const handlePaginaInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      const parsed = parseInt(paginaInput, 10)
+      if (!isNaN(parsed) && parsed >= 1 && parsed <= result.totalPages) {
+        handlePageChange(parsed)
+      } else {
+        setPaginaInput(String(result.page))
+      }
+    }
+  }
+
+  // ── Acciones de membresía ────────────────────────────────────────────────
+  const handleRegistrarMembresia = useCallback((clienteId: string) => {
+    router.push(`/recepcionista/clientes/${clienteId}?action=registrar`)
+  }, [router])
+
+  const handleRenovarMembresia = useCallback((clienteId: string) => {
+    router.push(`/recepcionista/clientes/${clienteId}?action=renovar`)
+  }, [router])
+
+  const textoResultados = result.count === 0
+    ? 'Sin resultados'
+    : `${result.count} cliente${result.count !== 1 ? 's' : ''} encontrado${result.count !== 1 ? 's' : ''}`
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
+      {/* ── Encabezado ─────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Clientes</h1>
-          <p className="text-zinc-400">
-            Gestiona los perfiles de los clientes
-          </p>
+          <p className="text-zinc-400 text-sm mt-0.5">Gestiona los perfiles y membresías de los clientes</p>
         </div>
-        <div className="text-zinc-400 text-sm">
-          {result.count} cliente{result.count !== 1 ? 's' : ''} encontrado{result.count !== 1 ? 's' : ''}
-        </div>
+        <span className="text-zinc-500 text-sm">{textoResultados}</span>
       </div>
 
-      <div className="flex items-center gap-4">
-        <BuscadorCliente onSearch={handleSearch} />
+      {/* ── Resumen estadístico ────────────────────────────────────────── */}
+      <ResumenEstadistico />
+
+      {/* ── Barra de herramientas ──────────────────────────────────────── */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex-1 min-w-60">
+          <BuscadorCliente onSearch={handleSearch} isLoading={loading} />
+        </div>
         <FiltroMembresia value={filtroMembresia} onChange={handleFiltroChange} />
+        <ExportarCSV clientes={result.data as ClienteConMembresia[]} />
       </div>
 
-      <ListaClientes clientes={result.data} loading={loading} showMembresia={showMembresia} />
+      {/* ── Tabla ─────────────────────────────────────────────────────── */}
+      <ListaClientes
+        clientes={result.data}
+        loading={loading}
+        showMembresia
+        onRegistrarMembresia={handleRegistrarMembresia}
+        onRenovarMembresia={handleRenovarMembresia}
+      />
 
-      {result.totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-zinc-400 text-sm">
-            Página {result.page} de {result.totalPages}
-          </p>
-          <div className="flex gap-2">
+      {/* ── Controles de paginación ────────────────────────────────────── */}
+      {(result.totalPages > 1 || result.count > 10) && (
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          {/* Selector de cantidad por página */}
+          <div className="flex items-center gap-2 text-sm text-zinc-400">
+            <span>Mostrar</span>
+            <Select value={String(limite)} onValueChange={handleLimiteChange}>
+              <SelectTrigger className="w-20 h-8 border-zinc-700 bg-zinc-900 text-zinc-300">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-zinc-900 border-zinc-700">
+                {OPCIONES_LIMITE.map(n => (
+                  <SelectItem key={n} value={String(n)} className="text-zinc-300 hover:bg-zinc-800">
+                    {n}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <span>por página</span>
+          </div>
+
+          {/* Navegación de páginas */}
+          <div className="flex items-center gap-1">
+            {/* Primera página */}
             <Button
               variant="outline"
-              size="sm"
+              size="icon"
+              className="size-8 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+              onClick={() => handlePageChange(1)}
+              disabled={result.page === 1 || loading}
+              title="Primera página"
+            >
+              <ChevronsLeft className="size-4" />
+            </Button>
+            {/* Anterior */}
+            <Button
+              variant="outline"
+              size="icon"
+              className="size-8 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
               onClick={() => handlePageChange(result.page - 1)}
-              disabled={result.page === 1}
-              className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
+              disabled={result.page === 1 || loading}
+              title="Página anterior"
             >
               <ChevronLeft className="size-4" />
             </Button>
+
+            {/* Input de salto directo */}
+            <div className="flex items-center gap-1.5 text-sm text-zinc-400 px-1">
+              <span>Página</span>
+              <Input
+                type="number"
+                min={1}
+                max={result.totalPages}
+                value={paginaInput}
+                onChange={handlePaginaInputChange}
+                onKeyDown={handlePaginaInputKeyDown}
+                className="w-14 h-8 text-center border-zinc-700 bg-zinc-900 text-zinc-200"
+              />
+              <span>de {result.totalPages}</span>
+            </div>
+
+            {/* Siguiente */}
             <Button
               variant="outline"
-              size="sm"
+              size="icon"
+              className="size-8 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
               onClick={() => handlePageChange(result.page + 1)}
-              disabled={result.page === result.totalPages}
-              className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
+              disabled={result.page === result.totalPages || loading}
+              title="Página siguiente"
             >
               <ChevronRight className="size-4" />
+            </Button>
+            {/* Última página */}
+            <Button
+              variant="outline"
+              size="icon"
+              className="size-8 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+              onClick={() => handlePageChange(result.totalPages)}
+              disabled={result.page === result.totalPages || loading}
+              title="Última página"
+            >
+              <ChevronsRight className="size-4" />
             </Button>
           </div>
         </div>
