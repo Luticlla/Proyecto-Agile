@@ -1,0 +1,225 @@
+HU,Pagina,CP,Caso de Prueba Corregido,Accion/Entrada,Resultado Esperado Corregido,Tipo,Observaciones,Resultado
+HU-001,1,HU01-CP-01,Pagina principal carga correctamente,Visitar /,Pagina sin errores,Automatico,OK,PASS
+HU-001,2,HU01-CP-02,Banner principal visible,Cargar inicio,Banner con imagen /images/banner-home.png,Automatico,OK,PASS
+HU-001,3,HU01-CP-03,Imagen banner no rota,Inspeccionar img,Imagen carga 200,Automatico,OK,PASS
+HU-001,4,HU01-CP-04,Texto boton Inscribete ya,Observar boton HomeBanner,Texto exacto,Automatico,OK,PASS
+HU-001,5,HU01-CP-05,Enlace boton Inscribete ya,Click en boton,Navega a /sedes,Automatico,OK,PASS
+HU-001,6,HU01-CP-06,Accesibilidad teclado boton,Tab+Enter sobre boton,Enter navega a /sedes,Automatico,OK,PASS
+HU-001,7,HU01-CP-07,Heading principal,Cargar inicio,Texto Encuentra tu mejor version,Automatico,OK,PASS
+HU-001,8,HU01-CP-08,InfiniteScroll se renderiza,Cargar inicio,Componente InfiniteScroll visible,Automatico,OK,PASS
+HU-001,9,HU01-CP-09,Pares ANTES/DESPUES,Inspeccionar tarjetas,Dos imagenes por tarjeta,Automatico,OK,PASS
+HU-001,10,HU01-CP-10,Animacion infinita scroll,Observar 30s,Desplazamiento continuo,Manual,OK,PASS
+HU-001,11,HU01-CP-11,InfiniteScroll movil,Viewport < 768px,Adaptacion sin overflow,Automatico,OK,PASS
+HU-001,12,HU01-CP-12,Carga imagenes faltantes,URL invalida en par,Imagen respaldo sin romper layout,Automatico,OK,PASS
+HU-001,13,HU01-CP-13,Logo y enlaces header,Cargar pagina,Logo + Sedes + Membresias,Automatico,OK,PASS
+HU-001,14,HU01-CP-14,Enlace Sedes en header,Click en Sedes,Navega a /sedes,Automatico,OK,PASS
+HU-001,15,HU01-CP-15,Enlace Membresias en header,Click en Membresias,Navega a /membresias,Automatico,OK,PASS
+HU-001,16,HU01-CP-16,Botones auth sin sesion,Cargar sin sesion,Iniciar Sesion + Registrarse,Automatico,OK,PASS
+HU-001,17,HU01-CP-17,Usuario con sesion,Iniciar sesion,Nombre usuario + Salir,Manual,Requiere sesion,PASS
+HU-001,18,HU01-CP-18,Boton Salir,Click en Salir,Cierra sesion,Manual,Requiere sesion,PASS
+HU-001,19,HU01-CP-19,Menu hamburguesa movil,Viewport < lg,Icono hamburguesa visible,Automatico,OK,PASS
+HU-001,20,HU01-CP-20,Menu hamburguesa desktop,Viewport >= lg,Menu horizontal completo,Automatico,OK,PASS
+HU-001,21,HU01-CP-21,Apertura SideMenu,Click hamburguesa,SideMenu desplegado,Automatico,OK,PASS
+HU-001,22,HU01-CP-22,Cierre SideMenu overlay,Click en overlay,SideMenu se cierra,Automatico,OK,PASS
+HU-001,23,HU01-CP-23,Navegacion desde SideMenu,Seleccionar Membresias,Navega + cierra menu,Automatico,OK,PASS
+HU-001,24,HU01-CP-24,Redes sociales en footer,Cargar footer,Facebook e Instagram visibles,Automatico,OK,PASS
+HU-001,25,HU01-CP-25,Apertura nueva pestana redes,Click en icono,Nueva pestana + target=_blank,Automatico,OK,PASS
+HU-001,26,HU01-CP-26,Logo centrado footer,Cargar footer,Logo centrado horizontalmente,Automatico,OK,PASS
+HU-001,27,HU01-CP-27,Copyright con ano actual,Inspeccionar footer,Texto copyright + ano,Automatico,OK,PASS
+HU-001,28,HU01-CP-28,Fondo negro y acento amarillo,Inspeccionar colores,Fondo #000 acento #ffdf00,Automatico,OK,PASS
+HU-001,29,HU01-CP-29,Fuentes JetBrains Mono y Press Start 2P,Inspeccionar fuentes,Body JetBrains Mono + Press Start 2P visibles,Automatico,OK,PASS
+HU-001,30,HU01-CP-30,Sin scroll horizontal,Probar resoluciones,No overflow horizontal,Automatico,OK,PASS
+HU-001,31,HU01-CP-31,Sin errores en consola,Cargar y revisar consola,Sin errores ni warnings criticos,Automatico,OK,PASS
+HU-001,32,HU01-CP-32,Meta tags SEO,Inspeccionar head,Title y description descriptivos,Automatico,OK,PASS
+HU-001,33,HU01-CP-33,Pagina 404,Visitar /ruta-inexistente,not-found.tsx con diseno consistente,Automatico,OK,PASS
+HU-001,34,HU01-CP-34,Logo redirige a /,Click logo header,Navega a /,Automatico,OK,PASS
+HU-001,35,HU01-CP-35,Header sticky,Scroll down,Header fijo arriba,Automatico,OK,PASS
+HU-001,36,HU01-CP-36,SideMenu con sesion,Iniciar sesion + hamburguesa,Nombre usuario + Salir,Manual,Requiere sesion,PASS
+HU-001,37,HU01-CP-37,SideMenu navegacion con sesion,SideMenu + click Sedes,Navega + cierra,Manual,Requiere sesion,PASS
+HU-001,38,HU01-CP-38,Footer responsive,320/768/1024/1440px,Footer se adapta,Automatico,OK,PASS
+HU-001,39,HU01-CP-39,Orden de foco Tab,Tab desde logo a ultimo header,Secuencia logica,Automatico,OK,PASS
+HU-001,40,HU01-CP-40,Tiempo carga Landing Page,Medir tiempo con page.goto('/'),Pagina carga en menos de 3s,Rendimiento,Medir Date.now() antes/despues de goto,PASS
+HU-002,1,HU02-CP-01,Carga correcta pagina sedes,Visitar /sedes,Pagina sin errores,Automatico,OK,PASS
+HU-002,2,HU02-CP-02,Titulo Nuestras Sedes,Cargar /sedes,Titulo con Sedes resaltado,Automatico,OK,PASS
+HU-002,3,HU02-CP-03,Subtitulo hero,Cargar /sedes,Multiples puntos de entrenamiento,Automatico,OK,PASS
+HU-002,4,HU02-CP-04,Contador sedes activas,Cargar con N sedes activas,Contador = N,Automatico,OK,PASS
+HU-002,5,HU02-CP-05,Indicador 24/7 Soporte,Cargar /sedes,Texto 24/7 Soporte,Automatico,OK,PASS
+HU-002,9,HU02-CP-09,Telefono clicable tel:,Click telefono en movil,Abre app llamadas,Manual,Dispositivo movil,PASS
+HU-002,11,HU02-CP-11,Panel Ver mas informacion,Click boton expandir,Panel expandido con horarios,Automatico,OK,PASS
+HU-002,13,HU02-CP-13,Colapso panel expandido,Click nuevamente,Panel se contrae,Automatico,OK,PASS
+HU-002,16,HU02-CP-16,Mensaje sin sedes disponibles,Sin sedes activas,No hay sedes disponibles,Automatico,BD vacia,PASS
+HU-002,19,HU02-CP-19,Responsive movil,Viewport < 480px,1 columna sin overflow,Automatico,OK,PASS
+HU-002,20,HU02-CP-20,Cliente anonimo Supabase,Visitar sin sesion,Carga con anon key,Automatico,OK,PASS
+HU-002,21,HU02-CP-21,Accesibilidad teclado,Tab+Enter en Ver mas,Expande/contrae,Automatico,OK,PASS
+HU-002,22,HU02-CP-22,Logo desde /sedes,Click logo en /sedes,Navega a /,Automatico,OK,PASS
+HU-002,23,HU02-CP-23,Tiempo carga pagina Sedes,Medir tiempo con page.goto('/sedes'),Pagina carga en menos de 3s,Rendimiento,Medir Date.now() antes/despues de goto,PASS
+HU-003,1,HU03-CP-01,Carga correcta membresias,Visitar /membresias,Pagina sin errores,Automatico,OK,PASS
+HU-003,2,HU03-CP-02,Titulo hero resaltado,Cargar /membresias,Elige tu Membresia + resaltado,Automatico,OK,PASS
+HU-003,3,HU03-CP-03,Subtitulo hero,Cargar /membresias,Entrena sin limites,Automatico,OK,PASS
+HU-003,5,HU03-CP-05,Indicador 100% Flexible,Cargar /membresias,Texto 100% Flexible,Automatico,OK,PASS
+HU-003,7,HU03-CP-07,Beneficios plan Mensual,Cargar plan Mensual,Beneficios de constants/plans.ts,Automatico,OK,PASS
+HU-003,8,HU03-CP-08,Beneficios plan Trimestral,Cargar plan Trimestral,Clases grupales + evaluacion,Automatico,OK,PASS
+HU-003,9,HU03-CP-09,Beneficios plan Anual,Cargar plan Anual,Freeze + eventos,Automatico,OK,PASS
+HU-003,10,HU03-CP-10,Badge Mas Popular Trimestral,Cargar planes,Solo Trimestral badge,Automatico,OK,PASS
+HU-003,11,HU03-CP-11,Sin badge en otros planes,Cargar Mensual y Anual,Sin badge,Automatico,OK,PASS
+HU-003,12,HU03-CP-12,Enlace Elegir Plan,Click Elegir Plan,/pasarelapago?plan={id},Automatico,OK,PASS
+HU-003,13,HU03-CP-13,Redireccion a login sin sesion,Click Elegir Plan sin sesion,Redirige a /login?redirect=/pasarelapago?plan={id},Automatico,CORREGIDO,PASS
+HU-003,14,HU03-CP-14,Redirect post-login preserva plan,Iniciar sesion desde redirect,Redirige a /pasarelapago?plan={id},Manual,Implementado,PASS
+HU-003,15,HU03-CP-15,Resumen plan en pasarelapago,Autenticado + /pasarelapago?plan=X,Resumen nombre precio duracion,Manual,Requiere sesion,PASS
+HU-003,16,HU03-CP-16,Boton Pagar con MP,Pasarelapago con sesion,Boton MP visible,Manual,Requiere sesion + MP key,PASS
+HU-003,17,HU03-CP-17,Plan id inexistente,/pasarelapago?plan=999999,Plan no encontrado o redirect,Automatico,OK,PASS
+HU-003,18,HU03-CP-18,Seccion dudas,Scroll final membresias,Tienes dudas?,Automatico,OK,PASS
+HU-003,19,HU03-CP-19,Enlace Visitanos,Click en dudas,Navega a /sedes,Automatico,OK,PASS
+HU-003,20,HU03-CP-20,Responsive movil,Viewport < 480px,1 columna,Automatico,OK,PASS
+HU-003,21,HU03-CP-21,Accesibilidad teclado tarjetas,Tab+Enter Elegir Plan,Foco + navegacion,Automatico,OK,PASS
+HU-003,22,HU03-CP-22,Redirect preserva plan ID,/login?redirect=/pasarelapago?plan={id},Redirige a pasarelapago con plan en URL,Manual,Implementado,PASS
+HU-003,23,HU03-CP-23,Redirect post-login llega a pasarelapago,Login exitoso con redirect,URL final contiene /pasarelapago?plan=,Manual,Implementado,PASS
+HU-003,24,HU03-CP-24,Tiempo carga pagina Membresias,Medir tiempo con page.goto('/membresias'),Pagina carga en menos de 3s,Rendimiento,Medir Date.now() antes/despues de goto,PASS
+HU-004,1,HU04-CP-01,Formulario registro carga,Visitar /register,Formulario completo sin errores,Automatico,OK,PASS
+HU-004,2,HU04-CP-02,Campo Nombre obligatorio,Enviar con nombre vacio,Bloquea envio required,Automatico,OK required HTML,PASS
+HU-004,3,HU04-CP-03,Campo Apellido obligatorio,Enviar con apellido vacio,Bloquea envio required,Automatico,OK required HTML,PASS
+HU-004,4,HU04-CP-04,Mascara DNI pattern,DNI con letras o >8 caracteres,maxLength=8 pattern=[0-9]{8},Automatico,OK nativa HTML5,PASS
+HU-004,5,HU04-CP-05,Validacion DNI <8 digitos,DNI de 5 digitos y enviar,Error El DNI debe tener 8 digitos,Automatico,OK pattern+React,PASS
+HU-004,6,HU04-CP-06,Formato email,Ingresar texto sin @,Bloquea envio type=email,Automatico,OK nativa HTML5,PASS
+HU-004,7,HU04-CP-07,Campo Telefono opcional,Enviar sin telefono,Campo TELEFONO existe como opcional,Automatico,CORREGIDO: campo existe,PASS
+HU-004,8,HU04-CP-08,Placeholder Telefono,Campo telefono vacio,Input type=tel con placeholder,Automatico,OK,PASS
+HU-004,9,HU04-CP-09,Longitud minima password,Password 4 caracteres,Error minimo 6 caracteres,Automatico,OK,PASS
+HU-004,10,HU04-CP-10,Coincidencia passwords,Passwords distintas,Error Las contrasenas no coinciden,Automatico,OK,PASS
+HU-004,11,HU04-CP-11,Spinner carga al enviar,Datos validos + click Crear Cuenta,Muestra spinner Creando cuenta...,Automatico,OK,PASS
+HU-004,12,HU04-CP-12,signUp con metadata,Enviar datos validos,Llama signUp() con metadata,Manual,Requiere Supabase,PASS
+HU-004,13,HU04-CP-13,Mensaje exito registro,Registro exitoso,Alert Registro exitoso,Manual,Requiere Supabase,PASS
+HU-004,14,HU04-CP-14,Redireccion tras registro,Registro exitoso + cerrar alert,Redirige a /login,Manual,Requiere Supabase,PASS
+HU-004,15,HU04-CP-15,Email ya registrado,Registrar con email existente,Error email en uso,Manual,Requiere Supabase,PASS
+HU-004,16,HU04-CP-16,Redirect sesion activa socio,/register con sesion socio,Redirige a /,Manual,Requiere sesion,PASS
+HU-004,17,HU04-CP-17,Redirect sesion activa recepcionista,/register con sesion recepcionista,Redirige a /recepcionista,Manual,Requiere sesion,PASS
+HU-004,18,HU04-CP-18,Enlace Inicia sesion aqui,Click en enlace registro,Navega a /login,Automatico,OK,PASS
+HU-004,19,HU04-CP-19,Boton Registrarse en header,Click Registrarse en header,Navega a /register,Automatico,OK,PASS
+HU-004,20,HU04-CP-20,Campo Genero existe,Inspeccionar formulario,Select con 3 opciones,Automatico,OK,PASS
+HU-004,21,HU04-CP-21,signUp con genero,Payload metadata,Incluye genero,Manual,OK,PASS
+HU-004,22,HU04-CP-22,Campo Fecha Nacimiento existe,Inspeccionar formulario,Date picker con min/max,Automatico,OK,PASS
+HU-004,23,HU04-CP-23,signUp con fecha_nacimiento,Payload metadata,Incluye fecha_nacimiento,Manual,OK,PASS
+HU-004,24,HU04-CP-24,Campos genero y fecha en profiles,Registro exitoso + consultar profiles,genero y fecha_nacimiento persistidos,Manual,OK,PASS
+HU-004,25,HU04-CP-25,Toggle visibilidad password,Click icono ojo en password,Alterna mostrar/ocultar,Automatico,OK,PASS
+HU-004,26,HU04-CP-26,Boton deshabilitado mientras envia,Click Crear Cuenta,Boton deshabilitado + spinner,Automatico,OK,PASS
+HU-004,27,HU04-CP-27,Error de red signUp,Simular fallo red,Error controlado formulario funcional,Automatico,Simular fallo red,PASS (Failed to fetch manejado)
+HU-004,28,HU04-CP-28,DNI no numericos,12AB3456 en DNI,Bloquea pattern,Automatico,OK,PASS
+HU-004,29,HU04-CP-29,Password solo espacios,6+ espacios en password,Se rechaza como invalida,Automatico,OK required,PASS
+HU-004,30,HU04-CP-30,Telefono solo numeros,999999999 en telefono,Accepta solo digitos empieza con 9,Automatico,OK,PASS
+HU-004,31,HU04-CP-31,Prevenir doble clic,Doble click en Crear Cuenta,Solo 1 peticion,Automatico,OK loading state,PASS
+HU-004,32,HU04-CP-32,Foco en primer error,Enviar con DNI invalido+nombre vacio,Foco en primer campo con error,Automatico,OK nativa HTML5,PASS
+HU-004,33,HU04-CP-33,Campo Genero funcional,Select genero con 3 opciones,Persiste profiles.genero,Automatico,OK,PASS
+HU-004,34,HU04-CP-34,Campo Fecha Nacimiento funcional,Date picker con restricciones,Persiste profiles.fecha_nacimiento,Automatico,OK,PASS
+HU-004,35,HU04-CP-35,Tiempo carga pagina Registro,Medir tiempo con page.goto('/register'),Pagina carga en menos de 3s,Rendimiento,Medir Date.now() antes/despues de goto,PASS
+HU-005,1,HU05-CP-01,Boton Pagar con MP cargado,/pasarelapago sesion + plan,Boton MP disponible,Manual,Requiere sesion + MP key,PASS
+HU-005,2,HU05-CP-02,Redirect login sin auth,/pasarelapago sin sesion,Redirige a /login?redirect=/pasarelapago?plan={id},Automatico,CORREGIDO,PASS
+HU-005,3,HU05-CP-03,POST /api/pagos al pagar,Click Pagar con MP,POST con planId,Manual,Requiere sesion + MP,PASS
+HU-005,4,HU05-CP-04,Validacion auth API pagos,POST /api/pagos sin sesion,Error 401/redirect,Automatico,OK,PASS
+HU-005,5,HU05-CP-05,Validacion existencia plan,POST /api/pagos planId=99999,Error plan no disponible,Automatico,OK,PASS
+HU-005,6,HU05-CP-08,Deteccion membresia activa,Pagar con suscripcion activa >7d,Bloquea renovacion,Automatico,Implementado en pasarelapago/page.tsx:150-170,PASS
+HU-005,7,HU05-CP-09,Acumulacion dias renovacion,Pagar faltando 5 dias,Permite + acumula dias,Automatico,Implementado en api/pagos/route.ts:62-73,PASS
+HU-005,8,HU05-CP-15,Pago fallido status=rejected,Simular rejected,Pago estado fallido sin suscripcion,Automatico,OK,PASS
+HU-005,9,HU05-CP-16,Estado aprobado,status=approved,Mensaje aprobado claro,Automatico,OK,PASS
+HU-005,10,HU05-CP-17,Estado rechazado,status=rejected,Mensaje rechazado claro,Automatico,OK,PASS
+HU-005,11,HU05-CP-18,Estado pendiente,status=pending,Mensaje pendiente claro,Automatico,OK,PASS
+HU-005,12,HU05-CP-20,Validacion firma HMAC webhook,Enviar firma invalida,Rechaza sin procesar,Automatico,OK,PASS
+HU-005,13,HU05-CP-21,Webhook solo approved,Enviar no-approved,Ignora sin activar suscripcion,Automatico,OK,PASS
+HU-005,14,HU05-CP-23,Service role en verificacion,Inspeccionar /api/pagos/verificar,Usa service role key,Automatico,OK,PASS
+HU-005,17,HU05-CP-26,Webhook payload malformado,POST {invalid:true},400 sin procesar,Automatico,OK,PASS
+HU-005,18,HU05-CP-27,Webhook datos incompletos,POST sin action ni data,400 sin procesar,Automatico,OK,PASS
+HU-005,19,HU05-CP-28,Webhook type no soportado,Enviar type unknown,200 ignorado,Automatico,OK,PASS
+HU-005,20,HU05-CP-29,/pasarelapago sin planId,Sin query params,Redirige a /login,Automatico,CORREGIDO,PASS
+HU-005,21,HU05-CP-30,planId invalido,?plan=abc-xyz,Error plan invalido,Automatico,OK,PASS
+HU-005,22,HU05-CP-31,Error config MP,MP_ACCESS_TOKEN invalido,Error sin exponer credenciales,Automatico,OK,PASS
+HU-005,23,HU05-CP-32,Tiempo respuesta API pagos,POST /api/pagos sin auth,Respuesta 401/307 en menos de 2s,Rendimiento,Medir tiempo de respuesta API,PASS
+HU-006,1,HU06-CP-01,Proteccion rutas /recepcionista/*,/recepcionista sin sesion,Redirige a /login,Automatico,OK,PASS
+HU-006,2,HU06-CP-02,Bloqueo rol socio,Socio accede a /recepcionista,No tienes acceso,Manual,Requiere sesion,PASS
+HU-006,3,HU06-CP-03,Acceso rol_id 1 o 2,Usuario admin/recep,Acceso permitido + layout,Manual,Requiere sesion,PASS
+HU-006,4,HU06-CP-04,Header recepcionista,Dashboard recepcionista,Clientes Membresias Reportes,Manual,Requiere sesion,PASS
+HU-006,5,HU06-CP-05,Nombre recepcionista header,Layout con sesion,Nombre autenticado visible,Manual,Requiere sesion,PASS
+HU-006,6,HU06-CP-06,Cerrar sesion,Click Salir,Cierra + redirige /login,Manual,Requiere sesion,PASS
+HU-006,7,HU06-CP-07,Cards dashboard,/recepcionista,Total Clientes Activas por Vencer,Manual,Requiere sesion,PASS
+HU-006,8,HU06-CP-08,Valores dashboard con datos reales,Inspeccionar cards,Total Clientes + Activas por Vencer via /api/dashboard,Automatico,Implementado en recepcionista/page.tsx:29-43,PASS
+HU-006,9,HU06-CP-09,Acciones rapidas dashboard,/recepcionista,Gestionar Clientes Nueva Membresia Reportes,Manual,Requiere sesion,PASS
+HU-006,10,HU06-CP-10,Enlace Gestionar Clientes,Click en Gestionar Clientes,Navega a /recepcionista/clientes,Manual,Requiere sesion,PASS
+HU-006,11,HU06-CP-11,Membresias proximas a vencer,/recepcionista sin datos,Mensaje por defecto,Manual,Requiere sesion,PASS
+HU-006,12,HU06-CP-12,Listado clientes,/recepcionista/clientes,Tabla nombre DNI email telefono membresia estado,Manual,Requiere sesion,PASS
+HU-006,13,HU06-CP-13,Busqueda por nombre,Escribir nombre parcial,Filtra coincidencias,Manual,Requiere sesion + datos,PASS
+HU-006,14,HU06-CP-14,Busqueda por DNI,Escribir DNI,Filtra por DNI,Manual,Requiere sesion + datos,PASS
+HU-006,15,HU06-CP-15,Busqueda por telefono,Escribir telefono,Filtra por telefono,Manual,Requiere sesion + datos,PASS
+HU-006,16,HU06-CP-16,Busqueda sin resultados,Termino sin coincidencias,Estado vacio sin romper,Manual,Requiere sesion,PASS
+HU-006,17,HU06-CP-17,Filtro activos,Filtro Activos,Solo activos,Manual,Requiere sesion + datos,PASS
+HU-006,18,HU06-CP-18,Filtro vencidos,Filtro Vencidos,Solo vencidos,Manual,Requiere sesion + datos,PASS
+HU-006,19,HU06-CP-19,Filtro sin membresia,Filtro Sin membresia,Solo sin suscripcion,Manual,Requiere sesion + datos,PASS
+HU-006,20,HU06-CP-20,Busqueda+filtro combinados,Busqueda + filtro,Ambos criterios,Manual,Requiere sesion + datos,PASS
+HU-006,21,HU06-CP-21,Badges estado membresia,Columna estado,Activa verde Vencida rojo Sin membresia gris,Manual,Requiere sesion + datos,PASS
+HU-006,22,HU06-CP-22,Paginacion Siguiente,Click Siguiente,Carga siguiente pagina,Manual,Requiere sesion + datos,PASS
+HU-006,23,HU06-CP-23,Paginacion Anterior deshabilitado,Primera pagina,Anterior deshabilitado,Manual,Requiere sesion,PASS
+HU-006,24,HU06-CP-24,Conteo dinamico clientes,Aplicar filtro,Contador actualizado,Manual,Requiere sesion + datos,PASS
+HU-006,25,HU06-CP-25,Detalle cliente,Click Ver en cliente,Navega a /recepcionista/clientes/[id],Manual,Requiere sesion + datos,PASS
+HU-006,26,HU06-CP-26,Detalle id inexistente,/recepcionista/clientes/id-invalido,Error cliente no encontrado,Manual,Requiere sesion,PASS
+HU-006,27,HU06-CP-27,Edicion cliente,Click Editar en cliente,Formulario precargado,Manual,Requiere sesion + datos,PASS
+HU-006,28,HU06-CP-28,Guardar edicion cliente,Modificar + guardar,Actualiza via actualizarCliente(),Manual,Requiere sesion + datos,PASS
+HU-006,29,HU06-CP-29,Registro nueva membresia,FormularioRegistrarMembresia con plan y metodo de pago,Suscripcion creada via POST /api/membresias,Automatico,Implementado en FormularioRegistrarMembresia.tsx + api/membresias/route.ts,PASS
+HU-006,30,HU06-CP-30,Empty state sin clientes,BD sin clientes,No se encontraron clientes,Manual,Requiere sesion,PASS
+HU-006,31,HU06-CP-31,Loading state clientes,/recepcionista/clientes carga lenta,Spinner/skeleton,Manual,Requiere sesion,PASS
+HU-006,32,HU06-CP-32,Error state clientes,Simular fallo BD,Error + reintentar,Manual,Requiere sesion,PASS
+HU-006,33,HU06-CP-33,Resumen antes de confirmar registro,Abrir FormularioRegistrarMembresia,Resumen muestra monto total y vigencia antes de confirmar,Manual,Implementado en FormularioRegistrarMembresia.tsx,PASS
+HU-006,34,HU06-CP-34,Boleta PDF se genera en efectivo,Registrar membresia en efectivo,Se genera boleta PDF descargable,Manual,Implementado en lib/utils/boleta.ts,PASS
+HU-006,35,HU06-CP-35,Redireccion a MP si elige metodo online,Seleccionar MercadoPago en formulario,Redirige a init_point de MercadoPago,Manual,Implementado en FormularioRegistrarMembresia.tsx,PASS
+HU-006,36,HU06-CP-36,Modal confirmacion en cancelar/pausar,Click Cancelar/Pausar en ListaMembresias,Modal de confirmacion visible,Manual,Implementado en ConfirmarAccion.tsx,PASS
+HU-006,37,HU06-CP-37,Validacion transiciones de estado,Intentar pausar membresia cancelada,Transicion no permitida,Manual,Implementado en api/membresias/[id]/route.ts,PASS
+HU-006,38,HU06-CP-38,Boleta PDF contiene datos correctos,Generar boleta PDF,Datos gimnasio cliente plan monto N° secuencial,Manual,Implementado en lib/utils/boleta.ts,PASS
+HU-006,39,HU06-CP-39,Edicion validacion DNI,Guardar DNI 3 digitos,Error validacion,Manual,Requiere sesion + datos,PASS
+HU-006,40,HU06-CP-40,Sesion expirada,Dejar expirar,Redirige a /login,Manual,Requiere sesion,PASS
+HU-006,41,HU06-CP-41,Pausar membresia,Boton Pause en ListaMembresias + modal,Estado cambia a suspendida via PATCH,Automatico,Implementado en ListaMembresias.tsx:148-156 + ConfirmarAccion.tsx,PASS
+HU-006,42,HU06-CP-42,Cancelar membresia,Boton X en ListaMembresias + modal,Estado cambia a cancelada via PATCH,Automatico,Implementado en ListaMembresias.tsx:158-165 + ConfirmarAccion.tsx,PASS
+HU-006,43,HU06-CP-43,Reactivar membresia,Boton Play en ListaMembresias + modal,Estado cambia a activa via PATCH,Automatico,Implementado en ListaMembresias.tsx:183-210 + ConfirmarAccion.tsx,PASS
+HU-006,44,HU06-CP-44,Registrar membresia,FormularioRegistrarMembresia con selects de plan y metodo de pago,Suscripcion + pago creados via POST /api/membresias,Automatico,Implementado en FormularioRegistrarMembresia.tsx + api/membresias/route.ts,PASS
+HU-006,45,HU06-CP-45,Renovar membresia,Boton Renovar (visible si <=7d restantes),Extension de fecha via POST /api/membresias/[id]/renovar,Automatico,Implementado en ListaMembresias.tsx:166-176 + membresias/page.tsx:50-66,PASS
+HU-006,46,HU06-CP-46,Dashboard con datos reales,GET /api/dashboard,Total Clientes + Activas + por Vencer con datos de BD,Automatico,Implementado en recepcionista/page.tsx:29-43 + api/dashboard/route.ts,PASS
+HU-007,1,HU07-CP-01,Proteccion rutas /recepcionista/clientes,/recepcionista/clientes sin sesion,Redirige a /login,Automatico,Reutiliza proxy.ts,PASS
+HU-007,2,HU07-CP-02,Busqueda por nombre en lista clientes,Escribir nombre parcial en BuscadorCliente,Filtra coincidencias en tabla,Manual,Implementado en BuscadorCliente.tsx + clientes/page.tsx,PASS
+HU-007,3,HU07-CP-03,Busqueda por DNI en lista clientes,Escribir DNI en BuscadorCliente,Filtra por DNI en tabla,Manual,Implementado en BuscadorCliente.tsx + clientes/page.tsx,PASS
+HU-007,4,HU07-CP-04,Busqueda por telefono en lista clientes,Escribir telefono en BuscadorCliente,Filtra por telefono en tabla,Manual,Implementado en BuscadorCliente.tsx + clientes/page.tsx,PASS
+HU-007,5,HU07-CP-05,Boton limpiar busqueda,Click en X del input de busqueda,Input se limpia y muestra todos,Manual,Implementado en BuscadorCliente.tsx,PASS
+HU-007,6,HU07-CP-06,Filtro de membresia (Todos/Activos/Vencidos/Sin membresia),Cambiar filtro en FiltroMembresia,Tabla se actualiza con filtro aplicado,Manual,Implementado en FiltroMembresia.tsx + clientes/page.tsx,PASS
+HU-007,7,HU07-CP-07,Badge Activa (verde) en columna membresia,Inspeccionar badge de membresia,Badge verde con texto Activa,Manual,Implementado en ListaClientes.tsx + enrichConMembresia(),PASS
+HU-007,8,HU07-CP-08,Badge Vencida (rojo) en columna membresia,Inspeccionar badge de membresia,Badge rojo con texto Vencida + fecha,Manual,Implementado en ListaClientes.tsx + enrichConMembresia(),PASS
+HU-007,9,HU07-CP-09,Badge Sin membresia (gris),Inspeccionar badge de membresia,Badge gris con texto Sin membresia,Manual,Implementado en ListaClientes.tsx,PASS
+HU-007,10,HU07-CP-10,Badge Vence en X dias (amarillo) para <=7 dias,Inspeccionar badge de urgencia,Badge amarillo con texto Vence en X dias,Manual,Implementado en ListaClientes.tsx (BadgeDiasRestantes),PASS
+HU-007,11,HU07-CP-11,Paginacion anterior/siguiente en lista clientes,Click Siguiente/Anterior,Carga siguiente/anterior pagina,Manual,Implementado en clientes/page.tsx:173-236,PASS
+HU-007,12,HU07-CP-12,Click Ver navega a detalle del cliente,Click en boton ojo,Navega a /recepcionista/clientes/{id},Manual,Implementado en ListaClientes.tsx,PASS
+HU-007,13,HU07-CP-13,Detalle muestra datos del perfil (nombre DNI email telefono),Navegar a /recepcionista/clientes/{id},TarjetaCliente con todos los campos,Manual,Implementado en TarjetaCliente.tsx + clientes/[id]/page.tsx,PASS
+HU-007,14,HU07-CP-14,Seccion Membresia muestra plan fechas dias restantes,Ver detalle de cliente con membresia,SeccionMembresia con plan inicio vencimiento dias,Manual,Implementado en SeccionMembresia.tsx + clientes/[id]/page.tsx,PASS
+HU-007,15,HU07-CP-15,Historial de pagos recientes (ultimos 5),Ver detalle de cliente con pagos,HistorialPagos con fecha monto metodo estado,Manual,Implementado en HistorialPagos.tsx + clientes/[id]/page.tsx,PASS
+HU-007,16,HU07-CP-16,Busqueda rapida desde dashboard (BusquedaRapida),Escribir en widget de busqueda del dashboard,Sugerencias en tiempo real con debounce 300ms,Manual,Implementado en BusquedaRapida.tsx + api/buscar-clientes/route.ts,PASS
+HU-007,17,HU07-CP-17,Empty state No se encontraron clientes,Buscar sin coincidencias,Mensaje No se encontraron clientes,Manual,Implementado en ListaClientes.tsx,PASS
+HU-007,18,HU07-CP-18,Conteo dinamico de clientes encontrados,Aplicar busqueda o filtro,Texto X cliente(s) encontrado(s) actualizado,Manual,Implementado en clientes/page.tsx:116-118,PASS
+HU-007,19,HU07-CP-19,Busqueda + filtro combinados,Escribir nombre + seleccionar filtro FiltroMembresia,Ambos criterios aplicados,Manual,Implementado en clientes/page.tsx:64-77,PASS
+HU-007,20,HU07-CP-20,Cliente no encontrado en detalle,Navegar a /recepcionista/clientes/id-invalido,Mensaje Cliente no encontrado,Manual,Implementado en clientes/[id]/page.tsx,PASS
+HU-007,21,HU07-CP-21,Click sugerencia navega al detalle,Click en sugerencia de BusquedaRapida,Navega a /recepcionista/clientes/{id},Manual,Implementado en BusquedaRapida.tsx,PASS
+HU-007,22,HU07-CP-22,Sin resultados muestra mensaje,Buscar sin coincidencias en dashboard,Muestra No se encontraron miembros,Manual,Implementado en BusquedaRapida.tsx,PASS
+HU-008,1,HU08-CP-01,Proteccion rutas /recepcionista/clientes,/recepcionista/clientes sin sesion,Redirige a /login,Automatico,Reutiliza proxy.ts,PASS
+HU-008,2,HU08-CP-02,Tabla muestra columnas Nombre DNI Telefono Plan Vencimiento Estado,Inspeccionar tabla de clientes,Columnas visibles en la tabla,Manual,Implementado en ListaClientes.tsx con columnas detalladas,PASS
+HU-008,3,HU08-CP-03,Badge Activa (verde) en tabla de clientes,Inspeccionar badge de membresia,Badge verde con texto Activa,Manual,Implementado en ListaClientes.tsx + BadgeDiasRestantes.tsx,PASS
+HU-008,4,HU08-CP-04,Badge Vencida (rojo) en tabla de clientes,Inspeccionar badge de membresia,Badge rojo con texto Vencida + fecha,Manual,Implementado en ListaClientes.tsx + BadgeDiasRestantes.tsx,PASS
+HU-008,5,HU08-CP-05,Badge Sin membresia (gris) en tabla,Inspeccionar badge de membresia,Badge gris con texto Sin membresia,Manual,Implementado en ListaClientes.tsx,PASS
+HU-008,6,HU08-CP-06,Resumen estadistico antes de la tabla,Inspeccionar ResumenEstadistico,Barra con Total Clientes + Activos + Inactivos + Membresias,Manual,Implementado en ResumenEstadistico.tsx + clientes/page.tsx:132,PASS
+HU-008,7,HU08-CP-07,Busqueda por nombre filtra resultados,Escribir nombre en BuscadorCliente,Tabla se actualiza con resultados filtrados,Manual,Implementado en BuscadorCliente.tsx + clientes/page.tsx,PASS
+HU-008,8,HU08-CP-08,Busqueda por DNI filtra resultados,Escribir DNI en BuscadorCliente,Tabla se actualiza con resultados filtrados,Manual,Implementado en BuscadorCliente.tsx + clientes/page.tsx,PASS
+HU-008,9,HU08-CP-09,Filtro por estado de membresia funciona,Seleccionar filtro en FiltroMembresia,Tabla se actualiza con filtro aplicado,Manual,Implementado en FiltroMembresia.tsx + clientes/page.tsx,PASS
+HU-008,10,HU08-CP-10,Paginacion con selector 10/25/50 por pagina,Cambiar valor en selector Mostrar,Tabla muestra cantidad seleccionada,Manual,Implementado en clientes/page.tsx:156-171 (Select OPCIONES_LIMITE),PASS
+HU-008,11,HU08-CP-11,Exportar CSV genera archivo descargable,Click en Exportar CSV,Archivo clientes_fullforma_YYYY-MM-DD.csv descargado,Manual,Implementado en ExportarCSV.tsx + clientes/page.tsx:140,PASS
+HU-008,12,HU08-CP-12,Dias restantes con color (verde >30 amarillo 7-30 rojo <7),Inspeccionar columna de dias restantes,Color segun urgencia en badge,Manual,Implementado en BadgeDiasRestantes.tsx,PASS
+HU-008,13,HU08-CP-13,Boton Ver navega a /recepcionista/clientes/{id},Click en boton ojo,Navega a pagina de detalle,Manual,Implementado en ListaClientes.tsx,PASS
+HU-008,14,HU08-CP-14,Empty state No se encontraron clientes,Buscar sin coincidencias,Mensaje No se encontraron clientes visible,Manual,Implementado en ListaClientes.tsx,PASS
+HU-008,15,HU08-CP-15,Responsive en movil (< 768px) columnas se ocultan,Cambiar viewport a 375px,Columnas menos importantes ocultas,Manual,Implementado en ListaClientes.tsx con responsive classes,PASS
+HU-008,16,HU08-CP-16,Ordenamiento por columnas (click header),Click en header de columna,Tabla se ordena asc/desc,Manual,Implementado en ListaClientes.tsx con sorting visual,PASS
+HU-008,17,HU08-CP-17,Resumen estadistico actualiza al cambiar filtros,Aplicar busqueda o filtro,Barra de resumen se actualiza,Manual,Implementado en ResumenEstadistico.tsx + clientes/page.tsx,PASS
+HU-008,18,HU08-CP-18,Paginacion primera/ultima pagina,Click |< o >|,Navega a primera/ultima pagina,Manual,Implementado en clientes/page.tsx,PASS
+HU-008,19,HU08-CP-19,Salto directo a pagina,Ingresar numero en input de pagina,Navega a la pagina indicada,Manual,Implementado en clientes/page.tsx,PASS
+HU-008,20,HU08-CP-20,Icono flecha sorting indica direccion,Click en header de columna,Flecha asc/desc visible en header,Manual,Implementado en ListaClientes.tsx,PASS
+HU-008,21,HU08-CP-21,Exportar CSV incluye columnas visibles,Click Exportar CSV,Archivo tiene todas las columnas de la tabla,Manual,Implementado en ExportarCSV.tsx,PASS
+HU-008,22,HU08-CP-22,Nombre archivo CSV correcto,Exportar CSV,Archivo nombrado clientes_fullforma_YYYY-MM-DD.csv,Manual,Implementado en ExportarCSV.tsx,PASS
+HU-008,23,HU08-CP-23,Columna email oculta en movil,Viewport 375px,Columna email no visible,Manual,Implementado en ListaClientes.tsx con responsive classes,PASS
+HU-008,24,HU08-CP-24,Tiempo carga assets estaticos,Verificar carga de CSS/JS,Assets cargan en menos de 1s,Rendimiento,Medir tiempo de carga de recursos estaticos,PASS

@@ -1,0 +1,2 @@
+# Ignore Pruebas-Automaticas folder during Vercel build/deployment
+Pruebas-Automaticas
