@@ -147,10 +147,16 @@ function PasarelaPagoContent() {
   }, [])
 
   useEffect(() => {
-    if (!user || membresiaCheckedRef.current) return
+    if (membresiaCheckedRef.current) return
+
+    if (!user) {
+      setCheckingMembresia(false)
+      return
+    }
+
+    membresiaCheckedRef.current = true
 
     const checkMembresia = async () => {
-      membresiaCheckedRef.current = true
       try {
         const response = await fetch('/api/membresias/estado')
         if (response.ok) {

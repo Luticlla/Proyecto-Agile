@@ -158,7 +158,10 @@ export function ListaPlanesMembresia({ planes }: { planes: Plan[] }) {
                   Membresía activa
                 </Button>
               ) : (
-                <Link href={`/pasarelapago?plan=${plan.id}`} className="block">
+                <Link
+                  href={user ? `/pasarelapago?plan=${plan.id}` : `/login?redirect=${encodeURIComponent(`/pasarelapago?plan=${plan.id}`)}`}
+                  className="block"
+                >
                   <Button
                     className={`
                       w-full font-arcade text-[10px] md:text-xs uppercase tracking-wider py-3 md:py-4

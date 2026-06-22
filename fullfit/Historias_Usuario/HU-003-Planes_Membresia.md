@@ -36,9 +36,9 @@
 - id, nombre, descripcion, precio, duracion_dias, activo, creado_en
 
 ### 6. Features por Plan (constants/plans.ts)
-- **Mensual**: Acceso a todas las sedes, Área de pesas y máquinas, Vestuarios y locker, App de seguimiento
+- **Mensual**: Acceso a todas las sedes, Área de pesas y máquinas, Vestuarios y locker
 - **Trimestral**: + Clases grupales ilimitadas, Evaluación corporal mensual
-- **Anual**: + 2 días de freeze, Acceso prioritario a eventos
+- **Anual**: Acceso prioritario a eventos
 
 ## Archivos Relacionados
 - `app/(marketing)/membresias/page.tsx`

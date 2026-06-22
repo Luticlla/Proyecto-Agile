@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
 
+// ── HU-007: Login y Autenticación ─────────────────────────────────────────
 test.describe('HU-007: Login y Autenticación', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/login', { waitUntil: 'networkidle', timeout: 30000 })
@@ -14,8 +15,7 @@ test.describe('HU-007: Login y Autenticación', () => {
   })
 
   test('Subtítulo "Inicia sesión para acceder a tu cuenta" visible', async ({ page }) => {
-    const sub = page.getByText(/Inicia sesión para acceder/i)
-    if (await sub.count() > 0) await expect(sub.first()).toBeVisible()
+    await expect(page.getByText(/Inicia sesión para acceder/i).first()).toBeVisible()
   })
 
   test('Campo Email o DNI visible y required', async ({ page }) => {
@@ -35,24 +35,18 @@ test.describe('HU-007: Login y Autenticación', () => {
     await expect(page.locator('button:has-text("Iniciar Sesión")')).toBeVisible()
   })
 
-  test('Enlace "¿Olvidaste tu contraseña?" visible y navega a /forgot-password', async ({ page }) => {
-    const link = page.locator('a:has-text("Olvidaste")')
-    await expect(link).toBeVisible()
-    await link.click()
+  test('Enlace "¿Olvidaste tu contraseña?" navega a /forgot-password', async ({ page }) => {
+    await page.locator('a:has-text("Olvidaste")').click()
     await expect(page).toHaveURL(/forgot-password/)
   })
 
-  test('Enlace "¿No tienes cuenta? Regístrate aquí" visible y navega a /register', async ({ page }) => {
-    const link = page.locator('a:has-text("Regístrate")')
-    await expect(link).toBeVisible()
-    await link.click()
+  test('Enlace "¿No tienes cuenta? Regístrate aquí" navega a /register', async ({ page }) => {
+    await page.locator('a:has-text("Regístrate")').click()
     await expect(page).toHaveURL(/register/)
   })
 
-  test('Enlace "Volver al inicio" visible y navega a /', async ({ page }) => {
-    const link = page.locator('a:has-text("Volver al inicio")')
-    await expect(link).toBeVisible()
-    await link.click()
+  test('Enlace "Volver al inicio" navega a /', async ({ page }) => {
+    await page.locator('a:has-text("Volver al inicio")').click()
     await expect(page).toHaveURL('/')
   })
 
@@ -60,24 +54,12 @@ test.describe('HU-007: Login y Autenticación', () => {
     await page.locator('#email').fill('test@test.com')
     await page.locator('#password').fill('test1234')
     await page.locator('button[type="submit"]').click()
-    await page.waitForTimeout(500)
-    const spinner = page.locator('svg.animate-spin, [class*="animate-spin"]')
-    expect(await spinner.count()).toBeGreaterThanOrEqual(0)
-  })
-
-  test('Error de red manejado: mostrar mensaje cuando Supabase falla', async ({ page }) => {
-    await page.locator('#email').fill('test@test.com')
-    await page.locator('#password').fill('test1234')
-    await page.locator('button[type="submit"]').click()
-    await page.waitForTimeout(2000)
-    const errorEl = page.locator('.text-red-400')
-    if (await errorEl.count() > 0) {
-      const errorText = await errorEl.textContent()
-      expect(errorText?.length).toBeGreaterThan(0)
-    }
+    const spinner = page.locator('svg.animate-spin, [class*="animate-spin"], button:disabled')
+    await expect(spinner.first()).toBeVisible({ timeout: 5000 })
   })
 })
 
+// ── HU-007b: Recuperar Contraseña ─────────────────────────────────────────
 test.describe('HU-007b: Recuperar Contraseña', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/forgot-password', { waitUntil: 'networkidle', timeout: 30000 })
@@ -102,24 +84,12 @@ test.describe('HU-007b: Recuperar Contraseña', () => {
   })
 
   test('Enlace "Volver a Iniciar Sesión" navega a /login', async ({ page }) => {
-    const link = page.locator('a:has-text("Volver a Iniciar Sesión")')
-    await expect(link).toBeVisible()
-    await link.click()
+    await page.locator('a:has-text("Volver a Iniciar Sesión")').click()
     await expect(page).toHaveURL(/login/)
-  })
-
-  test('Error de red manejado al enviar formulario', async ({ page }) => {
-    await page.locator('#email').fill('test@test.com')
-    await page.locator('button[type="submit"]').click()
-    await page.waitForTimeout(2000)
-    const errorEl = page.locator('.text-red-400')
-    if (await errorEl.count() > 0) {
-      const errorText = await errorEl.textContent()
-      expect(errorText?.length).toBeGreaterThan(0)
-    }
   })
 })
 
+// ── HU-007c: Actualizar Contraseña ────────────────────────────────────────
 test.describe('HU-007c: Actualizar Contraseña', () => {
   test('Página update-password redirige a /login sin sesión de recovery', async ({ page }) => {
     await page.goto('/update-password', { waitUntil: 'networkidle', timeout: 30000 })

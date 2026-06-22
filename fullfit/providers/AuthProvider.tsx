@@ -11,7 +11,7 @@ type AuthContextType = {
   profile: Profile | null
   loading: boolean
   isRecovery: boolean
-  signUp: (email: string, password: string, metadata: { nombre: string; apellido: string; telefono?: string; dni?: string }) => Promise<{ error: Error | null }>
+  signUp: (email: string, password: string, metadata: { nombre: string; apellido: string; telefono?: string; dni?: string; fecha_nacimiento?: string; genero?: string | null }) => Promise<{ error: Error | null }>
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<{ error: Error | null }>
@@ -112,7 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [fetchProfile])
 
-  const signUp = async (email: string, password: string, metadata: { nombre: string; apellido: string; telefono?: string; dni?: string }) => {
+  const signUp = async (email: string, password: string, metadata: { nombre: string; apellido: string; telefono?: string; dni?: string; fecha_nacimiento?: string; genero?: string | null }) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,

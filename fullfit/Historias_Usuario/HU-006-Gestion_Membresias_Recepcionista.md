@@ -109,9 +109,6 @@
 - [x] Validación de rol de recepcionista (rol_id 1 o 2)
 - [x] Políticas RLS en Supabase para suscripciones y pagos
 - [x] Registro de auditoría para acciones importantes
-
-## Archivos Relacionados
-
 ### Archivos existentes (modificados)
 - `app/recepcionista/membresias/page.tsx` — Reemplazado placeholder con implementación completa
 - `app/recepcionista/clientes/[id]/page.tsx` — Agregada sección para registrar membresía
