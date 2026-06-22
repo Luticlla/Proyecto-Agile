@@ -32,6 +32,12 @@ export function FormularioEditarCliente({ cliente, onSave, onCancel }: Formulari
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target
 
+    if (name === 'nombre' || name === 'apellido') {
+      const onlyLetters = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '')
+      setFormData(prev => ({ ...prev, [name]: onlyLetters }))
+      return
+    }
+
     if (name === 'dni') {
       const onlyDigits = value.replace(/\D/g, '').slice(0, 8)
       setFormData(prev => ({ ...prev, [name]: onlyDigits }))

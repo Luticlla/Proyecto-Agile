@@ -29,6 +29,9 @@ export function FormularioCrearUsuario({ isOpen, onClose, onSuccess }: Formulari
   })
 
   const handleChange = (field: keyof CrearUsuarioPayload, value: any) => {
+    if (field === 'nombre' || field === 'apellido') {
+      value = (value as string).replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '')
+    }
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 

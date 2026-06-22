@@ -35,6 +35,9 @@ export function FormularioEditarUsuario({ usuario, isOpen, onClose, onSuccess }:
   }, [usuario, isOpen])
 
   const handleChange = (field: keyof ActualizarUsuarioPayload, value: any) => {
+    if (field === 'nombre' || field === 'apellido') {
+      value = (value as string).replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '')
+    }
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
