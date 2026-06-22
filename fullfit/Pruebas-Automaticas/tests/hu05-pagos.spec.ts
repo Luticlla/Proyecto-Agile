@@ -12,23 +12,23 @@ function firmarCuerpo(body: string): string {
 test.describe('HU-005: Plataforma de Pago — MercadoPago', () => {
 
   // ── Protección de rutas ──────────────────────────────────────────────────
-  test('CP-02: Sin autenticación, /pasarelapago redirige a /membresias', async ({ page }) => {
+  test('HU05-CP-02: Sin autenticación, /pasarelapago redirige a /membresias', async ({ page }) => {
     await page.goto('/pasarelapago?plan=1', { waitUntil: 'networkidle', timeout: 30000 })
     expect(page.url()).toContain('/membresias')
   })
 
-  test('CP-29: /pasarelapago sin planId redirige a /membresias', async ({ page }) => {
+  test('HU05-CP-33: /pasarelapago sin planId redirige a /membresias', async ({ page }) => {
     await page.goto('/pasarelapago', { waitUntil: 'networkidle', timeout: 30000 })
     expect(page.url()).toContain('/membresias')
   })
 
-  test('CP-30: planId con formato inválido redirige a /membresias', async ({ page }) => {
+  test('HU05-CP-30: planId con formato inválido redirige a /membresias', async ({ page }) => {
     await page.goto('/pasarelapago?plan=abc-xyz', { waitUntil: 'networkidle', timeout: 30000 })
     expect(page.url()).toContain('/membresias')
   })
 
   // ── API /api/pagos ───────────────────────────────────────────────────────
-  test('CP-04: POST /api/pagos sin sesión retorna error de autenticación', async ({ request }) => {
+  test('HU05-CP-04: POST /api/pagos sin sesión retorna error de autenticación', async ({ request }) => {
     const response = await request.post('/api/pagos', {
       data: { planId: 1 },
       headers: { 'Content-Type': 'application/json' },
@@ -36,7 +36,7 @@ test.describe('HU-005: Plataforma de Pago — MercadoPago', () => {
     expect([401, 307]).toContain(response.status())
   })
 
-  test('CP-05: POST /api/pagos con plan inexistente retorna error', async ({ request }) => {
+  test('HU05-CP-05: POST /api/pagos con plan inexistente retorna error', async ({ request }) => {
     const response = await request.post('/api/pagos', {
       data: { planId: 99999 },
       headers: { 'Content-Type': 'application/json' },
@@ -44,7 +44,7 @@ test.describe('HU-005: Plataforma de Pago — MercadoPago', () => {
     expect([400, 401, 404]).toContain(response.status())
   })
 
-  test('CP-31: Error de configuración MP manejado sin exponer credenciales', async ({ request }) => {
+  test('HU05-CP-31: Error de configuración MP manejado sin exponer credenciales', async ({ request }) => {
     const response = await request.post('/api/pagos', {
       data: { planId: 1 },
       headers: { 'Content-Type': 'application/json' },
@@ -54,7 +54,7 @@ test.describe('HU-005: Plataforma de Pago — MercadoPago', () => {
     expect(body).not.toContain('ACCESS_TOKEN')
   })
 
-  test('CP-23: /api/pagos/verificar sin payload retorna error', async ({ request }) => {
+  test('HU05-CP-23: /api/pagos/verificar sin payload retorna error', async ({ request }) => {
     const res = await request.post('/api/pagos/verificar', {
       data: {},
       headers: { 'Content-Type': 'application/json' },
@@ -63,28 +63,28 @@ test.describe('HU-005: Plataforma de Pago — MercadoPago', () => {
   })
 
   // ── Páginas de resultado de pago ─────────────────────────────────────────
-  test('CP-15: Pago fallido status=rejected muestra estado correcto', async ({ page }) => {
+  test('HU05-CP-15: Pago fallido status=rejected muestra estado correcto', async ({ page }) => {
     await page.goto('/pasarelapago?status=rejected', { waitUntil: 'networkidle', timeout: 30000 })
     await expect(page.getByText(/pago no procesado|rechazado/i).first()).toBeVisible()
   })
 
-  test('CP-16: status=approved muestra mensaje de éxito', async ({ page }) => {
+  test('HU05-CP-16: status=approved muestra mensaje de éxito', async ({ page }) => {
     await page.goto('/pasarelapago?status=approved', { waitUntil: 'networkidle', timeout: 30000 })
     await expect(page.getByText(/aprobado/i).first()).toBeVisible()
   })
 
-  test('CP-17: status=rejected muestra mensaje de fallo', async ({ page }) => {
+  test('HU05-CP-17: status=rejected muestra mensaje de fallo', async ({ page }) => {
     await page.goto('/pasarelapago?status=rejected', { waitUntil: 'networkidle', timeout: 30000 })
     await expect(page.getByText(/pago no procesado|rechazado|no se pudo/i).first()).toBeVisible()
   })
 
-  test('CP-18: status=pending muestra mensaje de espera', async ({ page }) => {
+  test('HU05-CP-18: status=pending muestra mensaje de espera', async ({ page }) => {
     await page.goto('/pasarelapago?status=pending', { waitUntil: 'networkidle', timeout: 30000 })
     await expect(page.getByText(/pago pendiente|pendiente|procesando/i).first()).toBeVisible()
   })
 
   // ── Webhook MercadoPago ──────────────────────────────────────────────────
-  test('CP-20: Webhook con firma HMAC inválida retorna 401', async ({ request }) => {
+  test('HU05-CP-20: Webhook con firma HMAC inválida retorna 401', async ({ request }) => {
     const res = await request.post('/api/webhooks/mercadopago', {
       data: { action: 'payment.update', type: 'payment', data: { id: '123' } },
       headers: {
@@ -95,13 +95,13 @@ test.describe('HU-005: Plataforma de Pago — MercadoPago', () => {
     expect([401, 200]).toContain(res.status())
   })
 
-  // CP-21 / CP-26 / CP-27 / CP-28:
+  // HU05-CP-21 / HU05-CP-26 / HU05-CP-27 / HU05-CP-28:
   // Playwright re-serializa el body cuando data es string + Content-Type JSON,
   // lo que rompe el HMAC. Los tests verifican que el endpoint no falla con error
   // 5xx: el servidor responde 401 (firma inválida) o 200/400 (payload procesado).
   // En ambos casos el comportamiento es correcto — no hay crash.
 
-  test('CP-21: Webhook con type no-payment no produce error 5xx', async ({ request }) => {
+  test('HU05-CP-21: Webhook con type no-payment no produce error 5xx', async ({ request }) => {
     const res = await request.post('/api/webhooks/mercadopago', {
       data: { action: 'payment.update', type: 'merchant_order', data: { id: '123' } },
       headers: { 'Content-Type': 'application/json' },
@@ -109,7 +109,7 @@ test.describe('HU-005: Plataforma de Pago — MercadoPago', () => {
     expect(res.status()).toBeLessThan(500)
   })
 
-  test('CP-26: Webhook con payload malformado no produce error 5xx', async ({ request }) => {
+  test('HU05-CP-30: Webhook con payload malformado no produce error 5xx', async ({ request }) => {
     const res = await request.post('/api/webhooks/mercadopago', {
       data: { invalid: true },
       headers: { 'Content-Type': 'application/json' },
@@ -117,7 +117,7 @@ test.describe('HU-005: Plataforma de Pago — MercadoPago', () => {
     expect(res.status()).toBeLessThan(500)
   })
 
-  test('CP-27: Webhook con datos incompletos no produce error 5xx', async ({ request }) => {
+  test('HU05-CP-31: Webhook con datos incompletos no produce error 5xx', async ({ request }) => {
     const res = await request.post('/api/webhooks/mercadopago', {
       data: {},
       headers: { 'Content-Type': 'application/json' },
@@ -125,7 +125,7 @@ test.describe('HU-005: Plataforma de Pago — MercadoPago', () => {
     expect(res.status()).toBeLessThan(500)
   })
 
-  test('CP-28: Webhook con type no soportado no produce error 5xx', async ({ request }) => {
+  test('HU05-CP-32: Webhook con type no soportado no produce error 5xx', async ({ request }) => {
     const res = await request.post('/api/webhooks/mercadopago', {
       data: { action: 'test', type: 'unknown', data: { id: '123' } },
       headers: { 'Content-Type': 'application/json' },
@@ -134,7 +134,7 @@ test.describe('HU-005: Plataforma de Pago — MercadoPago', () => {
   })
 
   // ── Tests con sesión de recepcionista ────────────────────────────────────
-  test('CP-08: Detección de membresía activa bloquea nueva compra', async ({ page }) => {
+  test('HU05-CP-08: Detección de membresía activa bloquea nueva compra', async ({ page }) => {
     await loginAsRecepcionista(page)
     await page.goto('/pasarelapago?plan=1', { waitUntil: 'networkidle', timeout: 30000 })
     const url = page.url()
@@ -142,7 +142,7 @@ test.describe('HU-005: Plataforma de Pago — MercadoPago', () => {
     expect(isBlocked || url.includes('pasarelapago')).toBeTruthy()
   })
 
-  test('CP-09: Acumulación de días de renovación al pagar con membresía activa', async ({ page }) => {
+  test('HU05-CP-09: Acumulación de días de renovación al pagar con membresía activa', async ({ page }) => {
     await loginAsRecepcionista(page)
     await page.goto('/pasarelapago?plan=1', { waitUntil: 'networkidle', timeout: 30000 })
     const url = page.url()
