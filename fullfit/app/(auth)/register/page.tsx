@@ -246,15 +246,16 @@ export default function RegisterPage() {
               </label>
               <div className="flex gap-2">
                 <Input
-                  id="dni"
-                  name="dni"
-                  value={formData.dni}
-                  onChange={handleChange}
-                  placeholder="12345678"
-                  required
-                  maxLength={8}
-                  inputMode="numeric"
-                  disabled={validating || reniecValidado}
+                    id="dni"
+                    name="dni"
+                    value={formData.dni}
+                    onChange={handleChange}
+                    placeholder="12345678"
+                    required
+                    pattern="[0-9]{8}"
+                    maxLength={8}
+                    inputMode="numeric"
+                    disabled={validating || reniecValidado}
                   className={`bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 flex-1 ${
                     reniecValidado ? 'opacity-60 cursor-not-allowed' : ''
                   }`}
