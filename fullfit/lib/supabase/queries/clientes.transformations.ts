@@ -87,7 +87,13 @@ export function applyBusquedaFilter(
   query: ReturnType<typeof supabase.from>,
   busqueda: string
 ) {
-  return query.or(
-    `nombre.ilike.%${busqueda}%,apellido.ilike.%${busqueda}%,dni.ilike.%${busqueda}%,telefono.ilike.%${busqueda}%`
-  )
+  const palabras = busqueda.trim().split(/\s+/).filter(Boolean)
+
+  return palabras.reduce((q, palabra) => {
+    const escapada = palabra.replace(/[%,()]/g, '') // evita romper la sintaxis de .or()
+    return q.or(
+      `nombre.ilike.%${escapada}%,apellido.ilike.%${escapada}%,dni.ilike.%${escapada}%,telefono.ilike.%${escapada}%`
+    )
+  }, query)
 }
+

@@ -6,18 +6,24 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2, ArrowLeft } from 'lucide-react'
+import { Loader2, ArrowLeft, ShieldCheck, CheckCircle2, XCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-const validateEmail = (email: string) => {
-  return String(email)
-    .toLowerCase()
-    .match(
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    )
+// ─── Validaciones ────────────────────────────────────────────────────────────
+const validateEmail = (email: string) =>
+  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+    String(email).toLowerCase()
+  )
+
+function validatePassword(password: string): string | null {
+  if (!password) return null
+  if (password.length < 8) return 'La contraseña debe tener al menos 8 caracteres'
+  if (/^\d+$/.test(password)) return 'La contraseña no puede contener solo números'
+  return null
 }
 
+// ─── Componente ───────────────────────────────────────────────────────────────
 export default function RegisterPage() {
   const { signUp } = useAuth()
   const router = useRouter()
@@ -31,23 +37,36 @@ export default function RegisterPage() {
     fecha_nacimiento: '',
     genero: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   })
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
 
+  const [error, setError] = useState('')
+  const [passwordError, setPasswordError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [validating, setValidating] = useState(false)
+  const [reniecValidado, setReniecValidado] = useState(false)
+
+  // ─── Handlers ────────────────────────────────────────────────────────────────
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
 
+    // Campos bloqueados tras validación RENIEC
+    if (reniecValidado && (name === 'nombre' || name === 'apellido')) return
+
     if (name === 'nombre' || name === 'apellido') {
-      const onlyLetters = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '')
-      setFormData(prev => ({ ...prev, [name]: onlyLetters }))
+      setFormData(prev => ({ ...prev, [name]: value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '') }))
       return
     }
 
     if (name === 'dni') {
-      const onlyDigits = value.replace(/\D/g, '').slice(0, 8)
-      setFormData(prev => ({ ...prev, [name]: onlyDigits }))
+      const digits = value.replace(/\D/g, '').slice(0, 8)
+      // Si cambia el DNI después de validar → resetear validación
+      if (reniecValidado) {
+        setReniecValidado(false)
+        setFormData(prev => ({ ...prev, dni: digits, nombre: '', apellido: '' }))
+      } else {
+        setFormData(prev => ({ ...prev, dni: digits }))
+      }
       return
     }
 
@@ -58,32 +77,66 @@ export default function RegisterPage() {
       return
     }
 
+    if (name === 'password') {
+      setPasswordError(validatePassword(value))
+    }
+
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const getMaxBirthDate = () => {
-    const today = new Date()
-    today.setFullYear(today.getFullYear() - 18)
-    return today.toISOString().split('T')[0]
+  // ─── Validar DNI con RENIEC ──────────────────────────────────────────────────
+  const handleValidarReniec = async () => {
+    setError('')
+    if (formData.dni.length !== 8) {
+      setError('Ingresa los 8 dígitos del DNI antes de validar')
+      return
+    }
+    setValidating(true)
+    try {
+      const res = await fetch(`/api/reniec/public?dni=${formData.dni}`)
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || 'Error al consultar RENIEC')
+        return
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        nombre: data.nombre,
+        apellido: data.apellido,
+        dni: data.dni,
+      }))
+      setReniecValidado(true)
+    } catch {
+      setError('No se pudo conectar con el servicio RENIEC. Intenta más tarde.')
+    } finally {
+      setValidating(false)
+    }
   }
 
-  const getMinBirthDate = () => {
-    const today = new Date()
-    today.setFullYear(today.getFullYear() - 100)
-    return today.toISOString().split('T')[0]
-  }
+  // ─── Condiciones para habilitar "Crear Cuenta" ────────────────────────────────
+  const allConditionsMet =
+    reniecValidado &&
+    validateEmail(formData.email) &&
+    formData.password !== '' &&
+    passwordError === null &&
+    formData.password === formData.confirmPassword &&
+    formData.fecha_nacimiento !== '' &&
+    formData.genero !== ''
 
+  // ─── Submit ──────────────────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
 
-    if (!validateEmail(formData.email)) {
-      setError('El correo no es válido')
+    if (!reniecValidado) {
+      setError('Debes validar tu DNI con RENIEC antes de continuar')
       return
     }
 
-    if (!/^\d{8}$/.test(formData.dni)) {
-      setError('El DNI debe tener exactamente 8 dígitos')
+    if (!validateEmail(formData.email)) {
+      setError('El correo no es válido')
       return
     }
 
@@ -96,9 +149,7 @@ export default function RegisterPage() {
     const today = new Date()
     let age = today.getFullYear() - birthDate.getFullYear()
     const monthDiff = today.getMonth() - birthDate.getMonth()
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--
-    }
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) age--
     if (age < 18) {
       setError('Debes ser mayor de 18 años para registrarte')
       return
@@ -109,20 +160,19 @@ export default function RegisterPage() {
       return
     }
 
-    if (formData.telefono) {
-      if (!/^9\d{8}$/.test(formData.telefono)) {
-        setError('El teléfono debe tener 9 dígitos y comenzar con 9')
-        return
-      }
+    if (formData.telefono && !/^9\d{8}$/.test(formData.telefono)) {
+      setError('El teléfono debe tener 9 dígitos y comenzar con 9')
+      return
+    }
+
+    const pwdErr = validatePassword(formData.password)
+    if (pwdErr) {
+      setPasswordError(pwdErr)
+      return
     }
 
     if (formData.password !== formData.confirmPassword) {
       setError('Las contraseñas no coinciden')
-      return
-    }
-
-    if (formData.password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres')
       return
     }
 
@@ -134,7 +184,7 @@ export default function RegisterPage() {
       telefono: formData.telefono || undefined,
       dni: formData.dni,
       fecha_nacimiento: formData.fecha_nacimiento,
-      genero: formData.genero === 'prefiero no decirlo' ? null : formData.genero
+      genero: formData.genero === 'prefiero no decirlo' ? null : formData.genero,
     })
 
     if (error) {
@@ -146,12 +196,26 @@ export default function RegisterPage() {
     }
   }
 
+  const getMaxBirthDate = () => {
+    const d = new Date()
+    d.setFullYear(d.getFullYear() - 18)
+    return d.toISOString().split('T')[0]
+  }
+
+  const getMinBirthDate = () => {
+    const d = new Date()
+    d.setFullYear(d.getFullYear() - 100)
+    return d.toISOString().split('T')[0]
+  }
+
+  // ─── UI ──────────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-950 px-4 py-8">
       <Link href="/" className="flex items-center gap-2 text-zinc-400 hover:text-white mb-6 hoverEffect">
         <ArrowLeft className="size-4" />
         <span className="font-arcade text-xs">Volver al inicio</span>
       </Link>
+
       <Card className="w-full max-w-md bg-zinc-900 border-zinc-800">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-white">Crear Cuenta</CardTitle>
@@ -159,14 +223,60 @@ export default function RegisterPage() {
             Únete a Full Forma y alcanza tus metas
           </CardDescription>
         </CardHeader>
+
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Error general */}
             {error && (
-              <div className="p-3 text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded">
+              <div className="flex items-start gap-2 p-3 text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded">
+                <XCircle className="size-4 shrink-0 mt-0.5" />
                 {error}
               </div>
             )}
 
+            {/* DNI + botón Validar */}
+            <div className="space-y-2">
+              <label htmlFor="dni" className="text-sm text-zinc-300">
+                DNI *{' '}
+                {reniecValidado && (
+                  <span className="inline-flex items-center gap-1 text-emerald-400 text-xs ml-1">
+                    <CheckCircle2 className="size-3" /> Validado con RENIEC
+                  </span>
+                )}
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  id="dni"
+                  name="dni"
+                  value={formData.dni}
+                  onChange={handleChange}
+                  placeholder="12345678"
+                  required
+                  maxLength={8}
+                  inputMode="numeric"
+                  disabled={validating || reniecValidado}
+                  className={`bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 flex-1 ${
+                    reniecValidado ? 'opacity-60 cursor-not-allowed' : ''
+                  }`}
+                />
+                <Button
+                  type="button"
+                  onClick={handleValidarReniec}
+                  disabled={loading || validating || reniecValidado || formData.dni.length !== 8}
+                  className="shrink-0 bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-40"
+                >
+                  {validating ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : reniecValidado ? (
+                    <ShieldCheck className="size-4" />
+                  ) : (
+                    'Validar'
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Nombre y Apellido — bloqueados tras validación RENIEC */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label htmlFor="nombre" className="text-sm text-zinc-300">Nombre *</label>
@@ -175,9 +285,12 @@ export default function RegisterPage() {
                   name="nombre"
                   value={formData.nombre}
                   onChange={handleChange}
-                  placeholder="Juan"
+                  placeholder={reniecValidado ? '' : 'Valida tu DNI'}
                   required
-                  className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
+                  disabled={reniecValidado}
+                  className={`bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 ${
+                    reniecValidado ? 'opacity-60 cursor-not-allowed' : ''
+                  }`}
                 />
               </div>
               <div className="space-y-2">
@@ -187,29 +300,17 @@ export default function RegisterPage() {
                   name="apellido"
                   value={formData.apellido}
                   onChange={handleChange}
-                  placeholder="Pérez"
+                  placeholder={reniecValidado ? '' : 'Valida tu DNI'}
                   required
-                  className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
+                  disabled={reniecValidado}
+                  className={`bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 ${
+                    reniecValidado ? 'opacity-60 cursor-not-allowed' : ''
+                  }`}
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="dni" className="text-sm text-zinc-300">DNI *</label>
-              <Input
-                id="dni"
-                name="dni"
-                value={formData.dni}
-                onChange={handleChange}
-                placeholder="12345678"
-                required
-                maxLength={8}
-                pattern="[0-9]{8}"
-                inputMode="numeric"
-                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
-              />
-            </div>
-
+            {/* Email */}
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm text-zinc-300">Email *</label>
               <Input
@@ -224,6 +325,7 @@ export default function RegisterPage() {
               />
             </div>
 
+            {/* Teléfono */}
             <div className="space-y-2">
               <label htmlFor="telefono" className="text-sm text-zinc-300">Teléfono (opcional)</label>
               <div className="flex">
@@ -244,8 +346,11 @@ export default function RegisterPage() {
               </div>
             </div>
 
+            {/* Fecha de nacimiento */}
             <div className="space-y-2">
-              <label htmlFor="fecha_nacimiento" className="text-sm text-zinc-300">Fecha de Nacimiento *</label>
+              <label htmlFor="fecha_nacimiento" className="text-sm text-zinc-300">
+                Fecha de Nacimiento *
+              </label>
               <Input
                 id="fecha_nacimiento"
                 name="fecha_nacimiento"
@@ -259,9 +364,13 @@ export default function RegisterPage() {
               />
             </div>
 
+            {/* Sexo */}
             <div className="space-y-2">
               <label htmlFor="genero" className="text-sm text-zinc-300">Sexo *</label>
-              <Select value={formData.genero} onValueChange={(value) => setFormData(prev => ({ ...prev, genero: value }))}>
+              <Select
+                value={formData.genero}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, genero: value }))}
+              >
                 <SelectTrigger className="w-full bg-zinc-800 border-zinc-700 text-white">
                   <SelectValue placeholder="Selecciona tu sexo" />
                 </SelectTrigger>
@@ -273,6 +382,7 @@ export default function RegisterPage() {
               </Select>
             </div>
 
+            {/* Contraseña */}
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm text-zinc-300">Contraseña *</label>
               <Input
@@ -281,14 +391,24 @@ export default function RegisterPage() {
                 type="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="••••••••"
+                placeholder="Mínimo 8 caracteres, no solo números"
                 required
-                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
+                className={`bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 ${
+                  passwordError ? 'border-red-500' : ''
+                }`}
               />
+              {passwordError && (
+                <p className="flex items-center gap-1 text-xs text-red-400">
+                  <XCircle className="size-3 shrink-0" /> {passwordError}
+                </p>
+              )}
             </div>
 
+            {/* Confirmar contraseña */}
             <div className="space-y-2">
-              <label htmlFor="confirmPassword" className="text-sm text-zinc-300">Confirmar Contraseña *</label>
+              <label htmlFor="confirmPassword" className="text-sm text-zinc-300">
+                Confirmar Contraseña *
+              </label>
               <Input
                 id="confirmPassword"
                 name="confirmPassword"
@@ -297,14 +417,31 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 placeholder="••••••••"
                 required
-                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
+                className={`bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 ${
+                  formData.confirmPassword && formData.password !== formData.confirmPassword
+                    ? 'border-red-500'
+                    : ''
+                }`}
               />
+              {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                <p className="flex items-center gap-1 text-xs text-red-400">
+                  <XCircle className="size-3 shrink-0" /> Las contraseñas no coinciden
+                </p>
+              )}
             </div>
+
+            {/* Hint de condiciones pendientes */}
+            {!allConditionsMet && (
+              <p className="text-xs text-zinc-500">
+                Para activar el registro: valida tu DNI con RENIEC, completa todos los campos y asegúrate de que las contraseñas coincidan.
+              </p>
+            )}
 
             <Button
               type="submit"
-              disabled={loading}
-              className="w-full bg-yellow-400 text-zinc-950 hover:bg-yellow-300"
+              disabled={loading || !allConditionsMet}
+              title={!allConditionsMet ? 'Completa todos los campos y valida tu DNI' : ''}
+              className="w-full bg-yellow-400 text-zinc-950 hover:bg-yellow-300 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>

@@ -25,12 +25,16 @@ export async function listarMembresias(
     .select(MEMBRESIA_SELECT_WITH_JOINS, { count: 'exact' })
 
   if (buscar) {
-    query = query.or(`
-      profiles.nombre.ilike.%${buscar}%,
-      profiles.apellido.ilike.%${buscar}%,
-      profiles.dni.eq.${buscar}
-    `)
+  const palabras = buscar.trim().split(/\s+/).filter(Boolean)
+
+  for (const palabra of palabras) {
+    const escapada = palabra.replace(/[%,()]/g, '')
+    query = query.or(
+      `nombre.ilike.%${escapada}%,apellido.ilike.%${escapada}%,dni.ilike.%${escapada}%`,
+      { referencedTable: 'profiles' }
+    )
   }
+}
 
   if (estado !== 'todos') {
     const estadoMap: Record<string, string> = {

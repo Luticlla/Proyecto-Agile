@@ -40,6 +40,7 @@ export function mapRowToMembresiaConCliente(
 /**
  * Select clause compartido para queries de membresías con joins.
  */
+// membresias.helpers.ts
 export const MEMBRESIA_SELECT_WITH_JOINS = `
   id,
   usuario_id,
@@ -48,7 +49,7 @@ export const MEMBRESIA_SELECT_WITH_JOINS = `
   fecha_fin,
   estado,
   creado_en,
-  profiles!suscripciones_usuario_id_fkey (nombre, apellido, dni),
+  profiles!suscripciones_usuario_id_fkey!inner (nombre, apellido, dni),
   planes_membresia!suscripciones_plan_id_fkey (nombre, precio, duracion_dias)
 `
 
