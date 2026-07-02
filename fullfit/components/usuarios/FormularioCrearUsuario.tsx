@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2, ShieldCheck, CheckCircle2, XCircle } from 'lucide-react'
+import { toast } from 'sonner'
 import type { CrearUsuarioPayload } from '@/lib/supabase/queries/usuarios.types'
 
 interface FormularioCrearUsuarioProps {
@@ -138,6 +139,7 @@ export function FormularioCrearUsuario({ isOpen, onClose, onSuccess }: Formulari
         throw new Error(data.error || 'Error al crear el usuario')
       }
 
+      toast.success('Usuario creado exitosamente')
       onSuccess()
     } catch (err: any) {
       setError(err.message)

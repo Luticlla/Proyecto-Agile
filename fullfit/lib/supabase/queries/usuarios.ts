@@ -104,3 +104,55 @@ export async function verificarUltimoAdmin(
 
   return (count || 0) === 0
 }
+
+/**
+ * Desactiva un usuario del sistema (activo = false)
+ */
+export async function desactivarUsuario(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ activo: false } as never)
+    .eq('id', id)
+
+  if (error) {
+    console.error('Error desactivando usuario:', error)
+    return false
+  }
+
+  return true
+}
+
+/**
+ * Activa un usuario del sistema (activo = true)
+ */
+export async function activarUsuario(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ activo: true } as never)
+    .eq('id', id)
+
+  if (error) {
+    console.error('Error activando usuario:', error)
+    return false
+  }
+
+  return true
+}
+
+/**
+ * Verifica si un usuario está activo
+ */
+export async function verificarUsuarioActivo(id: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('activo')
+    .eq('id', id)
+    .single()
+
+  if (error) {
+    console.error('Error verificando si usuario está activo:', error)
+    return false
+  }
+
+  return (data as Record<string, unknown>)?.activo === true
+}

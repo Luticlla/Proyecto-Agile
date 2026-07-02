@@ -237,6 +237,8 @@ export type Database = {
           cierre_lv: string
           apertura_sab: string
           cierre_sab: string
+          apertura_dom: string | null
+          cierre_dom: string | null
           estado: string
           creado_en: string
           actualizado_en: string
@@ -254,6 +256,8 @@ export type Database = {
           cierre_lv?: string
           apertura_sab?: string
           cierre_sab?: string
+          apertura_dom?: string | null
+          cierre_dom?: string | null
           estado?: string
         }
         Update: {
@@ -268,6 +272,8 @@ export type Database = {
           cierre_lv?: string
           apertura_sab?: string
           cierre_sab?: string
+          apertura_dom?: string | null
+          cierre_dom?: string | null
           estado?: string
         }
       }

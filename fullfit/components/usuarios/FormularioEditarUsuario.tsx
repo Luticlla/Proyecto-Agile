@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 import type { ActualizarUsuarioPayload, UsuarioSistema } from '@/lib/supabase/queries/usuarios.types'
 
 interface FormularioEditarUsuarioProps {
@@ -71,6 +72,7 @@ export function FormularioEditarUsuario({ usuario, isOpen, onClose, onSuccess }:
         throw new Error(data.error || 'Error al actualizar el usuario')
       }
 
+      toast.success('Usuario actualizado exitosamente')
       onSuccess()
     } catch (err: any) {
       setError(err.message)

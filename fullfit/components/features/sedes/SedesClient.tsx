@@ -19,6 +19,8 @@ type Sede = {
   cierre_lv: string
   apertura_sab: string
   cierre_sab: string
+  apertura_dom: string | null
+  cierre_dom: string | null
   estado: 'activa' | 'inactiva'
   creado_en: string
   actualizado_en: string
@@ -51,6 +53,9 @@ const SedeCard = ({
 
   const horarioLV = `${formatHora(sede.apertura_lv)} – ${formatHora(sede.cierre_lv)}`
   const horarioSab = `${formatHora(sede.apertura_sab)} – ${formatHora(sede.cierre_sab)}`
+  const horarioDom = sede.apertura_dom && sede.cierre_dom
+    ? `${formatHora(sede.apertura_dom)} – ${formatHora(sede.cierre_dom)}`
+    : null
 
   return (
     <article className="relative border-2 border-white/10 bg-black/60 hover:border-white/30 transition-all duration-500 overflow-hidden">
@@ -140,7 +145,11 @@ const SedeCard = ({
             </div>
             <div className="flex justify-between">
               <span className="text-white/40 text-[9px] font-mono">Domingo</span>
-              <span className="text-red-400/70 text-[9px] font-mono">Cerrado</span>
+              {horarioDom ? (
+                <span className="text-white/80 text-[9px] font-mono">{horarioDom}</span>
+              ) : (
+                <span className="text-red-400/70 text-[9px] font-mono">Cerrado</span>
+              )}
             </div>
           </div>
         </div>
@@ -176,8 +185,11 @@ const SedesClient = ({ sedes }: SedesClientProps) => {
       <Container className="py-20">
         <div className="text-center">
           <Dumbbell className="size-16 text-gym-logo/20 mx-auto mb-4" />
+          <p className="font-arcade text-gym-logo text-xs uppercase tracking-widest mb-2">
+            Próximamente
+          </p>
           <p className="font-arcade text-white/40 text-xs uppercase tracking-wider">
-            No hay sedes disponibles en este momento
+            Estamos preparando nuestras sedes para ti
           </p>
         </div>
       </Container>

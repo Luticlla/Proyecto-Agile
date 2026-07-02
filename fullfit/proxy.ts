@@ -36,20 +36,35 @@ export async function proxy(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname
 
-  // Obtener profile UNA sola vez si hay usuario (reutilizar en todas las condiciones)
-  let profile: { rol_id: number } | null = null
+  // Obtener profile UNA sola vez si hay usuario
+  let profile: { rol_id: number; activo: boolean } | null = null
   if (user) {
     const { data } = await supabase
       .from('profiles')
-      .select('rol_id')
+      .select('rol_id, activo')
       .eq('id', user.id)
       .single()
     profile = data
   }
 
-  const isRecepcionista = profile && (profile.rol_id === 1 || profile.rol_id === 2)
+  // Variables de rol para reutilizar en todas las condiciones
+  const isSoloAdmin = profile?.rol_id === 1
+  const isSoloRecepcionista = profile?.rol_id === 2
 
-  // 1. Proteger rutas de recepcionista
+  // 0. Bloquear usuarios inactivos (excepto login, register y retornos MercadoPago)
+  if (profile && profile.activo === false) {
+    const isAllowed = pathname.startsWith('/login') ||
+      pathname.startsWith('/register') ||
+      pathname.startsWith('/pasarelapago')
+    if (!isAllowed) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      url.searchParams.set('error', 'Tu cuenta está desactivada')
+      return NextResponse.redirect(url)
+    }
+  }
+
+  // 1. Proteger rutas de recepcionista (solo rol_id === 2)
   if (pathname.startsWith('/recepcionista')) {
     if (!user) {
       const url = request.nextUrl.clone()
@@ -57,42 +72,109 @@ export async function proxy(request: NextRequest) {
       url.searchParams.set('redirect', pathname)
       return NextResponse.redirect(url)
     }
-    if (!isRecepcionista) {
+    if (!isSoloRecepcionista) {
       const url = request.nextUrl.clone()
-      url.pathname = '/'
+      url.pathname = isSoloAdmin ? '/gerente' : '/'
       return NextResponse.redirect(url)
     }
-
-    // Proteger gestión de usuarios (solo admin)
-    if (pathname.startsWith('/recepcionista/usuarios') && profile?.rol_id !== 1) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/recepcionista'
-      return NextResponse.redirect(url)
-    }
-
     return supabaseResponse
   }
 
-  // 2. Proteger rutas que requieren auth (excepto returns de MercadoPago)
-  if (pathname.startsWith('/pasarelapago') && !user) {
-    const hasStatusParam = request.nextUrl.searchParams.has('status')
-    if (hasStatusParam) {
-      return supabaseResponse
+  // 2. Proteger rutas de gerente (solo rol_id === 1)
+  if (pathname.startsWith('/gerente')) {
+    if (!user) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      url.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(url)
     }
-    return NextResponse.redirect(new URL('/membresias', request.url))
+    if (!isSoloAdmin) {
+      const url = request.nextUrl.clone()
+      url.pathname = isSoloRecepcionista ? '/recepcionista' : '/'
+      return NextResponse.redirect(url)
+    }
+    return supabaseResponse
   }
 
-  // 3. Redirect de auth pages si ya está logueado
-  if ((pathname === '/login' || pathname === '/register') && user) {
+  // 3. Proteger /pasarelapago según rol
+  if (pathname.startsWith('/pasarelapago')) {
+    const hasStatusParam = request.nextUrl.searchParams.has('status')
+    const hasPlanParam = request.nextUrl.searchParams.has('plan')
+
+    // Retorno de MercadoPago (?status=...)
+    if (hasStatusParam) {
+      if (!user) return supabaseResponse
+      if (isSoloAdmin) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/gerente'
+        return NextResponse.redirect(url)
+      }
+      return supabaseResponse
+    }
+
+    // Página de auto-servicio (?plan=ID)
+    if (hasPlanParam) {
+      if (!user) {
+        return NextResponse.redirect(new URL('/membresias', request.url))
+      }
+      if (profile?.rol_id !== 3) {
+        const url = request.nextUrl.clone()
+        url.pathname = isSoloAdmin ? '/gerente' : '/recepcionista'
+        return NextResponse.redirect(url)
+      }
+      return supabaseResponse
+    }
+
+    // Sin parámetros → redirigir según rol
+    if (!user) {
+      return NextResponse.redirect(new URL('/membresias', request.url))
+    }
     const url = request.nextUrl.clone()
-    url.pathname = isRecepcionista ? '/recepcionista' : '/'
+    if (isSoloAdmin) {
+      url.pathname = '/gerente'
+    } else if (isSoloRecepcionista) {
+      url.pathname = '/recepcionista'
+    } else {
+      url.pathname = '/membresias'
+    }
     return NextResponse.redirect(url)
   }
 
-  // 4. Redirect recepcionistas desde la página principal
-  if (pathname === '/' && user && isRecepcionista) {
+  // 4. Proteger rutas marketing para usuarios logueados
+  const rutasMarketing = ['/membresias', '/sedes']
+  const esRutaMarketing = rutasMarketing.some(ruta => pathname.startsWith(ruta))
+
+  if (esRutaMarketing && user) {
     const url = request.nextUrl.clone()
-    url.pathname = '/recepcionista'
+    if (isSoloAdmin) {
+      url.pathname = '/gerente'
+    } else if (isSoloRecepcionista) {
+      url.pathname = '/recepcionista'
+    }
+    return NextResponse.redirect(url)
+  }
+
+  // 5. Redirect de auth pages si ya está logueado
+  if ((pathname === '/login' || pathname === '/register') && user) {
+    const url = request.nextUrl.clone()
+    if (isSoloAdmin) {
+      url.pathname = '/gerente'
+    } else if (isSoloRecepcionista) {
+      url.pathname = '/recepcionista'
+    } else {
+      url.pathname = '/'
+    }
+    return NextResponse.redirect(url)
+  }
+
+  // 6. Redirect desde la página principal según rol
+  if (pathname === '/' && user) {
+    const url = request.nextUrl.clone()
+    if (isSoloAdmin) {
+      url.pathname = '/gerente'
+    } else if (isSoloRecepcionista) {
+      url.pathname = '/recepcionista'
+    }
     return NextResponse.redirect(url)
   }
 
@@ -102,7 +184,10 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     '/recepcionista/:path*',
+    '/gerente/:path*',
     '/pasarelapago/:path*',
+    '/membresias/:path*',
+    '/sedes/:path*',
     '/login',
     '/register',
     '/',

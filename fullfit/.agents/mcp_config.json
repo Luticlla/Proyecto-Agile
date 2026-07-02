@@ -1,0 +1,15 @@
+{
+  "mcp": {
+    "codebase-memory-mcp": {
+      "enabled": true,
+      "command": [
+        "/home/luticlla/.local/bin/codebase-memory-mcp"
+      ]
+    }
+  },
+  "mcpServers": {
+    "codebase-memory-mcp": {
+      "command": "/home/luticlla/.local/bin/codebase-memory-mcp"
+    }
+  }
+}

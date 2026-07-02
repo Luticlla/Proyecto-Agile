@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2, ArrowLeft, ShieldCheck, CheckCircle2, XCircle } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -38,6 +39,7 @@ export default function RegisterPage() {
     genero: '',
     password: '',
     confirmPassword: '',
+    aceptaTerminos: false,
   })
 
   const [error, setError] = useState('')
@@ -123,7 +125,8 @@ export default function RegisterPage() {
     passwordError === null &&
     formData.password === formData.confirmPassword &&
     formData.fecha_nacimiento !== '' &&
-    formData.genero !== ''
+    formData.genero !== '' &&
+    formData.aceptaTerminos
 
   // ─── Submit ──────────────────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
@@ -173,6 +176,11 @@ export default function RegisterPage() {
 
     if (formData.password !== formData.confirmPassword) {
       setError('Las contraseñas no coinciden')
+      return
+    }
+
+    if (!formData.aceptaTerminos) {
+      setError('Debes aceptar los Términos y Condiciones para continuar')
       return
     }
 
@@ -431,17 +439,40 @@ export default function RegisterPage() {
               )}
             </div>
 
+            {/* Términos y Condiciones */}
+            <div className="flex items-start gap-3 pt-2">
+              <Checkbox
+                id="terminos"
+                checked={formData.aceptaTerminos}
+                onCheckedChange={(checked) =>
+                  setFormData(prev => ({ ...prev, aceptaTerminos: checked === true }))
+                }
+                className="mt-0.5 border-zinc-600 data-[state=checked]:bg-yellow-400 data-[state=checked]:border-yellow-400"
+              />
+              <label htmlFor="terminos" className="text-sm text-zinc-400 leading-snug cursor-pointer">
+                Acepto los{' '}
+                <a
+                  href="/terminos-y-condiciones"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-yellow-400 hover:underline"
+                >
+                  Términos y Condiciones
+                </a>
+              </label>
+            </div>
+
             {/* Hint de condiciones pendientes */}
             {!allConditionsMet && (
               <p className="text-xs text-zinc-500">
-                Para activar el registro: valida tu DNI con RENIEC, completa todos los campos y asegúrate de que las contraseñas coincidan.
+                Para activar el registro: valida tu DNI con RENIEC, completa todos los campos, asegúrate de que las contraseñas coincidan y acepta los Términos y Condiciones.
               </p>
             )}
 
             <Button
               type="submit"
               disabled={loading || !allConditionsMet}
-              title={!allConditionsMet ? 'Completa todos los campos y valida tu DNI' : ''}
+              title={!allConditionsMet ? 'Completa todos los campos, valida tu DNI y acepta los Términos' : ''}
               className="w-full bg-yellow-400 text-zinc-950 hover:bg-yellow-300 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {loading ? (

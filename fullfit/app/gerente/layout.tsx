@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Users, CreditCard, BarChart3, LogOut } from 'lucide-react'
+import { Users, Building2, LogOut } from 'lucide-react'
 
-export default function RecepcionistaLayout({
+export default function GerenteLayout({
   children,
 }: {
   children: React.ReactNode
@@ -15,24 +15,22 @@ export default function RecepcionistaLayout({
   const { profile, loading, signOut } = useAuth()
   const router = useRouter()
 
-  // El proxy ya valida el rol server-side, solo mostramos loading mientras carga
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-950">
-        <Loader2 className="size-8 text-zinc-400 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <Loader2 className="size-8 text-gray-400 animate-spin" />
       </div>
     )
   }
 
-  // Si no hay perfil después de cargar, algo falló
   if (!profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-950">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <p className="text-zinc-400 mb-4">Error al cargar el perfil</p>
+          <p className="text-gray-500 mb-4">Error al cargar el perfil</p>
           <Button
             onClick={() => signOut()}
-            className="bg-yellow-400 text-zinc-950 hover:bg-yellow-300"
+            className="bg-yellow-500 text-gray-900 hover:bg-yellow-400"
           >
             Cerrar sesión
           </Button>
@@ -41,15 +39,14 @@ export default function RecepcionistaLayout({
     )
   }
 
-  // Si el proxy falló y un usuario no-recepcionista llegó aquí
-  if (profile.rol_id !== 1 && profile.rol_id !== 2) {
+  if (profile.rol_id !== 1) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-950">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <p className="text-zinc-400 mb-4">No tienes acceso a esta sección</p>
+          <p className="text-gray-500 mb-4">No tienes acceso a esta sección</p>
           <Button
             onClick={() => router.push('/')}
-            className="bg-yellow-400 text-zinc-950 hover:bg-yellow-300"
+            className="bg-yellow-500 text-gray-900 hover:bg-yellow-400"
           >
             Volver al inicio
           </Button>
@@ -65,30 +62,24 @@ export default function RecepcionistaLayout({
 
   return (
     <div className="min-h-screen bg-zinc-950">
-      <header className="border-b border-zinc-800 bg-zinc-900">
+      <header className="border-b border-zinc-800 bg-zinc-950">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
-              <Link href="/recepcionista" className="text-xl font-bold text-yellow-400">
-                FullFit Admin
+              <Link href="/gerente" className="text-xl font-bold text-white">
+                FullFit
               </Link>
               <nav className="flex items-center gap-4">
-                <Link href="/recepcionista/clientes">
+                <Link href="/gerente/usuarios">
                   <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800">
                     <Users className="size-4 mr-2" />
-                    Clientes
+                    Usuarios del Sistema
                   </Button>
                 </Link>
-                <Link href="/recepcionista/membresias">
+                <Link href="/gerente/sedes">
                   <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800">
-                    <CreditCard className="size-4 mr-2" />
-                    Membresías
-                  </Button>
-                </Link>
-                <Link href="/recepcionista/reportes">
-                  <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800">
-                    <BarChart3 className="size-4 mr-2" />
-                    Reportes
+                    <Building2 className="size-4 mr-2" />
+                    Sedes
                   </Button>
                 </Link>
               </nav>
