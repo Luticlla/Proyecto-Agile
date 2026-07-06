@@ -1,11 +1,11 @@
 'use client'
 
 import { useAuth } from '@/hooks'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Users, Building2, CreditCard, LogOut } from 'lucide-react'
+import { Users, Building2, CreditCard, LogOut, Dumbbell, ShieldCheck } from 'lucide-react'
 
 export default function GerenteLayout({
   children,
@@ -14,23 +14,27 @@ export default function GerenteLayout({
 }) {
   const { profile, loading, signOut } = useAuth()
   const router = useRouter()
+  const pathname = usePathname()
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <Loader2 className="size-8 text-gray-400 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950">
+        <div className="flex flex-col items-center gap-3">
+          <Dumbbell className="size-10 text-yellow-500 animate-pulse" />
+          <Loader2 className="size-6 text-zinc-400 animate-spin" />
+        </div>
       </div>
     )
   }
 
   if (!profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950">
         <div className="text-center">
-          <p className="text-gray-500 mb-4">Error al cargar el perfil</p>
+          <p className="text-zinc-400 mb-4">Error al cargar el perfil</p>
           <Button
             onClick={() => signOut()}
-            className="bg-yellow-500 text-gray-900 hover:bg-yellow-400"
+            className="bg-yellow-500 text-zinc-900 hover:bg-yellow-400"
           >
             Cerrar sesión
           </Button>
@@ -41,12 +45,12 @@ export default function GerenteLayout({
 
   if (profile.rol_id !== 1) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950">
         <div className="text-center">
-          <p className="text-gray-500 mb-4">No tienes acceso a esta sección</p>
+          <p className="text-zinc-400 mb-4">No tienes acceso a esta sección</p>
           <Button
             onClick={() => router.push('/')}
-            className="bg-yellow-500 text-gray-900 hover:bg-yellow-400"
+            className="bg-yellow-500 text-zinc-900 hover:bg-yellow-400"
           >
             Volver al inicio
           </Button>
@@ -60,45 +64,59 @@ export default function GerenteLayout({
     router.push('/login')
   }
 
+  const navLinks = [
+    { href: '/gerente/usuarios', label: 'Usuarios', icon: Users },
+    { href: '/gerente/sedes', label: 'Sedes', icon: Building2 },
+    { href: '/gerente/planes', label: 'Planes', icon: CreditCard },
+  ]
+
   return (
     <div className="min-h-screen bg-zinc-950">
-      <header className="border-b border-zinc-800 bg-zinc-950">
-        <div className="container mx-auto px-4 py-4">
+      <header className="border-b border-zinc-800 bg-zinc-950/95 backdrop-blur sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <Link href="/gerente" className="text-xl font-bold text-white">
-                FullFit
+            <div className="flex items-center gap-8">
+              <Link href="/gerente" className="flex items-center gap-2 group">
+                <Dumbbell className="size-6 text-yellow-500 group-hover:rotate-12 transition-transform duration-200" />
+                <span className="text-lg font-black tracking-tight text-white">
+                  FULL<span className="text-yellow-500">FORMA</span>
+                </span>
               </Link>
-              <nav className="flex items-center gap-4">
-                <Link href="/gerente/usuarios">
-                  <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800">
-                    <Users className="size-4 mr-2" />
-                    Usuarios del Sistema
-                  </Button>
-                </Link>
-                <Link href="/gerente/sedes">
-                  <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800">
-                    <Building2 className="size-4 mr-2" />
-                    Sedes
-                  </Button>
-                </Link>
-                <Link href="/gerente/planes">
-                  <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800">
-                    <CreditCard className="size-4 mr-2" />
-                    Planes
-                  </Button>
-                </Link>
+              <nav className="flex items-center gap-1">
+                {navLinks.map(({ href, label, icon: Icon }) => {
+                  const isActive = pathname.startsWith(href)
+                  return (
+                    <Link key={href} href={href}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={`transition-all duration-200 ${
+                          isActive
+                            ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
+                            : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+                        }`}
+                      >
+                        <Icon className="size-4 mr-2" />
+                        {label}
+                      </Button>
+                    </Link>
+                  )
+                })}
               </nav>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-zinc-400 text-sm">
-                {profile.nombre} {profile.apellido}
-              </span>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-zinc-800/50 border border-zinc-700">
+                <ShieldCheck className="size-3.5 text-yellow-500" />
+                <span className="text-zinc-300 text-sm font-medium">
+                  {profile.nombre} {profile.apellido}
+                </span>
+              </div>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleSignOut}
-                className="text-zinc-400 hover:text-white"
+                className="text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                title="Cerrar sesión"
               >
                 <LogOut className="size-4" />
               </Button>

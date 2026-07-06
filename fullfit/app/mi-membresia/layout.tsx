@@ -74,7 +74,7 @@ export default function MiMembresiaLayout({
                 href="/"
                 className="font-arcade text-gym-logo text-sm md:text-base tracking-widest uppercase [text-shadow:0_0_16px_rgba(255,223,0,0.4)] hover:opacity-80 transition-opacity"
               >
-                FullFit
+                FULLFORMA
               </Link>
               <div className="h-5 w-px bg-white/10 hidden md:block" />
               <nav className="hidden md:flex items-center gap-1">

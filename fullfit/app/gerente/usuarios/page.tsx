@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus, Search, Loader2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus, Search, Loader2, Users } from 'lucide-react'
 import {
   ListaUsuarios,
   FiltroRol,
@@ -114,12 +114,15 @@ export default function UsuariosPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Personal del Sistema</h1>
-          <p className="text-gray-500 text-sm mt-0.5">Gestiona los administradores y recepcionistas</p>
+          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+            <Users className="size-6" />
+            Personal del Sistema
+          </h1>
+          <p className="text-zinc-400 text-sm mt-0.5">Gestiona los administradores y recepcionistas</p>
         </div>
         <Button
           onClick={() => setIsCrearOpen(true)}
-          className="bg-yellow-500 text-gray-900 hover:bg-yellow-400"
+          className="bg-yellow-500 text-zinc-950 hover:bg-yellow-400"
         >
           <Plus className="size-4 mr-2" />
           Nuevo Usuario
@@ -129,20 +132,20 @@ export default function UsuariosPage() {
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[240px]">
           {loading ? (
-            <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400 animate-spin" />
+            <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400 animate-spin" />
           ) : (
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-500" />
           )}
           <Input
             value={busqueda}
             onChange={handleSearch}
             placeholder="Buscar por nombre, DNI o email..."
-            className="pl-10 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400"
+            className="pl-10 bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500"
           />
         </div>
         <FiltroRol value={filtroRol} onChange={(rol) => setFiltroRol(rol)} />
         <FiltroEstado value={filtroActivo} onChange={(activo) => setFiltroActivo(activo)} />
-        <div className="text-sm text-gray-500 min-w-[120px] text-right">
+        <div className="text-sm text-zinc-400 min-w-[120px] text-right">
           {textoResultados}
         </div>
       </div>
@@ -156,15 +159,15 @@ export default function UsuariosPage() {
 
       {(result.totalPages > 1 || result.count > 10) && (
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          <div className="flex items-center gap-2 text-sm text-zinc-400">
             <span>Mostrar</span>
             <Select value={String(limite)} onValueChange={(v) => setLimite(Number(v))}>
-              <SelectTrigger className="w-20 h-8 border-gray-200 bg-gray-50 text-gray-700">
+              <SelectTrigger className="w-20 h-8 border-zinc-800 bg-zinc-900 text-zinc-300">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-white border-gray-200">
+              <SelectContent className="bg-zinc-900 border-zinc-800">
                 {OPCIONES_LIMITE.map(n => (
-                  <SelectItem key={n} value={String(n)} className="text-gray-700 hover:bg-gray-100">
+                  <SelectItem key={n} value={String(n)} className="text-white">
                     {n}
                   </SelectItem>
                 ))}
@@ -177,7 +180,7 @@ export default function UsuariosPage() {
             <Button
               variant="outline"
               size="icon"
-              className="size-8 border-gray-200 text-gray-500 hover:bg-gray-100"
+              className="size-8 border-zinc-800 text-zinc-400 hover:bg-zinc-800"
               onClick={() => handlePageChange(1)}
               disabled={result.page === 1 || loading}
             >
@@ -186,21 +189,21 @@ export default function UsuariosPage() {
             <Button
               variant="outline"
               size="icon"
-              className="size-8 border-gray-200 text-gray-500 hover:bg-gray-100"
+              className="size-8 border-zinc-800 text-zinc-400 hover:bg-zinc-800"
               onClick={() => handlePageChange(result.page - 1)}
               disabled={result.page === 1 || loading}
             >
               <ChevronLeft className="size-4" />
             </Button>
 
-            <div className="flex items-center gap-2 text-sm text-gray-500 px-2">
+            <div className="flex items-center gap-2 text-sm text-zinc-400 px-2">
               Página {result.page} de {result.totalPages}
             </div>
 
             <Button
               variant="outline"
               size="icon"
-              className="size-8 border-gray-200 text-gray-500 hover:bg-gray-100"
+              className="size-8 border-zinc-800 text-zinc-400 hover:bg-zinc-800"
               onClick={() => handlePageChange(result.page + 1)}
               disabled={result.page === result.totalPages || loading}
             >
@@ -209,7 +212,7 @@ export default function UsuariosPage() {
             <Button
               variant="outline"
               size="icon"
-              className="size-8 border-gray-200 text-gray-500 hover:bg-gray-100"
+              className="size-8 border-zinc-800 text-zinc-400 hover:bg-zinc-800"
               onClick={() => handlePageChange(result.totalPages)}
               disabled={result.page === result.totalPages || loading}
             >

@@ -179,24 +179,18 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
 
     if (sede.imagen_url) {
       const filePath = sede.imagen_url.split('/Fotos_Sedes/')[1]
-      console.log('[DELETE sede] imagen_url:', sede.imagen_url)
-      console.log('[DELETE sede] filePath extraído:', filePath)
 
       if (filePath) {
-        const { data: removeData, error: removeError } = await supabaseAdmin.storage
+        const { error: removeError } = await supabaseAdmin.storage
           .from('Fotos_Sedes')
           .remove([filePath])
-
-        console.log('[DELETE sede] remove result:', { data: removeData, error: removeError })
 
         if (removeError) {
           console.error('[DELETE sede] Error eliminando imagen del storage:', removeError)
         }
       } else {
-        console.error('[DELETE sede] No se pudo extraer path de:', sede.imagen_url)
+        console.error('[DELETE sede] No se pudo extraer path de imagen:', sede.imagen_url)
       }
-    } else {
-      console.log('[DELETE sede] La sede no tiene imagen_url')
     }
 
     const { error: deleteError } = await supabaseAdmin

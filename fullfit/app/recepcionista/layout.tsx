@@ -1,11 +1,11 @@
 'use client'
 
 import { useAuth } from '@/hooks'
-import { useRouter } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
+import { useRouter, usePathname } from 'next/navigation'
+import { Loader2, Users, CreditCard, BarChart3, LogOut, Home, Dumbbell } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Users, CreditCard, BarChart3, LogOut } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 export default function RecepcionistaLayout({
   children,
@@ -14,25 +14,27 @@ export default function RecepcionistaLayout({
 }) {
   const { profile, loading, signOut } = useAuth()
   const router = useRouter()
+  const pathname = usePathname()
 
-  // El proxy ya valida el rol server-side, solo mostramos loading mientras carga
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-950">
-        <Loader2 className="size-8 text-zinc-400 animate-spin" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-black gap-4">
+        <Loader2 className="size-10 text-gym-logo animate-spin" />
+        <p className="font-mono text-white/40 text-xs tracking-widest uppercase">
+          Cargando...
+        </p>
       </div>
     )
   }
 
-  // Si no hay perfil después de cargar, algo falló
   if (!profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-950">
-        <div className="text-center">
-          <p className="text-zinc-400 mb-4">Error al cargar el perfil</p>
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="text-center space-y-4">
+          <p className="text-white/60 font-mono text-sm mb-4">Error al cargar el perfil</p>
           <Button
             onClick={() => signOut()}
-            className="bg-yellow-400 text-zinc-950 hover:bg-yellow-300"
+            className="bg-gym-logo text-black hover:bg-gym-logo/80 font-arcade text-xs tracking-widest uppercase"
           >
             Cerrar sesión
           </Button>
@@ -41,15 +43,14 @@ export default function RecepcionistaLayout({
     )
   }
 
-  // Si el proxy falló y un usuario no-recepcionista llegó aquí
   if (profile.rol_id !== 1 && profile.rol_id !== 2) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-950">
-        <div className="text-center">
-          <p className="text-zinc-400 mb-4">No tienes acceso a esta sección</p>
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="text-center space-y-4">
+          <p className="text-white/60 font-mono text-sm mb-4">No tienes acceso a esta sección</p>
           <Button
             onClick={() => router.push('/')}
-            className="bg-yellow-400 text-zinc-950 hover:bg-yellow-300"
+            className="bg-gym-logo text-black hover:bg-gym-logo/80 font-arcade text-xs tracking-widest uppercase"
           >
             Volver al inicio
           </Button>
@@ -63,53 +64,78 @@ export default function RecepcionistaLayout({
     router.push('/login')
   }
 
+  const navLinks = [
+    { href: '/recepcionista/clientes', label: 'Clientes', icon: Users },
+    { href: '/recepcionista/membresias', label: 'Membresías', icon: CreditCard },
+    { href: '/recepcionista/reportes', label: 'Reportes', icon: BarChart3 },
+  ]
+
   return (
-    <div className="min-h-screen bg-zinc-950">
-      <header className="border-b border-zinc-800 bg-zinc-900">
-        <div className="container mx-auto px-4 py-4">
+    <div className="min-h-screen bg-black">
+      {/* Header */}
+      <header className="border-b-2 border-gym-logo/30 bg-black/90 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
+            {/* Logo + nav */}
             <div className="flex items-center gap-6">
-              <Link href="/recepcionista" className="text-xl font-bold text-yellow-400">
-                FullFit Admin
+              <Link
+                href="/recepcionista"
+                className="font-arcade text-gym-logo text-sm md:text-base tracking-widest uppercase [text-shadow:0_0_16px_rgba(255,223,0,0.4)] hover:opacity-80 transition-opacity"
+              >
+                FULLFORMA <span className="text-white/50 text-[10px]">ADMIN</span>
               </Link>
-              <nav className="flex items-center gap-4">
-                <Link href="/recepcionista/clientes">
-                  <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800">
-                    <Users className="size-4 mr-2" />
-                    Clientes
-                  </Button>
-                </Link>
-                <Link href="/recepcionista/membresias">
-                  <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800">
-                    <CreditCard className="size-4 mr-2" />
-                    Membresías
-                  </Button>
-                </Link>
-                <Link href="/recepcionista/reportes">
-                  <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800">
-                    <BarChart3 className="size-4 mr-2" />
-                    Reportes
-                  </Button>
-                </Link>
+              <div className="h-5 w-px bg-white/10 hidden md:block" />
+              <nav className="hidden md:flex items-center gap-1">
+                {navLinks.map(({ href, label, icon: Icon }) => {
+                  const isActive = pathname.startsWith(href)
+                  return (
+                    <Link key={href} href={href}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={cn(
+                          "font-arcade text-[10px] tracking-widest uppercase gap-2 transition-all duration-200",
+                          isActive 
+                            ? "text-gym-logo bg-gym-logo/10" 
+                            : "text-white/40 hover:text-white hover:bg-white/5"
+                        )}
+                      >
+                        <Icon className="size-3" />
+                        {label}
+                      </Button>
+                    </Link>
+                  )
+                })}
               </nav>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-zinc-400 text-sm">
-                {profile.nombre} {profile.apellido}
-              </span>
+
+            {/* User info + logout */}
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:flex flex-col items-end">
+                <span className="font-mono text-white text-xs font-medium">
+                  {profile.nombre} {profile.apellido}
+                </span>
+                <span className="font-mono text-gym-logo/80 text-[10px] uppercase tracking-wider">
+                  {profile.rol_id === 1 ? 'Gerente' : 'Recepcionista'}
+                </span>
+              </div>
+              <div className="h-5 w-px bg-white/10" />
               <Button
                 variant="ghost"
-                size="icon"
+                size="sm"
                 onClick={handleSignOut}
-                className="text-zinc-400 hover:text-white"
+                className="text-white/40 hover:text-red-400 hover:bg-red-500/10 font-arcade text-[10px] tracking-widest uppercase gap-2"
               >
-                <LogOut className="size-4" />
+                <LogOut className="size-3" />
+                <span className="hidden sm:inline">Salir</span>
               </Button>
             </div>
           </div>
         </div>
       </header>
-      <main className="container mx-auto px-4 py-8">
+
+      {/* Main content */}
+      <main className="container mx-auto px-4 py-8 md:py-12">
         {children}
       </main>
     </div>

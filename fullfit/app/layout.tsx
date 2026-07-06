@@ -12,8 +12,8 @@ const pressStart2P = Press_Start_2P({
 });
 
 export const metadata: Metadata = {
-  title: { template: "%s | Full Forma", default: "Full Forma | GYM Peruano" },
-  description: "Full Forma, El gym que te pondra en forma",
+  title: { template: "%s | FULLFORMA", default: "FULLFORMA | GYM Peruano" },
+  description: "FULLFORMA, El gym que te pondra en forma",
 };
 
 export default function RootLayout({

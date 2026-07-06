@@ -8,7 +8,7 @@ const HomeBanner = () => {
       <div className="relative w-full max-w-[1600px] h-[50vh] sm:h-[60vh] md:h-[75vh] lg:h-[70vh]">
         <Image 
           src="/images/banner-home.png" 
-          alt="Full Forma Banner"
+          alt="FULLFORMA Banner"
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1600px) 100vw, 1600px"
           className="object-cover rounded-2xl md:rounded-[2rem] shadow-xl"

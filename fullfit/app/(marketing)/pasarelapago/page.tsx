@@ -143,7 +143,7 @@ function PasarelaPagoContent() {
   }, [user, loading, router, status])
 
   useEffect(() => {
-    document.title = 'Pasarela de Pago | Full Forma'
+    document.title = 'Pasarela de Pago | FULLFORMA'
   }, [])
 
   useEffect(() => {

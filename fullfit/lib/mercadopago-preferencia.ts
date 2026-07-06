@@ -24,6 +24,13 @@ export async function crearPreferenciaPago(
   params: PreferenciaParams
 ): Promise<PreferenciaResult> {
   try {
+    // Validar monto: MercadoPago requiere unit_price > 0
+    const monto = Math.round(Number(params.monto) * 100) / 100
+    if (!monto || isNaN(monto) || monto <= 0) {
+      console.error('Monto inválido para MercadoPago:', params.monto)
+      return { init_point: null, error: 'El monto del plan no es válido. Debe ser mayor a 0.' }
+    }
+
     const client = getMercadoPagoClient()
     const preference = new Preference(client)
 
@@ -31,9 +38,9 @@ export async function crearPreferenciaPago(
       body: {
         items: [{
           id: String(params.planId),
-          title: `Membresía ${params.planNombre} - Full Forma`,
+          title: `Membresía ${params.planNombre} - FULLFORMA`,
           quantity: 1,
-          unit_price: params.monto,
+          unit_price: monto,
           currency_id: 'PEN',
         }],
         metadata: params.metadata,

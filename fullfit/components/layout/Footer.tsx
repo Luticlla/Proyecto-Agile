@@ -26,7 +26,7 @@ const Footer = () => {
 
         {/* Copyright */}
         <p className="font-arcade text-white/40 text-[8px] tracking-wider text-center">
-          © {new Date().getFullYear()} Full Forma. Todos los derechos reservados.
+          © {new Date().getFullYear()} FULLFORMA. Todos los derechos reservados.
         </p>
 
       </Container>

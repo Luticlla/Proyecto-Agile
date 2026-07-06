@@ -228,7 +228,7 @@ export default function RegisterPage() {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-white">Crear Cuenta</CardTitle>
           <CardDescription className="text-zinc-400">
-            Únete a Full Forma y alcanza tus metas
+            Únete a FULLFORMA y alcanza tus metas
           </CardDescription>
         </CardHeader>
 

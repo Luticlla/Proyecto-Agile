@@ -94,7 +94,7 @@ function ModalBoleta({ pago, onClose }: { pago: PagoHistorial; onClose: () => vo
     ?.replace('MercadoPago - ', '')
     ?.replace('Extensión de membresía -', 'Renovación -')
     ?.replace('Ya posee membresía activa - pago registrado sin suscripción', 'Membresía ya activa')
-    || 'Membresía FullFit'
+    || 'Membresía FULLFORMA'
 
   return (
     <div
@@ -142,11 +142,11 @@ function ModalBoleta({ pago, onClose }: { pago: PagoHistorial; onClose: () => vo
           {/* Gimnasio info */}
           <div className="text-center space-y-1 pb-3 border-b border-white/10">
             <p className="font-arcade text-white text-sm tracking-widest uppercase">
-              Full<span className="text-gym-logo">Fit</span>
+              FULL<span className="text-gym-logo">FORMA</span>
             </p>
             <div className="flex items-center justify-center gap-1 text-white/30">
               <Building2 className="size-2.5" />
-              <span className="font-mono text-[9px]">Full Forma Gym</span>
+              <span className="font-mono text-[9px]">FULLFORMA Gym</span>
             </div>
             <div className="flex items-center justify-center gap-1 text-white/30">
               <MapPin className="size-2.5" />

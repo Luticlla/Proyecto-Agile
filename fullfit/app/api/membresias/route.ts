@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
 
     const result = await listarMembresias({
       buscar,
-      estado: estado as 'todos' | 'activas' | 'vencidas' | 'canceladas' | 'suspendidas',
+      estado: estado as 'todos' | 'activas' | 'vencidas' | 'canceladas' | 'suspendidas' | 'por_vencer',
       page,
       limit
     }, supabase)

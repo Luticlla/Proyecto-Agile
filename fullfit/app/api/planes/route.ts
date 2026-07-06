@@ -79,8 +79,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Faltan campos requeridos (nombre, precio, duracion_dias)' }, { status: 400 })
     }
 
-    if (precio < 0) {
-      return NextResponse.json({ error: 'El precio no puede ser negativo' }, { status: 400 })
+    if (precio <= 0) {
+      return NextResponse.json({ error: 'El precio debe ser mayor a 0' }, { status: 400 })
     }
 
     if (duracion_dias <= 0) {

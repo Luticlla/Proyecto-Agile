@@ -4,7 +4,7 @@ import type { BoletaData } from '../supabase/queries/membresias.types'
 import { formatDate } from './dates'
 
 const DATOS_GIMNASIO = {
-  nombre: 'Full Fit - Full Forma',
+  nombre: 'FULLFORMA Gym',
   direccion: 'Av. Principal 123, Trujillo',
   ruc: '20XXXXXXX',
   telefono: '(044) 123456',
@@ -101,6 +101,10 @@ export async function generarBoletaBase64(datos: BoletaData): Promise<string> {
   return Buffer.from(buffer).toString('base64')
 }
 
+/**
+ * Descarga una boleta PDF en el navegador del usuario.
+ * Crea un enlace temporal y lo simula como click de descarga.
+ */
 export function downloadBoleta(blob: Blob, numeroBoleta: string): void {
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')

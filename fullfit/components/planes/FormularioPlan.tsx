@@ -88,8 +88,8 @@ export function FormularioPlan({ isOpen, onClose, onSuccess, plan }: FormularioP
       setError('El nombre es requerido')
       return
     }
-    if (formData.precio < 0) {
-      setError('El precio no puede ser negativo')
+    if (formData.precio <= 0) {
+      setError('El precio debe ser mayor a 0')
       return
     }
     if (formData.duracion_dias <= 0) {
@@ -174,12 +174,15 @@ export function FormularioPlan({ isOpen, onClose, onSuccess, plan }: FormularioP
               <Input
                 type="number"
                 step="0.01"
-                min="0"
-                value={formData.precio}
-                onChange={(e) => handleChange('precio', parseFloat(e.target.value) || 0)}
+                min="0.01"
+                value={formData.precio || ''}
+                onChange={(e) => {
+                  const val = e.target.value
+                  handleChange('precio', val === '' ? 0 : parseFloat(val))
+                }}
                 className="bg-zinc-950 border-zinc-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 disabled={loading}
-                placeholder="0.00"
+                placeholder="Ej: 89.90"
               />
             </div>
             <div className="space-y-2">

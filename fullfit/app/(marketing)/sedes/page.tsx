@@ -4,8 +4,8 @@ import Container from '@/components/layout/Container'
 import SedesClient from '@/components/features/sedes/SedesClient'
 
 export const metadata = {
-  title: 'Sedes | Full Forma',
-  description: 'Encuentra tu Full Forma más cercano. Múltiples sedes en Trujillo con equipamiento de primera.',
+  title: 'Sedes | FULLFORMA',
+  description: 'Encuentra tu FULLFORMA más cercano. Múltiples sedes en Trujillo con equipamiento de primera.',
 }
 
 async function getSedes() {

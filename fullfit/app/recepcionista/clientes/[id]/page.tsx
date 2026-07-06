@@ -204,18 +204,18 @@ export default function ClienteDetailPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gym-logo/20 pb-4">
         <div className="flex items-center gap-4">
           <Link href="/recepcionista/clientes">
-            <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white">
+            <Button variant="ghost" size="icon" className="text-white/40 hover:text-white hover:bg-white/5">
               <ArrowLeft className="size-5" />
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-white">
+            <h1 className="font-arcade text-2xl md:text-3xl text-white uppercase tracking-widest">
               {cliente.nombre} {cliente.apellido}
             </h1>
-            <p className="text-zinc-400">Detalle del cliente</p>
+            <p className="font-mono text-white/40 text-xs md:text-sm mt-2">Detalle del cliente</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -223,14 +223,14 @@ export default function ClienteDetailPage() {
             <>
               <Button
                 onClick={handleShowMembresiaForm}
-                className="bg-green-600 text-white hover:bg-green-700"
+                className="bg-green-600 text-white hover:bg-green-700 font-mono text-xs uppercase tracking-wider"
               >
                 <CreditCard className="size-4 mr-2" />
                 Registrar Membresía
               </Button>
               <Button
                 onClick={() => setEditing(true)}
-                className="bg-yellow-400 text-zinc-950 hover:bg-yellow-300"
+                className="bg-gym-logo text-black hover:bg-gym-logo/80 font-mono text-xs uppercase tracking-wider"
               >
                 <Edit className="size-4 mr-2" />
                 Editar
@@ -247,7 +247,15 @@ export default function ClienteDetailPage() {
           onCancel={handleCancel}
         />
       ) : showMembresiaForm ? (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
+        <div className="bg-black border border-white/10 rounded-lg p-6 relative overflow-hidden">
+          <div
+            className="absolute inset-0 opacity-[0.03] pointer-events-none"
+            style={{
+              backgroundImage: 'linear-gradient(rgba(255,223,0,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,223,0,0.5) 1px, transparent 1px)',
+              backgroundSize: '40px 40px',
+            }}
+          />
+          <div className="relative z-10">
           {loadingPlanes || loadingMembresiaActiva ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="size-6 text-zinc-400 animate-spin" />
@@ -277,14 +285,15 @@ export default function ClienteDetailPage() {
               />
             </>
           )}
-          <div className="mt-4 flex justify-end">
-            <Button
-              variant="outline"
-              onClick={() => setShowMembresiaForm(false)}
-              className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
-            >
-              Cancelar
-            </Button>
+            <div className="mt-4 flex justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setShowMembresiaForm(false)}
+                className="border-white/10 text-white/40 hover:bg-white/5 hover:text-white font-mono text-xs uppercase tracking-wider"
+              >
+                Cancelar
+              </Button>
+            </div>
           </div>
         </div>
       ) : (

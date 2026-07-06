@@ -1,10 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import type { MembresiaConCliente } from '@/lib/supabase/queries/membresias.types'
+import type { MembresiaConCliente, EstadoMembresia } from '@/lib/supabase/queries/membresias.types'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Pause, Play, X, RefreshCw, Search } from 'lucide-react'
 import { BadgeEstado } from './BadgeEstado'
 import { BadgeDiasRestantes } from './BadgeDiasRestantes'
@@ -16,6 +17,8 @@ type ListaMembresiasProps = {
   buscar?: string
   onBuscarChange?: (valor: string) => void
   onBuscar?: () => void
+  estado?: EstadoMembresia
+  onEstadoChange?: (estado: EstadoMembresia) => void
   onAccion?: (id: number, accion: 'cancelar' | 'pausar' | 'reactivar' | 'renovar') => void
   page?: number
   totalPages?: number
@@ -30,6 +33,8 @@ export function ListaMembresias({
   buscar = '',
   onBuscarChange,
   onBuscar,
+  estado = 'todos',
+  onEstadoChange,
   onAccion,
   page = 1,
   totalPages = 1,
@@ -61,37 +66,51 @@ export function ListaMembresias({
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex flex-1 gap-2 w-full sm:w-auto">
-          <div className="relative flex-1 sm:max-w-xs">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500 size-4" />
+        <div className="flex flex-1 gap-2 w-full sm:w-auto flex-wrap">
+          <div className="relative flex-1 min-w-[200px] max-w-xs">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/40 size-4" />
             <Input
               placeholder="Buscar por nombre o DNI..."
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="pl-9 bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500"
+              className="pl-9 bg-black border-white/10 text-white placeholder:text-white/40 font-mono text-xs"
             />
           </div>
+          <Select value={estado} onValueChange={(val) => onEstadoChange?.(val as EstadoMembresia)}>
+            <SelectTrigger className="w-36 bg-black border-white/10 text-white font-mono text-xs uppercase">
+              <SelectValue placeholder="Estado" />
+            </SelectTrigger>
+            <SelectContent className="bg-black border-white/10">
+              <SelectItem value="todos" className="text-white hover:bg-white/5 font-mono text-xs uppercase">Todos</SelectItem>
+              <SelectItem value="activas" className="text-white hover:bg-white/5 font-mono text-xs uppercase">Activas</SelectItem>
+              <SelectItem value="por_vencer" className="text-white hover:bg-white/5 font-mono text-xs uppercase">Por Vencer</SelectItem>
+              <SelectItem value="vencidas" className="text-white hover:bg-white/5 font-mono text-xs uppercase">Vencidas</SelectItem>
+              <SelectItem value="suspendidas" className="text-white hover:bg-white/5 font-mono text-xs uppercase">Suspendidas</SelectItem>
+              <SelectItem value="canceladas" className="text-white hover:bg-white/5 font-mono text-xs uppercase">Canceladas</SelectItem>
+            </SelectContent>
+          </Select>
           <Button
             onClick={handleSearch}
-            variant="secondary"
-            className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300"
+            variant="outline"
+            className="border-white/10 text-white hover:bg-white/5 font-mono text-xs uppercase"
           >
             Buscar
           </Button>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-sm text-zinc-400">Mostrar:</span>
-          <select
-            value={limit}
-            onChange={(e) => onLimitChange?.(Number(e.target.value))}
-            className="bg-zinc-900 border border-zinc-800 rounded-md px-2 py-1 text-sm text-zinc-300"
-          >
-            <option value={10}>10</option>
-            <option value={25}>25</option>
-            <option value={50}>50</option>
-          </select>
+          <span className="text-[10px] text-white/40 font-mono uppercase tracking-wider">Mostrar:</span>
+          <Select value={String(limit)} onValueChange={(val) => onLimitChange?.(Number(val))}>
+            <SelectTrigger className="w-20 h-8 border-white/10 bg-black text-white font-mono text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-black border-white/10">
+              <SelectItem value="10" className="text-white hover:bg-white/5 font-mono text-xs">10</SelectItem>
+              <SelectItem value="25" className="text-white hover:bg-white/5 font-mono text-xs">25</SelectItem>
+              <SelectItem value="50" className="text-white hover:bg-white/5 font-mono text-xs">50</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -100,18 +119,18 @@ export function ListaMembresias({
           No se encontraron membresías
         </div>
       ) : (
-        <div className="rounded-lg border border-zinc-800 overflow-hidden">
+        <div className="rounded-lg border border-white/10 overflow-hidden bg-black">
           <Table>
             <TableHeader>
-              <TableRow className="bg-zinc-900">
-                <TableHead className="text-zinc-300">Cliente</TableHead>
-                <TableHead className="text-zinc-300">DNI</TableHead>
-                <TableHead className="text-zinc-300">Plan</TableHead>
-                <TableHead className="text-zinc-300">Estado</TableHead>
-                <TableHead className="text-zinc-300">Inicio</TableHead>
-                <TableHead className="text-zinc-300">Vencimiento</TableHead>
-                <TableHead className="text-zinc-300">Restante</TableHead>
-                <TableHead className="text-zinc-300 text-right">Acciones</TableHead>
+              <TableRow className="border-white/10 hover:bg-transparent">
+                <TableHead className="text-white/60 font-mono text-[10px] uppercase tracking-widest">Cliente</TableHead>
+                <TableHead className="text-white/60 font-mono text-[10px] uppercase tracking-widest">DNI</TableHead>
+                <TableHead className="text-white/60 font-mono text-[10px] uppercase tracking-widest">Plan</TableHead>
+                <TableHead className="text-white/60 font-mono text-[10px] uppercase tracking-widest">Estado</TableHead>
+                <TableHead className="text-white/60 font-mono text-[10px] uppercase tracking-widest">Inicio</TableHead>
+                <TableHead className="text-white/60 font-mono text-[10px] uppercase tracking-widest">Vencimiento</TableHead>
+                <TableHead className="text-white/60 font-mono text-[10px] uppercase tracking-widest">Restante</TableHead>
+                <TableHead className="text-white/60 font-mono text-[10px] uppercase tracking-widest text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -242,7 +261,7 @@ export function ListaMembresias({
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-zinc-400">
+          <p className="text-[10px] text-white/40 font-mono uppercase tracking-wider">
             Página {page} de {totalPages}
           </p>
           <div className="flex gap-2">
@@ -251,7 +270,7 @@ export function ListaMembresias({
               size="sm"
               onClick={() => onPageChange?.(page - 1)}
               disabled={page <= 1}
-              className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
+              className="border-white/10 text-white/40 hover:bg-white/5 hover:text-white font-mono text-xs uppercase"
             >
               Anterior
             </Button>
@@ -260,7 +279,7 @@ export function ListaMembresias({
               size="sm"
               onClick={() => onPageChange?.(page + 1)}
               disabled={page >= totalPages}
-              className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
+              className="border-white/10 text-white/40 hover:bg-white/5 hover:text-white font-mono text-xs uppercase"
             >
               Siguiente
             </Button>

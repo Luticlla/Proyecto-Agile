@@ -6,7 +6,7 @@ import { ListaPlanesMembresia } from '@/components/membresias'
 import { BannerSocioLogueado } from '@/components/membresias/BannerSocioLogueado'
 
 export const metadata = {
-  title: 'Membresías | Full Forma',
+  title: 'Membresías | FULLFORMA',
   description: 'Elige tu plan de entrenamiento. Acceso a todas nuestras sedes en Trujillo.',
 }
 

@@ -60,8 +60,8 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
     const body: ActualizarPlanPayload = await request.json()
 
-    if (body.precio !== undefined && body.precio < 0) {
-      return NextResponse.json({ error: 'El precio no puede ser negativo' }, { status: 400 })
+    if (body.precio !== undefined && body.precio <= 0) {
+      return NextResponse.json({ error: 'El precio debe ser mayor a 0' }, { status: 400 })
     }
 
     if (body.duracion_dias !== undefined && body.duracion_dias <= 0) {

@@ -6,10 +6,15 @@ import { ConfirmarAccion } from '@/components/membresias'
 import { downloadBoleta } from '@/lib/utils/boleta'
 import { base64ToBlob } from '@/lib/utils/blob'
 import { usePaginatedFetch } from '@/hooks'
-import type { MembresiaConCliente } from '@/lib/supabase/queries/membresias.types'
+import type { MembresiaConCliente, EstadoMembresia } from '@/lib/supabase/queries/membresias.types'
+import { useSearchParams } from 'next/navigation'
 
 export default function MembresiasPage() {
+  const searchParams = useSearchParams()
+  const estadoInicial = (searchParams.get('estado') as EstadoMembresia) || 'todos'
+  
   const [buscar, setBuscar] = useState('')
+  const [estado, setEstado] = useState<EstadoMembresia>(estadoInicial)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [accionPendiente, setAccionPendiente] = useState<{
     id: number
@@ -28,7 +33,7 @@ export default function MembresiasPage() {
     refresh
   } = usePaginatedFetch<MembresiaConCliente>({
     url: '/api/membresias',
-    params: { buscar, estado: 'todos' }
+    params: { buscar, estado }
   })
 
   const handleBuscar = () => {
@@ -121,11 +126,13 @@ export default function MembresiasPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Membresías</h1>
-        <p className="text-zinc-400">
-          Gestiona las membresías de los clientes
-        </p>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gym-logo/20 pb-4">
+        <div>
+          <h1 className="font-arcade text-2xl md:text-3xl text-white uppercase tracking-widest">Membresías</h1>
+          <p className="font-mono text-white/40 text-xs md:text-sm mt-2">
+            Gestiona las membresías de los clientes
+          </p>
+        </div>
       </div>
 
       <ListaMembresias
@@ -134,6 +141,11 @@ export default function MembresiasPage() {
         buscar={buscar}
         onBuscarChange={setBuscar}
         onBuscar={handleBuscar}
+        estado={estado}
+        onEstadoChange={(nuevoEstado) => {
+          setEstado(nuevoEstado)
+          setPage(1)
+        }}
         onAccion={handleAccion}
         page={page}
         totalPages={totalPages}

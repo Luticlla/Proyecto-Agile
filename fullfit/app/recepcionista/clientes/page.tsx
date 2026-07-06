@@ -120,12 +120,12 @@ export default function ClientesPage() {
   return (
     <div className="flex flex-col gap-6">
       {/* ── Encabezado ─────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gym-logo/20 pb-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Clientes</h1>
-          <p className="text-zinc-400 text-sm mt-0.5">Gestiona los perfiles y membresías de los clientes</p>
+          <h1 className="font-arcade text-2xl md:text-3xl text-white uppercase tracking-widest">Clientes</h1>
+          <p className="font-mono text-white/40 text-xs md:text-sm mt-2">Gestiona los perfiles y membresías de los clientes</p>
         </div>
-        <span className="text-zinc-500 text-sm">{textoResultados}</span>
+        <span className="font-mono text-gym-logo/80 text-xs uppercase tracking-wider">{textoResultados}</span>
       </div>
 
       {/* ── Resumen estadístico ────────────────────────────────────────── */}
@@ -153,15 +153,15 @@ export default function ClientesPage() {
       {(result.totalPages > 1 || result.count > 10) && (
         <div className="flex flex-wrap items-center justify-between gap-4">
           {/* Selector de cantidad por página */}
-          <div className="flex items-center gap-2 text-sm text-zinc-400">
+          <div className="flex items-center gap-2 text-sm text-white/40 font-mono uppercase tracking-wider text-[10px]">
             <span>Mostrar</span>
             <Select value={String(limite)} onValueChange={handleLimiteChange}>
-              <SelectTrigger className="w-20 h-8 border-zinc-700 bg-zinc-900 text-zinc-300">
+              <SelectTrigger className="w-20 h-8 border-white/10 bg-black text-white font-mono text-xs">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-zinc-700">
+              <SelectContent className="bg-black border-white/10 font-mono text-xs">
                 {OPCIONES_LIMITE.map(n => (
-                  <SelectItem key={n} value={String(n)} className="text-zinc-300 hover:bg-zinc-800">
+                  <SelectItem key={n} value={String(n)} className="text-white hover:bg-white/5 focus:bg-white/5">
                     {n}
                   </SelectItem>
                 ))}
@@ -176,7 +176,7 @@ export default function ClientesPage() {
             <Button
               variant="outline"
               size="icon"
-              className="size-8 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+              className="size-8 border-white/10 text-white/40 hover:bg-white/5 hover:text-white"
               onClick={() => handlePageChange(1)}
               disabled={result.page === 1 || loading}
               title="Primera página"
@@ -187,7 +187,7 @@ export default function ClientesPage() {
             <Button
               variant="outline"
               size="icon"
-              className="size-8 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+              className="size-8 border-white/10 text-white/40 hover:bg-white/5 hover:text-white"
               onClick={() => handlePageChange(result.page - 1)}
               disabled={result.page === 1 || loading}
               title="Página anterior"
@@ -196,7 +196,7 @@ export default function ClientesPage() {
             </Button>
 
             {/* Input de salto directo */}
-            <div className="flex items-center gap-1.5 text-sm text-zinc-400 px-1">
+            <div className="flex items-center gap-1.5 text-white/40 px-1 font-mono uppercase tracking-wider text-[10px]">
               <span>Página</span>
               <Input
                 type="number"
@@ -205,7 +205,7 @@ export default function ClientesPage() {
                 value={paginaInput}
                 onChange={handlePaginaInputChange}
                 onKeyDown={handlePaginaInputKeyDown}
-                className="w-14 h-8 text-center border-zinc-700 bg-zinc-900 text-zinc-200"
+                className="w-14 h-8 text-center border-white/10 bg-black text-white font-mono text-xs"
               />
               <span>de {result.totalPages}</span>
             </div>
@@ -214,7 +214,7 @@ export default function ClientesPage() {
             <Button
               variant="outline"
               size="icon"
-              className="size-8 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+              className="size-8 border-white/10 text-white/40 hover:bg-white/5 hover:text-white"
               onClick={() => handlePageChange(result.page + 1)}
               disabled={result.page === result.totalPages || loading}
               title="Página siguiente"
@@ -225,7 +225,7 @@ export default function ClientesPage() {
             <Button
               variant="outline"
               size="icon"
-              className="size-8 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+              className="size-8 border-white/10 text-white/40 hover:bg-white/5 hover:text-white"
               onClick={() => handlePageChange(result.totalPages)}
               disabled={result.page === result.totalPages || loading}
               title="Última página"

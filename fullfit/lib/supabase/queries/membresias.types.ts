@@ -1,4 +1,4 @@
-export type EstadoMembresia = 'todos' | 'activas' | 'vencidas' | 'canceladas' | 'suspendidas'
+export type EstadoMembresia = 'todos' | 'activas' | 'vencidas' | 'canceladas' | 'suspendidas' | 'por_vencer'
 
 export type MetodoPago = 'efectivo' | 'mercadopago'
 

@@ -1,10 +1,11 @@
 'use client'
 
 import { useAuth } from '@/hooks'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Users, CreditCard, AlertTriangle, Clock } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { BusquedaRapida } from '@/components/clientes'
+import { cn } from '@/lib/utils'
+import Link from 'next/link'
 
 interface ProximaAVencer {
   id: number
@@ -19,6 +20,33 @@ interface DashboardData {
   membresiasActivas: number
   membresiasPorVencer: number
   proximasAVencer: ProximaAVencer[]
+}
+
+function GridBackground() {
+  return (
+    <div
+      className="absolute inset-0 opacity-[0.03] pointer-events-none"
+      style={{
+        backgroundImage: `
+          linear-gradient(rgba(255,223,0,0.5) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,223,0,0.5) 1px, transparent 1px)
+        `,
+        backgroundSize: '40px 40px',
+      }}
+    />
+  )
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3 mb-4">
+      <div className="h-px flex-1 bg-gym-logo/20" />
+      <span className="font-arcade text-gym-logo text-[9px] md:text-[10px] tracking-widest uppercase">
+        {children}
+      </span>
+      <div className="h-px flex-1 bg-gym-logo/20" />
+    </div>
+  )
 }
 
 export default function RecepcionistaDashboard() {
@@ -44,120 +72,138 @@ export default function RecepcionistaDashboard() {
   }, [])
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-white">
-            Bienvenido, {profile?.nombre}
+    <div className="space-y-8 md:space-y-10">
+      {/* Hero Header */}
+      <section className="relative border-b border-gym-logo/20 overflow-hidden pb-8">
+        <GridBackground />
+        <div className="relative z-10 flex flex-col items-center text-center gap-4">
+          <div className="flex items-center gap-3">
+            <div className="h-px w-8 md:w-16 bg-gym-logo" />
+            <span className="font-arcade text-gym-logo text-[8px] md:text-[10px] tracking-widest uppercase">
+              Panel de Control
+            </span>
+            <div className="h-px w-8 md:w-16 bg-gym-logo" />
+          </div>
+
+          <h1 className="font-arcade text-white text-xl md:text-3xl lg:text-4xl tracking-wide uppercase leading-relaxed">
+            Bienvenido, <span className="text-gym-logo [text-shadow:0_0_20px_rgba(255,223,0,0.5)]">{profile?.nombre}</span>
           </h1>
-          <p className="text-zinc-400">
-            Panel de control del recepcionista
+
+          <p className="font-mono text-white/40 text-xs md:text-sm max-w-md leading-relaxed">
+            Gestiona clientes, membresías y reportes diarios desde este panel de administración.
           </p>
+
+          <div className="w-full max-w-md mt-4">
+            <BusquedaRapida />
+          </div>
         </div>
-        <BusquedaRapida />
-      </div>
+      </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">
-              Total Clientes
-            </CardTitle>
-            <Users className="size-4 text-zinc-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">
-              {loading ? '--' : data?.totalClientes ?? 0}
+      {/* Stats Cards */}
+      <section>
+        <SectionLabel>Estadísticas Generales</SectionLabel>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Card 1 */}
+          <Link href="/recepcionista/clientes" className="relative rounded-xl border border-white/10 bg-white/[0.02] p-5 overflow-hidden group hover:border-white/30 transition-colors block">
+            <GridBackground />
+            <div className="relative z-10 flex flex-col gap-2">
+              <div className="flex items-center justify-between text-white/40">
+                <span className="font-arcade text-[10px] tracking-widest uppercase">Total Clientes</span>
+                <Users className="size-4" />
+              </div>
+              <div className="font-arcade text-3xl md:text-4xl text-white">
+                {loading ? '--' : data?.totalClientes ?? 0}
+              </div>
+              <p className="font-mono text-[10px] text-white/30 uppercase tracking-wider">Usuarios registrados</p>
             </div>
-            <p className="text-xs text-zinc-500">
-              Usuarios registrados
-            </p>
-          </CardContent>
-        </Card>
+          </Link>
 
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">
-              Membresías Activas
-            </CardTitle>
-            <CreditCard className="size-4 text-zinc-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#ffdf00]">
-              {loading ? '--' : data?.membresiasActivas ?? 0}
+          {/* Card 2 */}
+          <Link href="/recepcionista/membresias?estado=activas" className="relative rounded-xl border border-gym-logo/20 bg-gradient-to-br from-gym-logo/5 via-black to-black p-5 overflow-hidden group hover:border-gym-logo/40 transition-colors block">
+            <GridBackground />
+            <div className="relative z-10 flex flex-col gap-2">
+              <div className="flex items-center justify-between text-gym-logo/80">
+                <span className="font-arcade text-[10px] tracking-widest uppercase">Membresías Activas</span>
+                <CreditCard className="size-4" />
+              </div>
+              <div className="font-arcade text-3xl md:text-4xl text-gym-logo [text-shadow:0_0_15px_rgba(255,223,0,0.4)] group-hover:scale-105 transition-transform origin-left">
+                {loading ? '--' : data?.membresiasActivas ?? 0}
+              </div>
+              <p className="font-mono text-[10px] text-gym-logo/50 uppercase tracking-wider">Con acceso vigente</p>
             </div>
-            <p className="text-xs text-zinc-500">
-              Con acceso vigente
-            </p>
-          </CardContent>
-        </Card>
+          </Link>
 
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">
-              Membresías por Vencer
-            </CardTitle>
-            <AlertTriangle className="size-4 text-zinc-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-400">
-              {loading ? '--' : data?.membresiasPorVencer ?? 0}
+          {/* Card 3 */}
+          <Link href="/recepcionista/membresias?estado=por_vencer" className="relative rounded-xl border border-red-500/20 bg-gradient-to-br from-red-500/5 via-black to-black p-5 overflow-hidden group hover:border-red-500/40 transition-colors block">
+            <GridBackground />
+            <div className="relative z-10 flex flex-col gap-2">
+              <div className="flex items-center justify-between text-red-400/80">
+                <span className="font-arcade text-[10px] tracking-widest uppercase">Membresías por Vencer</span>
+                <AlertTriangle className="size-4" />
+              </div>
+              <div className="font-arcade text-3xl md:text-4xl text-red-400 [text-shadow:0_0_15px_rgba(239,68,68,0.4)] group-hover:scale-105 transition-transform origin-left">
+                {loading ? '--' : data?.membresiasPorVencer ?? 0}
+              </div>
+              <p className="font-mono text-[10px] text-red-400/50 uppercase tracking-wider">Próximos 7 días</p>
             </div>
-            <p className="text-xs text-zinc-500">
-              Próximos 7 días
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+          </Link>
+        </div>
+      </section>
 
-      <Card className="bg-zinc-900 border-zinc-800">
-        <CardHeader>
-          <CardTitle className="text-lg text-white">Membresías Próximas a Vencer</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <p className="text-zinc-400 text-sm">Cargando...</p>
-          ) : data?.proximasAVencer && data.proximasAVencer.length > 0 ? (
-            <div className="space-y-3">
-              {data.proximasAVencer.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-zinc-800/50 border border-zinc-700/50"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="size-8 rounded-full bg-zinc-700 flex items-center justify-center">
-                      <Clock className="size-4 text-zinc-400" />
+      {/* Próximas a vencer list */}
+      <section>
+        <SectionLabel>Membresías Próximas a Vencer</SectionLabel>
+        <div className="relative rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden">
+          <GridBackground />
+          <div className="relative z-10 p-5">
+            {loading ? (
+              <p className="font-mono text-white/30 text-xs text-center py-8">Cargando...</p>
+            ) : data?.proximasAVencer && data.proximasAVencer.length > 0 ? (
+              <div className="space-y-3">
+                {data.proximasAVencer.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between p-3 rounded-lg bg-black border border-white/5 hover:border-gym-logo/30 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="size-8 rounded border border-white/10 bg-white/[0.02] flex items-center justify-center">
+                        <Clock className="size-4 text-white/40" />
+                      </div>
+                      <div>
+                        <p className="font-mono text-sm font-semibold text-white">
+                          {item.nombre} {item.apellido}
+                        </p>
+                        <p className="font-arcade text-[8px] tracking-widest uppercase text-white/40 mt-1">{item.plan}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-white">
-                        {item.nombre} {item.apellido}
-                      </p>
-                      <p className="text-xs text-zinc-400">{item.plan}</p>
+                    <div className="text-right">
+                      <span
+                        className={cn(
+                          "font-arcade text-xs md:text-sm",
+                          item.dias_restantes <= 2
+                            ? 'text-red-400 [text-shadow:0_0_10px_rgba(239,68,68,0.5)]'
+                            : item.dias_restantes <= 5
+                              ? 'text-orange-400'
+                              : 'text-gym-logo [text-shadow:0_0_10px_rgba(255,223,0,0.5)]'
+                        )}
+                      >
+                        {item.dias_restantes} {item.dias_restantes === 1 ? 'día' : 'días'}
+                      </span>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <span
-                      className={`text-sm font-semibold ${
-                        item.dias_restantes <= 2
-                          ? 'text-red-400'
-                          : item.dias_restantes <= 5
-                            ? 'text-orange-400'
-                            : 'text-yellow-400'
-                      }`}
-                    >
-                      {item.dias_restantes} {item.dias_restantes === 1 ? 'día' : 'días'}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-zinc-400 text-sm">
-              No hay membresías próximas a vencer en los próximos 7 días.
-            </p>
-          )}
-        </CardContent>
-      </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Clock className="size-8 text-white/20 mx-auto mb-3" />
+                <p className="font-mono text-white/40 text-xs">
+                  No hay membresías próximas a vencer en los próximos 7 días.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

@@ -36,7 +36,18 @@ export async function listarMembresias(
   }
 }
 
-  if (estado !== 'todos') {
+  if (estado === 'por_vencer') {
+    const hoy = getFechaLima()
+    const hoyDate = new Date(hoy)
+    const fechaLimite = new Date(hoyDate)
+    fechaLimite.setDate(fechaLimite.getDate() + 7)
+    const fechaLimiteStr = fechaLimite.toISOString().split('T')[0]
+    
+    query = query
+      .eq('estado', 'activa')
+      .gte('fecha_fin', hoy)
+      .lte('fecha_fin', fechaLimiteStr)
+  } else if (estado !== 'todos') {
     const estadoMap: Record<string, string> = {
       'activas': 'activa',
       'vencidas': 'vencida',

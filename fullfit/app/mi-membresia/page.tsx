@@ -310,7 +310,7 @@ export default function MiMembresiaPage() {
     ? <><span className="text-gym-logo [text-shadow:0_0_20px_rgba(255,223,0,0.5)]">Mi</span> Membresía</>
     : data?.membresiaVencida
     ? <>Membresía <span className="text-red-400 [text-shadow:0_0_20px_rgba(239,68,68,0.4)]">Vencida</span></>
-    : <>¡Únete a <span className="text-gym-logo [text-shadow:0_0_20px_rgba(255,223,0,0.5)]">FullFit</span>!</>
+    : <>¡Únete a <span className="text-gym-logo [text-shadow:0_0_20px_rgba(255,223,0,0.5)]">FULLFORMA</span>!</>
 
   const heroDesc = data?.membresiaActiva
     ? 'Consulta el estado de tu plan y tu historial de pagos.'
