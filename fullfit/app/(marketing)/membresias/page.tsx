@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { createAnonServerClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Container from '@/components/layout/Container'
 import { ListaPlanesMembresia } from '@/components/membresias'
+import { BannerSocioLogueado } from '@/components/membresias/BannerSocioLogueado'
 
 export const metadata = {
   title: 'Membresías | Full Forma',
@@ -81,7 +82,19 @@ const MembresiasPage = async () => {
 
       <section className="py-12 md:py-20">
         <Container>
-          <ListaPlanesMembresia planes={planes} />
+          <Suspense fallback={null}>
+            <BannerSocioLogueado />
+          </Suspense>
+          {planes.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-white/60 text-lg font-mono mb-2">Próximamente</p>
+              <p className="text-white/40 text-sm font-mono">
+                Estamos preparando los mejores planes para ti. Vuelve pronto.
+              </p>
+            </div>
+          ) : (
+            <ListaPlanesMembresia planes={planes} />
+          )}
         </Container>
       </section>
 

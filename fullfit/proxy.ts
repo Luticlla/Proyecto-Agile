@@ -50,6 +50,7 @@ export async function proxy(request: NextRequest) {
   // Variables de rol para reutilizar en todas las condiciones
   const isSoloAdmin = profile?.rol_id === 1
   const isSoloRecepcionista = profile?.rol_id === 2
+  const isSoloMiembro = profile?.rol_id === 3
 
   // 0. Bloquear usuarios inactivos (excepto login, register y retornos MercadoPago)
   if (profile && profile.activo === false) {
@@ -96,7 +97,23 @@ export async function proxy(request: NextRequest) {
     return supabaseResponse
   }
 
-  // 3. Proteger /pasarelapago según rol
+  // 3. Proteger rutas de miembro (solo rol_id === 3)
+  if (pathname.startsWith('/mi-membresia')) {
+    if (!user) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      url.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(url)
+    }
+    if (!isSoloMiembro) {
+      const url = request.nextUrl.clone()
+      url.pathname = isSoloAdmin ? '/gerente' : '/recepcionista'
+      return NextResponse.redirect(url)
+    }
+    return supabaseResponse
+  }
+
+  // 4. Proteger /pasarelapago según rol
   if (pathname.startsWith('/pasarelapago')) {
     const hasStatusParam = request.nextUrl.searchParams.has('status')
     const hasPlanParam = request.nextUrl.searchParams.has('plan')
@@ -144,7 +161,7 @@ export async function proxy(request: NextRequest) {
   const rutasMarketing = ['/membresias', '/sedes']
   const esRutaMarketing = rutasMarketing.some(ruta => pathname.startsWith(ruta))
 
-  if (esRutaMarketing && user) {
+  if (esRutaMarketing && user && !isSoloMiembro) {
     const url = request.nextUrl.clone()
     if (isSoloAdmin) {
       url.pathname = '/gerente'
@@ -161,21 +178,30 @@ export async function proxy(request: NextRequest) {
       url.pathname = '/gerente'
     } else if (isSoloRecepcionista) {
       url.pathname = '/recepcionista'
-    } else {
+    } else if (isSoloMiembro) {
+      // Socios van al homepage con su sesión activa
       url.pathname = '/'
+    } else {
+      // Rol desconocido: dejar pasar sin redirigir
+      return supabaseResponse
     }
     return NextResponse.redirect(url)
   }
 
   // 6. Redirect desde la página principal según rol
   if (pathname === '/' && user) {
-    const url = request.nextUrl.clone()
     if (isSoloAdmin) {
+      const url = request.nextUrl.clone()
       url.pathname = '/gerente'
-    } else if (isSoloRecepcionista) {
-      url.pathname = '/recepcionista'
+      return NextResponse.redirect(url)
     }
-    return NextResponse.redirect(url)
+    if (isSoloRecepcionista) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/recepcionista'
+      return NextResponse.redirect(url)
+    }
+    // Socios (rol_id=3) y roles desconocidos: quedan en el homepage con sesión activa
+    return supabaseResponse
   }
 
   return supabaseResponse
@@ -185,6 +211,7 @@ export const config = {
   matcher: [
     '/recepcionista/:path*',
     '/gerente/:path*',
+    '/mi-membresia/:path*',
     '/pasarelapago/:path*',
     '/membresias/:path*',
     '/sedes/:path*',

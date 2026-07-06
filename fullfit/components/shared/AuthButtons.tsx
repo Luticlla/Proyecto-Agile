@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/hooks'
 import { Button } from '@/components/ui/button'
-import { Loader2, User, LogOut } from 'lucide-react'
+import { Loader2, User, LogOut, CreditCard } from 'lucide-react'
 
 interface AuthButtonsProps {
   direction?: 'row' | 'column'
@@ -31,6 +31,19 @@ export default function AuthButtons({ direction = 'row' }: AuthButtonsProps) {
   if (user) {
     return (
       <div className={`flex ${direction === 'column' ? 'flex-col gap-3 w-full' : 'items-center gap-3'}`}>
+        {profile?.rol_id === 3 && (
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="font-arcade text-zinc-300 hover:text-yellow-400"
+          >
+            <Link href="/mi-membresia">
+              <CreditCard className="h-4 w-4 mr-1" />
+              Mi Membresía
+            </Link>
+          </Button>
+        )}
         <div className="flex items-center gap-2 text-zinc-300">
           <User className="h-4 w-4" />
           <span className="text-sm hidden sm:inline">

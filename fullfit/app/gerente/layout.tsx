@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Users, Building2, LogOut } from 'lucide-react'
+import { Users, Building2, CreditCard, LogOut } from 'lucide-react'
 
 export default function GerenteLayout({
   children,
@@ -80,6 +80,12 @@ export default function GerenteLayout({
                   <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800">
                     <Building2 className="size-4 mr-2" />
                     Sedes
+                  </Button>
+                </Link>
+                <Link href="/gerente/planes">
+                  <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800">
+                    <CreditCard className="size-4 mr-2" />
+                    Planes
                   </Button>
                 </Link>
               </nav>

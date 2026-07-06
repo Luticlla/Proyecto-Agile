@@ -63,6 +63,7 @@ export type Database = {
           precio: number
           duracion_dias: number
           activo: boolean
+          features: string[] | null
           creado_en: string
         }
         Insert: {
@@ -72,6 +73,7 @@ export type Database = {
           precio: number
           duracion_dias: number
           activo?: boolean
+          features?: string[] | null
         }
         Update: {
           nombre?: string
@@ -79,6 +81,7 @@ export type Database = {
           precio?: number
           duracion_dias?: number
           activo?: boolean
+          features?: string[] | null
         }
       }
       suscripciones: {
@@ -299,6 +302,7 @@ export type RolNombre = 'admin' | 'recepcionista' | 'miembro'
 
 export type PlanMembresia = Database['public']['Tables']['planes_membresia']['Row']
 export type PlanMembresiaInsert = Database['public']['Tables']['planes_membresia']['Insert']
+export type PlanMembresiaUpdate = Database['public']['Tables']['planes_membresia']['Update']
 
 export type Suscripcion = Database['public']['Tables']['suscripciones']['Row']
 export type SuscripcionInsert = Database['public']['Tables']['suscripciones']['Insert']
