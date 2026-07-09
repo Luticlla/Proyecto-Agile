@@ -18,7 +18,10 @@ export async function POST(request: NextRequest) {
     const client = getMercadoPagoClient()
     const payment = await new Payment(client).get({ id: String(payment_id) })
 
+    console.log('[verificar] Payment status:', payment.status, 'payment_id:', payment_id)
+
     if (payment.status !== 'approved') {
+      console.error('[verificar] Pago no aprobado:', payment.status, 'payment_id:', payment_id)
       return NextResponse.json(
         { error: 'Pago no aprobado', status: payment.status },
         { status: 400 }
@@ -35,7 +38,10 @@ export async function POST(request: NextRequest) {
       metadata: payment.metadata as Record<string, string> | undefined,
     })
 
+    console.log('[verificar] processPaymentActivation result:', result)
+
     if (!result.success) {
+      console.error('[verificar] Error activando pago:', result.error, 'payment_id:', payment_id)
       return NextResponse.json({ error: result.error }, { status: 400 })
     }
 

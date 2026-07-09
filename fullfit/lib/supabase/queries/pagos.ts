@@ -51,6 +51,7 @@ export async function processPaymentActivation(
 
   const metadata = payment.metadata
   if (!metadata?.user_id || !metadata?.plan_id) {
+    console.error('[processPaymentActivation] Invalid metadata:', metadata)
     return { success: false, error: 'Invalid metadata' }
   }
 
@@ -64,6 +65,7 @@ export async function processPaymentActivation(
     .maybeSingle()
 
   if (!perfil) {
+    console.error('[processPaymentActivation] User not found:', userId)
     return { success: false, error: 'User not found' }
   }
 
@@ -75,6 +77,7 @@ export async function processPaymentActivation(
     .maybeSingle()
 
   if (!plan) {
+    console.error('[processPaymentActivation] Plan not found:', planId)
     return { success: false, error: 'Plan not found' }
   }
 
@@ -97,6 +100,7 @@ export async function processPaymentActivation(
       .eq('id', membresiaActiva.id)
 
     if (updateError) {
+      console.error('[processPaymentActivation] Failed to extend subscription:', updateError)
       return { success: false, error: 'Failed to extend subscription' }
     }
 
@@ -136,9 +140,10 @@ export async function processPaymentActivation(
       creado_por: userId,
     })
     .select('id')
-    .single()
+    .maybeSingle()
 
-  if (subError) {
+  if (subError || !suscripcion) {
+    console.error('[processPaymentActivation] Failed to create subscription:', subError, { userId, planId })
     return { success: false, error: 'Failed to create subscription' }
   }
 

@@ -1,7 +1,7 @@
 import { Preference } from 'mercadopago'
 import { getMercadoPagoClient } from './mercadopago'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || ''
+const SITE_URL = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || ''
 
 type PreferenciaParams = {
   planId: number
@@ -34,6 +34,11 @@ export async function crearPreferenciaPago(
 
     const baseSiteUrl = params.siteUrl || SITE_URL || ''
     const cleanSiteUrl = baseSiteUrl.endsWith('/') ? baseSiteUrl.slice(0, -1) : baseSiteUrl
+
+    if (!SITE_URL) {
+      console.error('SITE_URL no está configurado. Define la variable de entorno SITE_URL o NEXT_PUBLIC_SITE_URL.')
+      return { init_point: null, error: 'URL del sitio no configurada. Contacta al administrador.' }
+    }
 
     const client = getMercadoPagoClient()
     const preference = new Preference(client)
