@@ -135,6 +135,38 @@ export async function cambiarEstadoPlan(
 }
 
 /**
+ * Elimina un plan. Retorna error si tiene suscripciones activas.
+ */
+export async function eliminarPlan(
+  id: number,
+  customSupabase?: SupabaseClient<Database>
+): Promise<{ success: boolean; suscripcionesActivas?: number; error?: string }> {
+  const client = customSupabase || supabase
+
+  const { count: suscripcionesActivas } = await client
+    .from('suscripciones')
+    .select('*', { count: 'exact', head: true })
+    .eq('plan_id', id)
+    .eq('estado', 'activa')
+
+  if (suscripcionesActivas && suscripcionesActivas > 0) {
+    return { success: false, suscripcionesActivas }
+  }
+
+  const { error } = await client
+    .from('planes_membresia')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    console.error('Error eliminando plan:', error)
+    return { success: false, error: 'Error al eliminar el plan' }
+  }
+
+  return { success: true }
+}
+
+/**
  * Cuenta suscripciones activas de un plan
  */
 export async function contarSuscripcionesActivasPorPlan(

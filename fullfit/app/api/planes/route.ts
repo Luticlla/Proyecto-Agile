@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
         duracion_dias,
         activo: body.activo !== undefined ? body.activo : true,
         features: body.features || []
-      } as any)
+      })
       .select()
       .single()
 

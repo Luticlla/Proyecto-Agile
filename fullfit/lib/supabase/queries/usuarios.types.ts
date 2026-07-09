@@ -27,6 +27,8 @@ export type CrearUsuarioPayload = {
   email: string
   password?: string
   rol_id: number
+  fecha_nacimiento?: string
+  genero?: string
 }
 
 export type ActualizarUsuarioPayload = {
@@ -36,4 +38,6 @@ export type ActualizarUsuarioPayload = {
   telefono?: string
   rol_id?: number
   activo?: boolean
+  fecha_nacimiento?: string | null
+  genero?: string | null
 }

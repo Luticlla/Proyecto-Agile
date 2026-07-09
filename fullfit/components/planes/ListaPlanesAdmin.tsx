@@ -2,10 +2,11 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { Edit, Power, PowerOff } from 'lucide-react'
+import { Edit, Power, PowerOff, Trash2 } from 'lucide-react'
 import { formatDate } from '@/lib/utils/dates'
 import { BadgeEstadoPlan } from './BadgeEstadoPlan'
 import { ConfirmarDesactivarPlan } from './ConfirmarDesactivarPlan'
+import { ConfirmarEliminarPlan } from './ConfirmarEliminarPlan'
 import { useState } from 'react'
 import type { PlanAdmin } from '@/lib/supabase/queries/planes.types'
 
@@ -14,10 +15,12 @@ interface ListaPlanesAdminProps {
   loading?: boolean
   onEditar: (plan: PlanAdmin) => void
   onToggleEstado: (id: number, activo: boolean) => Promise<void>
+  onEliminar: (id: number) => Promise<void>
 }
 
-export function ListaPlanesAdmin({ planes, loading, onEditar, onToggleEstado }: ListaPlanesAdminProps) {
+export function ListaPlanesAdmin({ planes, loading, onEditar, onToggleEstado, onEliminar }: ListaPlanesAdminProps) {
   const [planConfirmar, setPlanConfirmar] = useState<{ id: number; nombre: string; activo: boolean } | null>(null)
+  const [planEliminar, setPlanEliminar] = useState<{ id: number; nombre: string } | null>(null)
 
   if (loading) {
     return (
@@ -59,6 +62,12 @@ export function ListaPlanesAdmin({ planes, loading, onEditar, onToggleEstado }: 
     if (!planConfirmar) return
     await onToggleEstado(planConfirmar.id, !planConfirmar.activo)
     setPlanConfirmar(null)
+  }
+
+  const handleConfirmEliminar = async () => {
+    if (!planEliminar) return
+    await onEliminar(planEliminar.id)
+    setPlanEliminar(null)
   }
 
   const formatDuracion = (dias: number) => {
@@ -124,6 +133,15 @@ export function ListaPlanesAdmin({ planes, loading, onEditar, onToggleEstado }: 
                     >
                       {plan.activo ? <PowerOff className="size-4" /> : <Power className="size-4" />}
                     </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 text-red-400 hover:bg-red-500/10"
+                      onClick={() => setPlanEliminar({ id: plan.id, nombre: plan.nombre })}
+                      title="Eliminar"
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -138,6 +156,13 @@ export function ListaPlanesAdmin({ planes, loading, onEditar, onToggleEstado }: 
         onConfirm={handleConfirm}
         nombrePlan={planConfirmar?.nombre || ''}
         activo={planConfirmar?.activo || false}
+      />
+
+      <ConfirmarEliminarPlan
+        isOpen={!!planEliminar}
+        onClose={() => setPlanEliminar(null)}
+        onConfirm={handleConfirmEliminar}
+        nombrePlan={planEliminar?.nombre || ''}
       />
     </>
   )

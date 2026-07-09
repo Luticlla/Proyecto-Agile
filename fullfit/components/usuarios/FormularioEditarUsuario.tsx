@@ -29,7 +29,9 @@ export function FormularioEditarUsuario({ usuario, isOpen, onClose, onSuccess }:
         apellido: usuario.apellido,
         dni: usuario.dni || '',
         telefono: usuario.telefono || '',
-        rol_id: usuario.rol_id
+        rol_id: usuario.rol_id,
+        fecha_nacimiento: (usuario as any).fecha_nacimiento || '',
+        genero: (usuario as any).genero || '',
       })
       setError(null)
     }
@@ -145,6 +147,36 @@ export function FormularioEditarUsuario({ usuario, isOpen, onClose, onSuccess }:
                 className="bg-zinc-950 border-zinc-800"
                 disabled={loading}
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-300">Fecha de Nacimiento</label>
+              <Input
+                type="date"
+                value={formData.fecha_nacimiento || ''}
+                onChange={(e) => handleChange('fecha_nacimiento', e.target.value)}
+                className="bg-zinc-950 border-zinc-800"
+                disabled={loading}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-300">Sexo</label>
+              <Select
+                value={formData.genero || ''}
+                onValueChange={(value) => handleChange('genero', value)}
+                disabled={loading}
+              >
+                <SelectTrigger className="bg-zinc-950 border-zinc-800">
+                  <SelectValue placeholder="Selecciona sexo" />
+                </SelectTrigger>
+                <SelectContent className="bg-zinc-900 border-zinc-800">
+                  <SelectItem value="masculino" className="text-white hover:bg-zinc-800">Masculino</SelectItem>
+                  <SelectItem value="femenino" className="text-white hover:bg-zinc-800">Femenino</SelectItem>
+                  <SelectItem value="prefiero no decirlo" className="text-white hover:bg-zinc-800">Prefiero no decirlo</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

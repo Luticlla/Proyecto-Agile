@@ -15,6 +15,7 @@ export type Database = {
           activo: boolean
           creado_en: string
           actualizado_en: string
+          sede_id: number | null
         }
         Insert: {
           id: string
@@ -27,6 +28,7 @@ export type Database = {
           fecha_nacimiento?: string | null
           genero?: string | null
           activo?: boolean
+          sede_id?: number | null
         }
         Update: {
           nombre?: string
@@ -37,6 +39,7 @@ export type Database = {
           fecha_nacimiento?: string | null
           genero?: string | null
           activo?: boolean
+          sede_id?: number | null
         }
       }
       roles: {
@@ -94,6 +97,7 @@ export type Database = {
           estado: string
           creado_por: string
           creado_en: string
+          sede_id: number | null
         }
         Insert: {
           id?: number
@@ -103,6 +107,7 @@ export type Database = {
           fecha_fin: string
           estado?: string
           creado_por: string
+          sede_id?: number | null
         }
         Update: {
           usuario_id?: string
@@ -111,6 +116,7 @@ export type Database = {
           fecha_fin?: string
           estado?: string
           creado_por?: string
+          sede_id?: number | null
         }
       }
       pagos: {
@@ -125,6 +131,7 @@ export type Database = {
           observaciones: string | null
           registrado_por: string
           fecha_pago: string
+          sede_id: number | null
         }
         Insert: {
           id?: number
@@ -136,6 +143,7 @@ export type Database = {
           referencia?: string | null
           observaciones?: string | null
           registrado_por: string
+          sede_id?: number | null
         }
         Update: {
           suscripcion_id?: number | null
@@ -146,6 +154,7 @@ export type Database = {
           referencia?: string | null
           observaciones?: string | null
           registrado_por?: string
+          sede_id?: number | null
         }
       }
       accesos: {
@@ -156,6 +165,7 @@ export type Database = {
           metodo: string
           registrado_por: string | null
           fecha_hora: string
+          sede_id: number | null
         }
         Insert: {
           id?: number
@@ -163,12 +173,14 @@ export type Database = {
           tipo?: string
           metodo?: string
           registrado_por?: string | null
+          sede_id?: number | null
         }
         Update: {
           usuario_id?: string
           tipo?: string
           metodo?: string
           registrado_por?: string | null
+          sede_id?: number | null
         }
       }
       notificaciones: {
@@ -322,3 +334,13 @@ export type AuditoriaInsert = Database['public']['Tables']['auditoria']['Insert'
 export type Sede = Database['public']['Tables']['sedes']['Row']
 export type SedeInsert = Database['public']['Tables']['sedes']['Insert']
 export type SedeUpdate = Database['public']['Tables']['sedes']['Update']
+
+// Profile con sede (para joins con sedes)
+export type ProfileWithSede = Profile & { 
+  sedes: Sede | null 
+}
+
+// Profile con email y sede
+export type ProfileWithEmailAndSede = ProfileWithEmail & { 
+  sedes: Sede | null 
+}

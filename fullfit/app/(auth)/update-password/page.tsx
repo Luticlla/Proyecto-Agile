@@ -2,15 +2,19 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, Lock } from 'lucide-react'
+import { Suspense } from 'react'
 
-export default function UpdatePasswordPage() {
-  const { updatePassword, isRecovery, loading: authLoading } = useAuth()
+function UpdatePasswordForm() {
+  const { updatePassword } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const token = searchParams.get('token')
+
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
@@ -18,14 +22,19 @@ export default function UpdatePasswordPage() {
   const [success, setSuccess] = useState(false)
 
   useEffect(() => {
-    if (!authLoading && !isRecovery) {
+    if (!token) {
       router.push('/login')
     }
-  }, [isRecovery, authLoading, router])
+  }, [token, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    if (!token) {
+      setError('Token no válido')
+      return
+    }
 
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden')
@@ -38,7 +47,7 @@ export default function UpdatePasswordPage() {
     }
 
     setLoading(true)
-    const { error } = await updatePassword(password)
+    const { error } = await updatePassword(password, token)
 
     if (error) {
       setError(error.message)
@@ -49,16 +58,12 @@ export default function UpdatePasswordPage() {
     }
   }
 
-  if (authLoading) {
+  if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-950">
         <Loader2 className="size-8 text-zinc-400 animate-spin" />
       </div>
     )
-  }
-
-  if (!isRecovery) {
-    return null
   }
 
   if (success) {
@@ -142,5 +147,17 @@ export default function UpdatePasswordPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function UpdatePasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950">
+        <Loader2 className="size-8 text-zinc-400 animate-spin" />
+      </div>
+    }>
+      <UpdatePasswordForm />
+    </Suspense>
   )
 }

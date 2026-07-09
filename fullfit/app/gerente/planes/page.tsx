@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus, Search, Loader2, CreditCard } from 'lucide-react'
-import { ListaPlanesAdmin, FormularioPlan } from '@/components/planes'
+import { ListaPlanesAdmin, FormularioPlan, ConfirmarEliminarPlan } from '@/components/planes'
 import { toast } from 'sonner'
 import type { PlanAdmin } from '@/lib/supabase/queries/planes.types'
 
@@ -24,6 +24,11 @@ export default function PlanesPage() {
 
   const [isCrearOpen, setIsCrearOpen] = useState(false)
   const [planEditar, setPlanEditar] = useState<PlanAdmin | null>(null)
+  const [planEliminarConfirmar, setPlanEliminarConfirmar] = useState<{
+    id: number
+    nombre: string
+    suscripcionesActivas?: number
+  } | null>(null)
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -124,6 +129,62 @@ export default function PlanesPage() {
     cargarPlanes({ busqueda, activo, page, limit: limite })
   }
 
+  const handleEliminar = async (id: number) => {
+    try {
+      const response = await fetch(`/api/planes/${id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al eliminar el plan')
+      }
+
+      if (data.confirmRequired) {
+        const plan = planes.find(p => p.id === id)
+        setPlanEliminarConfirmar({
+          id,
+          nombre: plan?.nombre || '',
+          suscripcionesActivas: data.suscripcionesActivas,
+        })
+        return
+      }
+
+      toast.success('Plan eliminado exitosamente')
+      const activo = filtroEstado === 'todos' ? undefined : filtroEstado === 'activos'
+      cargarPlanes({ busqueda, activo, page, limit: limite })
+    } catch (error: any) {
+      toast.error(error.message)
+    }
+  }
+
+  const handleConfirmEliminar = async () => {
+    if (!planEliminarConfirmar) return
+
+    try {
+      const response = await fetch(`/api/planes/${planEliminarConfirmar.id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirm: true }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al eliminar el plan')
+      }
+
+      toast.success('Plan eliminado exitosamente')
+      setPlanEliminarConfirmar(null)
+      const activo = filtroEstado === 'todos' ? undefined : filtroEstado === 'activos'
+      cargarPlanes({ busqueda, activo, page, limit: limite })
+    } catch (error: any) {
+      toast.error(error.message)
+    }
+  }
+
   const textoResultados = total === 0
     ? 'Sin resultados'
     : `${total} plan${total !== 1 ? 'es' : ''} encontrado${total !== 1 ? 's' : ''}`
@@ -181,6 +242,7 @@ export default function PlanesPage() {
         loading={loading}
         onEditar={setPlanEditar}
         onToggleEstado={handleToggleEstado}
+        onEliminar={handleEliminar}
       />
 
       {(totalPages > 1 || total > limite) && (
@@ -259,6 +321,14 @@ export default function PlanesPage() {
         isOpen={!!planEditar}
         onClose={() => setPlanEditar(null)}
         onSuccess={handleSuccessEditar}
+      />
+
+      <ConfirmarEliminarPlan
+        isOpen={!!planEliminarConfirmar}
+        onClose={() => setPlanEliminarConfirmar(null)}
+        onConfirm={handleConfirmEliminar}
+        nombrePlan={planEliminarConfirmar?.nombre || ''}
+        suscripcionesActivas={planEliminarConfirmar?.suscripcionesActivas}
       />
     </div>
   )

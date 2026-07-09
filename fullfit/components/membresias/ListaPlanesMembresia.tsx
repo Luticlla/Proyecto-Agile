@@ -14,6 +14,7 @@ type Plan = {
   precio: number
   duracion_dias: number
   descripcion?: string
+  features?: string[] | null
 }
 
 type MembresiaEstado = {
@@ -78,7 +79,9 @@ export function ListaPlanesMembresia({ planes }: { planes: Plan[] }) {
       {planes.map((plan) => {
         const prices = formatPrice(plan.precio, plan.duracion_dias)
         const isPopular = plan.nombre === 'Trimestral'
-        const features = planFeatures[plan.nombre] || []
+        const features = (plan.features && plan.features.length > 0)
+          ? plan.features
+          : (planFeatures[plan.nombre] || [])
 
         return (
           <div

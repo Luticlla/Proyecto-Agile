@@ -6,10 +6,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2, ArrowLeft, ShieldCheck, CheckCircle2, XCircle } from 'lucide-react'
+import { Loader2, ArrowLeft, ShieldCheck, CheckCircle2, XCircle, MailCheck } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
 // ─── Validaciones ────────────────────────────────────────────────────────────
 const validateEmail = (email: string) =>
@@ -27,7 +26,6 @@ function validatePassword(password: string): string | null {
 // ─── Componente ───────────────────────────────────────────────────────────────
 export default function RegisterPage() {
   const { signUp } = useAuth()
-  const router = useRouter()
 
   const [formData, setFormData] = useState({
     nombre: '',
@@ -47,6 +45,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [validating, setValidating] = useState(false)
   const [reniecValidado, setReniecValidado] = useState(false)
+  const [registeredEmail, setRegisteredEmail] = useState('')
 
   // ─── Handlers ────────────────────────────────────────────────────────────────
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -199,8 +198,8 @@ export default function RegisterPage() {
       setError(error.message)
       setLoading(false)
     } else {
-      alert('¡Registro exitoso! Por favor verifica tu email para confirmar tu cuenta.')
-      router.push('/login')
+      setRegisteredEmail(formData.email)
+      setLoading(false)
     }
   }
 
@@ -217,6 +216,46 @@ export default function RegisterPage() {
   }
 
   // ─── UI ──────────────────────────────────────────────────────────────────────
+  if (registeredEmail) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-950 px-4 py-8">
+        <Link href="/" className="flex items-center gap-2 text-zinc-400 hover:text-white mb-6 hoverEffect">
+          <ArrowLeft className="size-4" />
+          <span className="font-arcade text-xs">Volver al inicio</span>
+        </Link>
+
+        <Card className="w-full max-w-md bg-zinc-900 border-zinc-800">
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <MailCheck className="size-12 text-yellow-400" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-white">Revisa tu correo</CardTitle>
+            <CardDescription className="text-zinc-400">
+              Te hemos enviado un enlace de confirmación a{' '}
+              <span className="text-yellow-400">{registeredEmail}</span>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 text-center">
+            <p className="text-sm text-zinc-500">
+              Haz clic en el enlace del correo para activar tu cuenta y poder iniciar sesión.
+            </p>
+            <p className="text-xs text-zinc-600">
+              ¿No recibiste el correo? Revisa tu bandeja de spam.
+            </p>
+            <Button
+              asChild
+              className="w-full bg-yellow-400 text-zinc-950 hover:bg-yellow-300"
+            >
+              <Link href="/login">
+                Ir a Iniciar Sesión
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-950 px-4 py-8">
       <Link href="/" className="flex items-center gap-2 text-zinc-400 hover:text-white mb-6 hoverEffect">

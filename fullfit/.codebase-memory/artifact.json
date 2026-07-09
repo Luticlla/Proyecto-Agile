@@ -1,11 +1,11 @@
 {
     "schema_version": 1,
-    "commit": "3786bb5c7920945af24c434e18460435c17c0808",
-    "indexed_at": "2026-07-06T16:27:20Z",
+    "commit": "a1d544d1cf5dac8d2b07750dfd13e3d7fdeaee26",
+    "indexed_at": "2026-07-09T02:05:49Z",
     "project": "home-luticlla-Documents-Proyecto-Agile-fullfit",
-    "nodes": 2954,
-    "edges": 4394,
-    "original_size": 8126464,
-    "compressed_size": 1199062,
-    "compression_level": 3
+    "nodes": 3008,
+    "edges": 4405,
+    "original_size": 5373952,
+    "compressed_size": 968950,
+    "compression_level": 9
 }

@@ -4,6 +4,7 @@ import { calcularDiasRestantes } from '@/lib/utils/dates'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { mapRowToMembresiaConCliente, MEMBRESIA_SELECT_WITH_JOINS } from './membresias.helpers'
 import type { MembresiaFilters, MembresiaListResult, MembresiaConCliente } from './membresias.types'
+import { applySedeFilterDirect } from './sede-filters'
 
 export type { MembresiaFilters, MembresiaListResult, MembresiaConCliente }
 
@@ -16,13 +17,17 @@ export async function listarMembresias(
   client?: SupabaseClient
 ): Promise<MembresiaListResult> {
   const db = client || supabase
-  const { buscar, estado = 'todos', page = 1, limit = 10 } = filtros
+  const { buscar, estado = 'todos', page = 1, limit = 10, sedeId } = filtros
   const from = (page - 1) * limit
   const to = from + limit - 1
 
   let query = db
     .from('suscripciones')
     .select(MEMBRESIA_SELECT_WITH_JOINS, { count: 'exact' })
+
+  if (sedeId) {
+    query = applySedeFilterDirect(query, sedeId)
+  }
 
   if (buscar) {
   const palabras = buscar.trim().split(/\s+/).filter(Boolean)

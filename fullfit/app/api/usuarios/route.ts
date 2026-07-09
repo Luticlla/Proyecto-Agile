@@ -65,7 +65,9 @@ export async function POST(request: NextRequest) {
         dni,
         telefono,
         rol_id,
-        activo: true
+        activo: true,
+        fecha_nacimiento: body.fecha_nacimiento || null,
+        genero: body.genero || null,
       } as any)
       .eq('id', newUserId)
 

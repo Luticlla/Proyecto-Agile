@@ -9,7 +9,8 @@ export async function GET(request: NextRequest) {
   try {
     const auth = await requireAuthenticatedRecepcionista(request)
     if (!auth.success) return auth.response
-    const { supabase } = auth
+    const { supabase, user } = auth
+    const { sedeId } = user
 
     const { searchParams } = new URL(request.url)
     const buscar = searchParams.get('buscar') || undefined
@@ -21,7 +22,8 @@ export async function GET(request: NextRequest) {
       buscar,
       estado: estado as 'todos' | 'activas' | 'vencidas' | 'canceladas' | 'suspendidas' | 'por_vencer',
       page,
-      limit
+      limit,
+      sedeId: sedeId ?? undefined
     }, supabase)
 
     return NextResponse.json(result)
@@ -69,7 +71,8 @@ export async function POST(request: NextRequest) {
       usuario_id,
       plan_id,
       metodo_pago,
-      monto
+      monto,
+      sedeId: user.sedeId ?? undefined
     }
 
     const result = await registrarMembresia(dto, user.id, supabase)

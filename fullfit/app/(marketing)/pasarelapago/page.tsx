@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { planFeatures, formatPrice } from '@/constants/plans'
 
 function PaymentSummary({ plan, prices, features }: {
-  plan: { nombre: string; precio: number; duracion_dias: number; descripcion?: string }
+  plan: { nombre: string; precio: number; duracion_dias: number; descripcion?: string; features?: string[] | null }
   prices: { total: string; perMonth: string }
   features: string[]
 }) {
@@ -123,7 +123,7 @@ function PasarelaPagoContent() {
   const status = searchParams.get('status')
   const paymentId = searchParams.get('payment_id')
 
-  const [plan, setPlan] = useState<{ id: number; nombre: string; precio: number; duracion_dias: number; descripcion?: string } | null>(null)
+  const [plan, setPlan] = useState<{ id: number; nombre: string; precio: number; duracion_dias: number; descripcion?: string; features?: string[] | null } | null>(null)
   const [paymentLoading, setPaymentLoading] = useState(false)
   const [planLoading, setPlanLoading] = useState(true)
   const [verificationLoading, setVerificationLoading] = useState(false)
@@ -318,7 +318,9 @@ function PasarelaPagoContent() {
   }
 
   const prices = formatPrice(plan.precio, plan.duracion_dias)
-  const features = planFeatures[plan.nombre] || []
+  const features = (plan.features && plan.features.length > 0)
+    ? plan.features
+    : (planFeatures[plan.nombre] || [])
 
   return (
     <main className="min-h-screen bg-black">

@@ -2,20 +2,20 @@
 
 import { useState, useEffect, createContext, useContext, ReactNode, useRef, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
-import type { Profile } from '@/lib/supabase/types'
+import type { ProfileWithSede } from '@/lib/supabase/types'
 import type { User, Session } from '@supabase/supabase-js'
 
 type AuthContextType = {
   user: User | null
   session: Session | null
-  profile: Profile | null
+  profile: ProfileWithSede | null
   loading: boolean
   isRecovery: boolean
   signUp: (email: string, password: string, metadata: { nombre: string; apellido: string; telefono?: string; dni?: string; fecha_nacimiento?: string; genero?: string | null }) => Promise<{ error: Error | null }>
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<{ error: Error | null }>
-  updatePassword: (password: string) => Promise<{ error: Error | null }>
+  updatePassword: (password: string, token?: string) => Promise<{ error: Error | null }>
   refreshProfile: () => Promise<void>
 }
 
@@ -24,7 +24,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
-  const [profile, setProfile] = useState<Profile | null>(null)
+  const [profile, setProfile] = useState<ProfileWithSede | null>(null)
   const [loading, setLoading] = useState(true)
   const [isRecovery, setIsRecovery] = useState(false)
   const lastFetchedUserId = useRef<string | null>(null)
@@ -37,7 +37,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { data, error } = await supabase
       .from('profiles')
-      .select('*')
+      .select(`
+        *,
+        sedes:sede_id (id, nombre)
+      `)
       .eq('id', userId)
       .single()
 
@@ -47,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     lastFetchedUserId.current = userId
-    return data as Profile
+    return data as ProfileWithSede
   }, [profile])
 
   useEffect(() => {
@@ -113,14 +116,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [fetchProfile])
 
   const signUp = async (email: string, password: string, metadata: { nombre: string; apellido: string; telefono?: string; dni?: string; fecha_nacimiento?: string; genero?: string | null }) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: metadata
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, metadata }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        return { error: new Error(data.error || 'Error al registrar') }
       }
-    })
-    return { error }
+
+      return { error: null }
+    } catch (error) {
+      return { error: error as Error }
+    }
   }
 
   const signIn = async (email: string, password: string) => {
@@ -132,18 +144,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/update-password`
-    })
-    return { error }
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        return { error: new Error(data.error || 'Error al enviar el correo') }
+      }
+
+      return { error: null }
+    } catch (error) {
+      return { error: error as Error }
+    }
   }
 
-  const updatePassword = async (password: string) => {
-    const { error } = await supabase.auth.updateUser({ password })
-    if (!error) {
-      setIsRecovery(false)
+  const updatePassword = async (password: string, token?: string) => {
+    try {
+      if (token) {
+        const response = await fetch('/api/auth/update-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, password }),
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          return { error: new Error(data.error || 'Error al actualizar la contraseña') }
+        }
+
+        setIsRecovery(false)
+        return { error: null }
+      }
+
+      const { error } = await supabase.auth.updateUser({ password })
+      if (!error) {
+        setIsRecovery(false)
+      }
+      return { error }
+    } catch (error) {
+      return { error: error as Error }
     }
-    return { error }
   }
 
   const signOut = async () => {

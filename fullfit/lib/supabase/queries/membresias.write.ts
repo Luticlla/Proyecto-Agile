@@ -19,7 +19,7 @@ type RegistroResult = {
  * extiende la suscripción. Si no, crea una nueva.
  */
 export async function registrarMembresia(
-  dto: RegistrarMembresiaDTO,
+  dto: RegistrarMembresiaDTO & { sedeId?: number },
   registradoPor: string,
   client?: SupabaseClient
 ): Promise<RegistroResult> {
