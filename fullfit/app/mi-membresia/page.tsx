@@ -171,9 +171,9 @@ function TarjetaMembresiaArcade({
           </p>
         </div>
 
-        {/* CTA — activa y por vencer: renovar desde pasarela */}
+        {/* CTA — activa y por vencer: elegir plan en /membresias */}
         {esActiva && dias <= 7 && (
-          <Link href={`/pasarelapago?plan=${membresia.plan_id}`} className="block">
+          <Link href="/membresias" className="block">
             <Button className="w-full bg-gym-logo text-black hover:bg-gym-logo/80 font-arcade text-[10px] tracking-widest uppercase gap-2">
               <AlertTriangle className="size-3.5" />
               Renovar Membresía
