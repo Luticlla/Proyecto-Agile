@@ -321,7 +321,7 @@ renovarMembresia(id: string, planId: string): Promise<Suscripcion>
 │  Vigencia: 20/06/2026 - 20/06/2027                 │
 ├─────────────────────────────────────────────────────┤
 │  ¡Gracias por entrenar con nosotros!                │
-│  www.fullforma.vercel.app                           │
+│  www.ubaubawaza.vercel.app                           │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -333,7 +333,7 @@ const DATOS_GIMNASIO = {
   direccion: 'Av. Principal 123, Trujillo',
   ruc: '20XXXXXXX',
   telefono: '(044) 123456',
-  web: 'www.fullforma.vercel.app'
+  web: 'www.ubaubawaza.vercel.app'
 }
 ```
 

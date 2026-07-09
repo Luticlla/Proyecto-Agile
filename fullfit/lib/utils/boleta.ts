@@ -8,7 +8,7 @@ const DATOS_GIMNASIO = {
   direccion: 'Av. Principal 123, Trujillo',
   ruc: '20XXXXXXX',
   telefono: '(044) 123456',
-  web: 'www.fullforma.vercel.app'
+  web: 'www.ubaubawaza.vercel.app'
 }
 
 export function generarBoletaPDF(datos: BoletaData): Blob {
