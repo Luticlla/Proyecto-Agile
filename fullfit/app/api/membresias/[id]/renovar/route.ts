@@ -89,6 +89,7 @@ export async function POST(
         planNombre: plan?.nombre || '',
         userId: membresia?.usuario_id || '',
         monto,
+        siteUrl: request.nextUrl.origin,
         metadata: {
           plan_id: String(plan_id),
           user_id: membresia?.usuario_id || '',

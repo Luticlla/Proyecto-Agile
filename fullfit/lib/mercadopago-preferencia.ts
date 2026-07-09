@@ -9,6 +9,7 @@ type PreferenciaParams = {
   userId: string
   monto: number
   metadata: Record<string, string>
+  siteUrl?: string
 }
 
 type PreferenciaResult = {
@@ -31,6 +32,9 @@ export async function crearPreferenciaPago(
       return { init_point: null, error: 'El monto del plan no es válido. Debe ser mayor a 0.' }
     }
 
+    const baseSiteUrl = params.siteUrl || SITE_URL || ''
+    const cleanSiteUrl = baseSiteUrl.endsWith('/') ? baseSiteUrl.slice(0, -1) : baseSiteUrl
+
     const client = getMercadoPagoClient()
     const preference = new Preference(client)
 
@@ -45,9 +49,9 @@ export async function crearPreferenciaPago(
         }],
         metadata: params.metadata,
         back_urls: {
-          success: `${SITE_URL}/pasarelapago?status=approved`,
-          failure: `${SITE_URL}/pasarelapago?status=rejected`,
-          pending: `${SITE_URL}/pasarelapago?status=pending`,
+          success: `${cleanSiteUrl}/pasarelapago?status=approved`,
+          failure: `${cleanSiteUrl}/pasarelapago?status=rejected`,
+          pending: `${cleanSiteUrl}/pasarelapago?status=pending`,
         },
         auto_return: 'approved',
       },

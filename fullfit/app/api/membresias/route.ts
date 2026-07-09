@@ -91,6 +91,7 @@ export async function POST(request: NextRequest) {
         planNombre: plan?.nombre || '',
         userId: usuario_id,
         monto,
+        siteUrl: request.nextUrl.origin,
         metadata: {
           plan_id: String(plan_id),
           user_id: usuario_id,
