@@ -2,13 +2,13 @@
 
 import { useState, useEffect, createContext, useContext, ReactNode, useRef, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
-import type { ProfileWithSede } from '@/lib/supabase/types'
+import type { Profile } from '@/lib/supabase/types'
 import type { User, Session } from '@supabase/supabase-js'
 
 type AuthContextType = {
   user: User | null
   session: Session | null
-  profile: ProfileWithSede | null
+  profile: Profile | null
   loading: boolean
   isRecovery: boolean
   signUp: (email: string, password: string, metadata: { nombre: string; apellido: string; telefono?: string; dni?: string; fecha_nacimiento?: string; genero?: string | null }) => Promise<{ error: Error | null }>
@@ -24,7 +24,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
-  const [profile, setProfile] = useState<ProfileWithSede | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [isRecovery, setIsRecovery] = useState(false)
   const lastFetchedUserId = useRef<string | null>(null)
@@ -37,10 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { data, error } = await supabase
       .from('profiles')
-      .select(`
-        *,
-        sedes:sede_id (id, nombre)
-      `)
+      .select('*')
       .eq('id', userId)
       .single()
 
@@ -50,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     lastFetchedUserId.current = userId
-    return data as ProfileWithSede
+    return data as Profile
   }, [profile])
 
   useEffect(() => {

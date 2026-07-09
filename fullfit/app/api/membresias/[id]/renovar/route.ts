@@ -13,7 +13,6 @@ export async function POST(
     const auth = await requireAuthenticatedRecepcionista(request)
     if (!auth.success) return auth.response
     const { supabase, user } = auth
-    const { sedeId, rolId } = user
 
     const { id } = await params
     const membresiaId = parseInt(id)
@@ -23,30 +22,6 @@ export async function POST(
         { error: 'ID de membresía inválido' },
         { status: 400 }
       )
-    }
-
-    // Verificar que la membresía pertenece a la sede del recepcionista (admin ve todo)
-    if (rolId !== 1 && sedeId) {
-      const membresia = await obtenerMembresia(membresiaId, supabase)
-      if (!membresia) {
-        return NextResponse.json(
-          { error: 'Membresía no encontrada' },
-          { status: 404 }
-        )
-      }
-      // Verificar vía suscripciones.sede_id (no profiles.sede_id)
-      const { data: sub } = await supabase
-        .from('suscripciones')
-        .select('sede_id')
-        .eq('id', membresiaId)
-        .single()
-      
-      if (sub?.sede_id !== sedeId) {
-        return NextResponse.json(
-          { error: 'No tienes permisos para renovar esta membresía' },
-          { status: 403 }
-        )
-      }
     }
 
     const body = await request.json()

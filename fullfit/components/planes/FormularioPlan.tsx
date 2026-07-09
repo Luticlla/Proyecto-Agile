@@ -88,8 +88,12 @@ export function FormularioPlan({ isOpen, onClose, onSuccess, plan }: FormularioP
       setError('El nombre es requerido')
       return
     }
-    if (formData.precio <= 0) {
-      setError('El precio debe ser mayor a 0')
+    if (formData.precio < 3) {
+      setError('El precio debe ser mayor a S/ 3.00')
+      return
+    }
+    if (formData.duracion_dias > 365) {
+      setError('La duración máxima es de 365 días (1 año)')
       return
     }
     if (formData.duracion_dias <= 0) {
@@ -174,7 +178,7 @@ export function FormularioPlan({ isOpen, onClose, onSuccess, plan }: FormularioP
               <Input
                 type="number"
                 step="0.01"
-                min="0.01"
+                min="3"
                 value={formData.precio || ''}
                 onChange={(e) => {
                   const val = e.target.value
@@ -182,7 +186,7 @@ export function FormularioPlan({ isOpen, onClose, onSuccess, plan }: FormularioP
                 }}
                 className="bg-zinc-950 border-zinc-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 disabled={loading}
-                placeholder="Ej: 89.90"
+                placeholder="Mínimo S/ 3.00"
               />
             </div>
             <div className="space-y-2">
@@ -190,11 +194,12 @@ export function FormularioPlan({ isOpen, onClose, onSuccess, plan }: FormularioP
               <Input
                 type="number"
                 min="1"
+                max="365"
                 value={formData.duracion_dias}
                 onChange={(e) => handleChange('duracion_dias', parseInt(e.target.value) || 30)}
                 className="bg-zinc-950 border-zinc-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 disabled={loading}
-                placeholder="30"
+                placeholder="Máximo 365 días"
               />
             </div>
           </div>

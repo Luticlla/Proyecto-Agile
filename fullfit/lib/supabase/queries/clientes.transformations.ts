@@ -17,8 +17,7 @@ export function addEmail(profile: Record<string, unknown>): ProfileWithEmail {
     genero: profile.genero as string | null,
     activo: profile.activo as boolean,
     creado_en: profile.creado_en as string,
-    actualizado_en: profile.actualizado_en as string,
-    sede_id: (profile.sede_id as number) ?? null
+    actualizado_en: profile.actualizado_en as string
   }
 }
 

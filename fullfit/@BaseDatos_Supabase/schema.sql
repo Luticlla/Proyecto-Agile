@@ -32,6 +32,7 @@ CREATE TABLE public.planes_membresia (
   duracion_dias integer NOT NULL CHECK (duracion_dias > 0),
   activo boolean NOT NULL DEFAULT true,
   creado_en timestamp without time zone NOT NULL DEFAULT now(),
+  features jsonb DEFAULT '[]'::jsonb,
   CONSTRAINT planes_membresia_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.suscripciones (
@@ -111,10 +112,10 @@ CREATE TABLE public.sedes (
   cierre_lv time without time zone NOT NULL DEFAULT '22:00:00'::time without time zone,
   apertura_sab time without time zone NOT NULL DEFAULT '07:00:00'::time without time zone,
   cierre_sab time without time zone NOT NULL DEFAULT '22:00:00'::time without time zone,
-  apertura_dom time without time zone,
-  cierre_dom time without time zone,
   estado character varying NOT NULL DEFAULT 'activa'::character varying CHECK (estado::text = ANY (ARRAY['activa'::character varying, 'inactiva'::character varying]::text[])),
   creado_en timestamp without time zone NOT NULL DEFAULT now(),
   actualizado_en timestamp without time zone NOT NULL DEFAULT now(),
+  apertura_dom time without time zone,
+  cierre_dom time without time zone,
   CONSTRAINT sedes_pkey PRIMARY KEY (id)
 );

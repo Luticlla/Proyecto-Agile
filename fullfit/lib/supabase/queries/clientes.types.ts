@@ -11,7 +11,6 @@ export type ClienteFilters = {
   limit?: number
   orderBy?: string
   orderDir?: 'asc' | 'desc'
-  sedeId?: number
 }
 
 export type ClienteListResult = {

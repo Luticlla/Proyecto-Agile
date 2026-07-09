@@ -41,7 +41,7 @@ export default function ClienteDetailPage() {
       const response = await fetch('/api/planes')
       if (response.ok) {
         const data = await response.json()
-        setPlanes(data.planes || [])
+        setPlanes(data.data || [])
       }
     } catch (error) {
       console.error('Error fetching planes:', error)

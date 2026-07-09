@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuthenticatedRecepcionista } from '@/lib/auth/api-guard'
-import { applySedeFilterToMiembros } from '@/lib/supabase/queries/sede-filters'
-
 export async function GET(request: NextRequest) {
   try {
     const auth = await requireAuthenticatedRecepcionista(request)
     if (!auth.success) return auth.response
-    const { supabase, user } = auth
-    const { sedeId } = user
-
+    const { supabase } = auth
     const { searchParams } = new URL(request.url)
     const q = searchParams.get('q') || ''
 
@@ -23,11 +19,6 @@ export async function GET(request: NextRequest) {
       .eq('rol_id', 3)
       .order('nombre')
       .limit(5)
-
-    // Filtrar por sede del recepcionista
-    if (sedeId) {
-      query = applySedeFilterToMiembros(query, sedeId)
-    }
 
     const { data, error } = await query
 

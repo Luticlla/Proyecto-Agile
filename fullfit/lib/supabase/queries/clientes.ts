@@ -4,7 +4,6 @@ import type { ClienteFilters, ClienteListResult, ClienteConMembresia, ClienteCon
 import { addEmail, enrichConMembresia, applyBusquedaFilter } from './clientes.transformations'
 import { getFechaLima } from '@/lib/utils'
 import { calcularDiasRestantes } from '@/lib/utils/dates'
-import { applySedeFilterToMiembros, applySedeFilterToStaff, applySedeFilterDirect } from './sede-filters'
 
 export type { EstadoSuscripcion, ClienteFilters, ClienteListResult, ClienteConMembresia, ClienteConMembresiaCompleta, MembresiaDetalle, PagoResumen } from './clientes.types'
 
@@ -16,22 +15,15 @@ function buildBaseQuery(filtros: {
   rol_id: number
   idsExcluidos?: string[]
   idsIncluidos?: string[]
-  sedeId?: number
 }) {
-  const { busqueda, activo, rol_id, idsExcluidos, idsIncluidos, sedeId } = filtros
+  const { busqueda, activo, rol_id, idsExcluidos, idsIncluidos } = filtros
 
   let query = supabase
     .from('profiles')
     .select('*', { count: 'exact' })
     .eq('rol_id', rol_id)
 
-  if (sedeId) {
-    if (rol_id === MIEMBRO_ROLE_ID) {
-      query = applySedeFilterToMiembros(query, sedeId)
-    } else {
-      query = applySedeFilterToStaff(query, sedeId, rol_id)
-    }
-  }
+
 
   if (idsIncluidos && idsIncluidos.length > 0) {
     query = query.in('id', idsIncluidos)
@@ -122,19 +114,19 @@ export async function actualizarCliente(id: string, datos: ProfileUpdate): Promi
 }
 
 export async function listarClientes(filtros: ClienteFilters = {}): Promise<ClienteListResult> {
-  const { busqueda, activo, rol_id = MIEMBRO_ROLE_ID, estado_suscripcion = 'todos', page = 1, limit = 10, sedeId } = filtros
+  const { busqueda, activo, rol_id = MIEMBRO_ROLE_ID, estado_suscripcion = 'todos', page = 1, limit = 10 } = filtros
   const from = (page - 1) * limit
   const to = from + limit - 1
 
   if (estado_suscripcion === 'sin_membresia') {
-    return listarClientesSinMembresia({ busqueda, activo, rol_id, page, limit, sedeId })
+    return listarClientesSinMembresia({ busqueda, activo, rol_id, page, limit })
   }
 
   if (estado_suscripcion === 'activos' || estado_suscripcion === 'vencidos') {
-    return listarClientesPorEstadoMembresia({ busqueda, activo, rol_id, estado_suscripcion, page, limit, sedeId })
+    return listarClientesPorEstadoMembresia({ busqueda, activo, rol_id, estado_suscripcion, page, limit })
   }
 
-  const query = buildBaseQuery({ busqueda, activo, rol_id, sedeId })
+  const query = buildBaseQuery({ busqueda, activo, rol_id })
   const { data, count, error } = await query.order('nombre').range(from, to)
 
   if (error) {
@@ -151,9 +143,8 @@ async function listarClientesSinMembresia(filtros: {
   rol_id?: number
   page: number
   limit: number
-  sedeId?: number
 }): Promise<ClienteListResult> {
-  const { busqueda, activo, rol_id = MIEMBRO_ROLE_ID, page, limit, sedeId } = filtros
+  const { busqueda, activo, rol_id = MIEMBRO_ROLE_ID, page, limit } = filtros
   const from = (page - 1) * limit
   const to = from + limit - 1
 
@@ -168,8 +159,7 @@ async function listarClientesSinMembresia(filtros: {
     busqueda,
     activo,
     rol_id,
-    idsExcluidos: idsUnicos.length > 0 ? idsUnicos : undefined,
-    sedeId
+    idsExcluidos: idsUnicos.length > 0 ? idsUnicos : undefined
   })
 
   const { data, count, error } = await query.order('nombre').range(from, to)
@@ -189,9 +179,8 @@ async function listarClientesPorEstadoMembresia(filtros: {
   estado_suscripcion: 'activos' | 'vencidos'
   page: number
   limit: number
-  sedeId?: number
 }): Promise<ClienteListResult> {
-  const { busqueda, activo, rol_id = MIEMBRO_ROLE_ID, estado_suscripcion, page, limit, sedeId } = filtros
+  const { busqueda, activo, rol_id = MIEMBRO_ROLE_ID, estado_suscripcion, page, limit } = filtros
   const from = (page - 1) * limit
   const to = from + limit - 1
 
@@ -211,10 +200,7 @@ async function listarClientesPorEstadoMembresia(filtros: {
     )
   }
 
-  // Si hay sedeId, filtrar suscripciones por usuarios de esa sede
-  if (sedeId) {
-    suscripcionQuery = applySedeFilterDirect(suscripcionQuery, sedeId)
-  }
+
 
   const { data: suscripciones } = await suscripcionQuery
   const usuarioIds = (suscripciones || []).map((s: { usuario_id: string }) => s.usuario_id)
@@ -228,8 +214,7 @@ async function listarClientesPorEstadoMembresia(filtros: {
     busqueda,
     activo,
     rol_id,
-    idsIncluidos: idsUnicos,
-    sedeId
+    idsIncluidos: idsUnicos
   })
 
   const { data, count, error } = await query.order('nombre').range(from, to)
@@ -315,7 +300,7 @@ export async function obtenerHistorialPagos(
   })
 }
 
-export async function contarClientesPorEstado(sedeId?: number): Promise<{
+export async function contarClientesPorEstado(): Promise<{
   activos: number
   inactivos: number
   total: number
@@ -332,11 +317,6 @@ export async function contarClientesPorEstado(sedeId?: number): Promise<{
     .eq('rol_id', MIEMBRO_ROLE_ID)
     .eq('activo', false)
 
-  if (sedeId) {
-    queryActivos = applySedeFilterToMiembros(queryActivos, sedeId)
-    queryInactivos = applySedeFilterToMiembros(queryInactivos, sedeId)
-  }
-
   const [activos, inactivos] = await Promise.all([queryActivos, queryInactivos])
 
   return {
@@ -346,7 +326,7 @@ export async function contarClientesPorEstado(sedeId?: number): Promise<{
   }
 }
 
-export async function contarMembresiasPorEstado(sedeId?: number): Promise<{
+export async function contarMembresiasPorEstado(): Promise<{
   activas: number
   vencidas: number
   por_vencer: number
@@ -359,10 +339,6 @@ export async function contarMembresiasPorEstado(sedeId?: number): Promise<{
   const fechaLimiteStr = fechaLimite.toISOString().split('T')[0]
 
   let baseQuery = supabase.from('suscripciones').select('*', { count: 'exact' })
-  
-  if (sedeId) {
-    baseQuery = applySedeFilterDirect(baseQuery, sedeId)
-  }
 
   const [activasResult, vencidasResult, porVencerResult, conMembresiaResult, totalMiembrosResult] = await Promise.all([
     baseQuery
@@ -371,21 +347,18 @@ export async function contarMembresiasPorEstado(sedeId?: number): Promise<{
     supabase
       .from('suscripciones')
       .select('usuario_id')
-      .or(`estado.eq.vencida,and(estado.eq.activa,fecha_fin.lt.${hoy})`)
-      .then(r => sedeId ? applySedeFilterDirect(r, sedeId) : r),
+      .or(`estado.eq.vencida,and(estado.eq.activa,fecha_fin.lt.${hoy})`),
     baseQuery
       .eq('estado', 'activa')
       .gte('fecha_fin', hoy)
       .lte('fecha_fin', fechaLimiteStr),
     supabase
       .from('suscripciones')
-      .select('usuario_id')
-      .then(r => sedeId ? applySedeFilterDirect(r, sedeId) : r),
+      .select('usuario_id'),
     supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true })
       .eq('rol_id', MIEMBRO_ROLE_ID)
-      .then(r => sedeId ? applySedeFilterToMiembros(r, sedeId) : r)
   ])
 
   const activas = activasResult.count || 0

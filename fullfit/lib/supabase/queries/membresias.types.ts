@@ -7,7 +7,6 @@ export type MembresiaFilters = {
   estado?: EstadoMembresia
   page?: number
   limit?: number
-  sedeId?: number
 }
 
 export type MembresiaListResult = {
@@ -39,7 +38,6 @@ export type RegistrarMembresiaDTO = {
   plan_id: number
   metodo_pago: MetodoPago
   monto: number
-  sedeId?: number
 }
 
 export type CambiarEstadoDTO = {

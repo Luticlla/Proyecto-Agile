@@ -5,7 +5,6 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 interface AuthUser {
   id: string
-  sedeId: number | null
   rolId: number
 }
 
@@ -15,7 +14,7 @@ type AuthGuardResult =
 
 /**
  * Verifica autenticación y permisos de recepcionista/admin para API routes.
- * Retorna el cliente supabase, usuario autenticado con sedeId y rolId.
+ * Retorna el cliente supabase, usuario autenticado con rolId.
  */
 export async function requireAuthenticatedRecepcionista(
   request: NextRequest
@@ -37,7 +36,7 @@ export async function requireAuthenticatedRecepcionista(
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('rol_id, sede_id')
+    .select('rol_id')
     .eq('id', user.id)
     .single()
 
@@ -56,7 +55,6 @@ export async function requireAuthenticatedRecepcionista(
     supabase, 
     user: { 
       id: user.id, 
-      sedeId: profile.sede_id, 
       rolId: profile.rol_id 
     }, 
     supabaseResponse 
@@ -87,7 +85,7 @@ export async function requireAuthenticated(
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('rol_id, sede_id')
+    .select('rol_id')
     .eq('id', user.id)
     .single()
 
@@ -96,7 +94,6 @@ export async function requireAuthenticated(
     supabase, 
     user: { 
       id: user.id, 
-      sedeId: profile?.sede_id ?? null, 
       rolId: profile?.rol_id ?? 3 
     }, 
     supabaseResponse 
