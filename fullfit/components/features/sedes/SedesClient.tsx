@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
 import Container from '@/components/layout/Container'
 import { MapPin, Phone, Clock, Dumbbell, ChevronDown, MessageCircle } from 'lucide-react'
 
@@ -209,28 +208,6 @@ const SedesClient = ({ sedes }: SedesClientProps) => {
                 onToggle={() => handleToggle(sede.id)}
               />
             ))}
-          </div>
-        </Container>
-      </section>
-
-      <section className="border-t-2 border-gym-logo/20 bg-gym-logo/5 py-12">
-        <Container>
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="text-center md:text-left">
-              <p className="font-arcade text-gym-logo text-xs uppercase tracking-widest mb-2">
-                ¿Aún no eres miembro?
-              </p>
-              <h3 className="font-arcade text-white text-sm md:text-base leading-relaxed">
-                Una membresía,{' '}
-                <span className="text-gym-logo">todas las sedes</span>
-              </h3>
-            </div>
-            <Link
-              href="/membresias"
-              className="bg-gym-logo text-black font-arcade text-[9px] uppercase tracking-wider px-6 py-3 hover:bg-gym-logo-claro hoverEffect whitespace-nowrap"
-            >
-              Ver Membresías
-            </Link>
           </div>
         </Container>
       </section>

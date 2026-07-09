@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Loader2, RefreshCw, ShieldCheck, ShieldOff, CreditCard, Clock, Calendar, AlertTriangle, Dumbbell } from 'lucide-react'
+import { Loader2, RefreshCw, ShieldCheck, ShieldOff, CreditCard, Clock, Calendar, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { HistorialPagos, type PagoHistorial } from '@/components/mi-membresia/HistorialPagos'
+import { ListaPlanesMembresia } from '@/components/membresias/ListaPlanesMembresia'
 import type { MiMembresiaData } from '@/lib/supabase/queries/mi-membresia'
 import type { PlanMembresia } from '@/lib/supabase/types'
 
@@ -194,47 +195,6 @@ function TarjetaMembresiaArcade({
   )
 }
 
-/* ─── Sin membresía: lista de planes ─────────────────────────────────────── */
-
-function ListaPlanesSinMembresia({ planes }: { planes: PlanMembresia[] }) {
-  return (
-    <section>
-      <SectionLabel>Planes Disponibles</SectionLabel>
-      {planes.length === 0 ? (
-        <div className="border border-white/10 rounded-lg bg-white/[0.02] p-8 text-center">
-          <Dumbbell className="size-8 text-white/20 mx-auto mb-3" />
-          <p className="font-mono text-white/40 text-sm">Próximamente disponibles</p>
-        </div>
-      ) : (
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-          {planes.map((plan) => (
-            <Link key={plan.id} href={`/pasarelapago?plan=${plan.id}`} className="group block">
-              <div className="relative rounded-xl border border-white/10 bg-white/[0.02] p-4 hover:border-gym-logo/40 hover:bg-gym-logo/5 transition-all duration-200 overflow-hidden">
-                <GridBackground />
-                <div className="relative z-10">
-                  <p className="font-arcade text-gym-logo text-[9px] tracking-widest uppercase mb-2">
-                    {plan.duracion_dias} días
-                  </p>
-                  <p className="font-arcade text-white text-sm tracking-wide mb-3">{plan.nombre}</p>
-                  <p className="font-arcade text-gym-logo text-xl [text-shadow:0_0_16px_rgba(255,223,0,0.4)]">
-                    S/ {plan.precio}
-                  </p>
-                  <Button
-                    size="sm"
-                    className="w-full mt-3 bg-gym-logo text-black hover:bg-gym-logo/80 font-arcade text-[9px] tracking-widest uppercase group-hover:scale-[1.02] transition-transform"
-                  >
-                    Activar Plan
-                  </Button>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
-    </section>
-  )
-}
-
 /* ─── Main page ───────────────────────────────────────────────────────────── */
 
 export default function MiMembresiaPage() {
@@ -397,7 +357,15 @@ export default function MiMembresiaPage() {
       {/* Content — sin membresía */}
       {!data?.membresiaActiva && !data?.membresiaVencida && (
         <>
-          <ListaPlanesSinMembresia planes={planes} />
+          <section>
+            <SectionLabel>Planes Disponibles</SectionLabel>
+            <ListaPlanesMembresia
+              planes={planes.map((p) => ({
+                ...p,
+                descripcion: p.descripcion ?? undefined,
+              }))}
+            />
+          </section>
           {historialPagos.length > 0 && <HistorialPagos pagos={historialPagos} />}
         </>
       )}

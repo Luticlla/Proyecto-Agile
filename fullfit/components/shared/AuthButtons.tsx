@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks'
 import { Button } from '@/components/ui/button'
 import { Loader2, User, LogOut, CreditCard } from 'lucide-react'
@@ -13,6 +14,7 @@ interface AuthButtonsProps {
 export default function AuthButtons({ direction = 'row' }: AuthButtonsProps) {
   const { user, profile, loading, signOut } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
+  const pathname = usePathname()
 
   const handleSignOut = async () => {
     setIsLoading(true)
@@ -36,7 +38,11 @@ export default function AuthButtons({ direction = 'row' }: AuthButtonsProps) {
             asChild
             variant="ghost"
             size="sm"
-            className="font-arcade text-zinc-300 hover:text-yellow-400"
+            className={`font-arcade ${
+              pathname === '/mi-membresia' 
+                ? 'text-yellow-400' 
+                : 'text-zinc-300 hover:text-yellow-400'
+            }`}
           >
             <Link href="/mi-membresia">
               <CreditCard className="h-4 w-4 mr-1" />
