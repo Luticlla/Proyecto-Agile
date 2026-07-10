@@ -51,7 +51,7 @@ export async function registrarMembresia(
 
   if (membresiaExistente) {
     const resultadoExtension = await extenderSuscripcion(
-      db, membresiaExistente.id, membresiaExistente.fecha_fin, plan.duracion_dias
+      db, membresiaExistente.id, membresiaExistente.fecha_fin, plan.duracion_dias, dto.plan_id
     )
 
     if (resultadoExtension.error) {
@@ -236,17 +236,23 @@ async function extenderSuscripcion(
   db: SupabaseClient,
   suscripcionId: number,
   fechaFinActual: string,
-  duracionDias: number
+  duracionDias: number,
+  planId?: number
 ): Promise<{ suscripcion: Record<string, unknown> | null; error?: string }> {
   const fechaFinDate = new Date(fechaFinActual)
   fechaFinDate.setDate(fechaFinDate.getDate() + duracionDias)
   const nuevaFechaFinStr = fechaFinDate.toISOString().split('T')[0]
 
+  const updateData: Record<string, unknown> = {
+    fecha_fin: nuevaFechaFinStr
+  }
+  if (planId) {
+    updateData.plan_id = planId
+  }
+
   const { data, error } = await db
     .from('suscripciones')
-    .update({
-      fecha_fin: nuevaFechaFinStr
-    })
+    .update(updateData)
     .eq('id', suscripcionId)
     .select()
     .single()

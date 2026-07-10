@@ -169,6 +169,16 @@ function TarjetaMembresiaArcade({
               ? 'Vence hoy'
               : `Venció hace ${Math.abs(dias)} días`}
           </p>
+          {esActiva && dias > 7 && (() => {
+            const [y, m, d] = membresia.fecha_fin.split('-').map(Number)
+            const fechaFin = new Date(y, m - 1, d)
+            fechaFin.setDate(fechaFin.getDate() - 7)
+            return (
+              <p className="font-mono text-white/30 text-[10px] mt-2 tracking-wider">
+                Podrás renovar el {formatDate(fechaFin.toISOString().split('T')[0])}
+              </p>
+            )
+          })()}
         </div>
 
         {/* CTA — activa y por vencer: elegir plan en /membresias */}

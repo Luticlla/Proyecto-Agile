@@ -96,7 +96,10 @@ export async function processPaymentActivation(
 
     const { error: updateError } = await supabaseAdmin
       .from('suscripciones')
-      .update({ fecha_fin: formatearFechaLima(nuevaFechaFin) })
+      .update({ 
+        fecha_fin: formatearFechaLima(nuevaFechaFin),
+        plan_id: planId
+      })
       .eq('id', membresiaActiva.id)
 
     if (updateError) {
