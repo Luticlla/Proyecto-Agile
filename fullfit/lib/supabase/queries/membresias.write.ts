@@ -2,7 +2,6 @@ import { supabase } from '../client'
 import { getFechaLima } from '@/lib/utils'
 import { calcularDiasRestantes } from '@/lib/utils/dates'
 import { VENTANA_RENOVACION_DIAS } from '@/constants/memberships'
-import { generarNumeroBoleta } from './membresias.helpers'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { RegistrarMembresiaDTO, CambiarEstadoDTO, RenovarMembresiaDTO } from './membresias.types'
 
@@ -209,8 +208,6 @@ export async function renovarMembresia(
     return { success: false, error: updateError.message }
   }
 
-  const referencia = dto.metodo_pago === 'efectivo' ? generarNumeroBoleta() : null
-
   const { error: pagoError } = await db
     .from('pagos')
     .insert({
@@ -219,7 +216,6 @@ export async function renovarMembresia(
       monto: dto.monto,
       metodo_pago: dto.metodo_pago,
       estado: dto.metodo_pago === 'efectivo' ? 'completado' : 'pendiente',
-      referencia,
       registrado_por: registradoPor
     })
 
@@ -305,8 +301,6 @@ async function crearPago(
   dto: RegistrarMembresiaDTO,
   registradoPor: string
 ): Promise<Record<string, unknown> | null> {
-  const referencia = dto.metodo_pago === 'efectivo' ? generarNumeroBoleta() : null
-
   const { data, error } = await db
     .from('pagos')
     .insert({
@@ -315,7 +309,6 @@ async function crearPago(
       monto: dto.monto,
       metodo_pago: dto.metodo_pago,
       estado: dto.metodo_pago === 'efectivo' ? 'completado' : 'pendiente',
-      referencia,
       registrado_por: registradoPor
     })
     .select()

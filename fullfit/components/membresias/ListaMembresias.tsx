@@ -19,7 +19,7 @@ type ListaMembresiasProps = {
   onBuscar?: () => void
   estado?: EstadoMembresia
   onEstadoChange?: (estado: EstadoMembresia) => void
-  onAccion?: (id: number, accion: 'cancelar' | 'pausar' | 'reactivar' | 'renovar') => void
+  onAccion?: (id: number, accion: 'cancelar' | 'pausar' | 'reactivar' | 'renovar', usuarioId?: string) => void
   page?: number
   totalPages?: number
   onPageChange?: (page: number) => void
@@ -187,7 +187,7 @@ export function ListaMembresias({
                               variant="ghost"
                               size="icon"
                               className="text-green-400 hover:text-green-300 hover:bg-green-500/10"
-                              onClick={() => onAccion?.(membresia.id, 'renovar')}
+                              onClick={() => onAccion?.(membresia.id, 'renovar', membresia.usuario_id)}
                               title="Renovar"
                             >
                               <RefreshCw className="size-4" />
@@ -234,7 +234,7 @@ export function ListaMembresias({
                             variant="ghost"
                             size="icon"
                             className="text-green-400 hover:text-green-300 hover:bg-green-500/10"
-                            onClick={() => onAccion?.(membresia.id, 'renovar')}
+                            onClick={() => onAccion?.(membresia.id, 'renovar', membresia.usuario_id)}
                             title="Renovar"
                           >
                             <RefreshCw className="size-4" />

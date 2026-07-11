@@ -4,7 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { Database } from '../types'
 
 /**
- * Lista los usuarios del sistema (roles 1 y 2) con paginación y filtros
+ * Lista los recepcionistas del sistema (rol_id = 2) con paginación y filtros
  */
 export async function listarUsuarios(
   filtros: UsuarioSistemaFilters,
@@ -19,7 +19,7 @@ export async function listarUsuarios(
   let query = client
     .from('profiles')
     .select('*', { count: 'exact' })
-    .in('rol_id', [1, 2]) // Admin y Recepcionista
+    .eq('rol_id', 2) // Solo Recepcionista
 
   if (filtros.busqueda) {
     query = query.or(`nombre.ilike.%${filtros.busqueda}%,apellido.ilike.%${filtros.busqueda}%,dni.ilike.%${filtros.busqueda}%,email.ilike.%${filtros.busqueda}%`)

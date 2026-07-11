@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { listarMembresias, registrarMembresia } from '@/lib/supabase/queries/membresias'
 import { crearPreferenciaPago } from '@/lib/mercadopago-preferencia'
-import { generarBoletaBase64 } from '@/lib/utils/boleta'
+import { generarBoletaBase64, calcularIGV, obtenerSiguienteComprobante, formatearFechaEmision } from '@/lib/utils/boleta'
+import { montoEnLetras } from '@/lib/utils/numero-a-letras'
 import { requireAuthenticatedRecepcionista } from '@/lib/auth/api-guard'
-import type { RegistrarMembresiaDTO, BoletaData } from '@/lib/supabase/queries/membresias.types'
+import { createServiceRoleClient } from '@/lib/supabase/server'
+import type { RegistrarMembresiaDTO, BoletaData, BoletaItem } from '@/lib/supabase/queries/membresias.types'
 
 export async function GET(request: NextRequest) {
   try {
@@ -124,29 +126,52 @@ export async function POST(request: NextRequest) {
       const fechaFinDate = new Date()
       fechaFinDate.setDate(fechaFinDate.getDate() + (plan?.duracion_dias || 30))
 
+      const planPrecio = plan?.precio || monto
+      const { valorUnitario, igv, total } = calcularIGV(planPrecio)
+
+      const item: BoletaItem = {
+        descripcion: plan?.nombre || '',
+        cantidad: 1,
+        valor_unitario: valorUnitario,
+        precio_unitario: planPrecio,
+        valor_total: valorUnitario
+      }
+
+      const numeroComprobante = await obtenerSiguienteComprobante()
+
       const boletaData: BoletaData = {
-        numero_boleta: (result.pago.referencia as string) || `BV-${Date.now()}`,
-        fecha: fechaInicio,
+        numero_comprobante: numeroComprobante,
+        fecha_emision: formatearFechaEmision(fechaInicio),
         cliente: {
-          nombre: `${cliente?.nombre || ''} ${cliente?.apellido || ''}`,
-          dni: cliente?.dni || ''
+          nombre: `${cliente?.nombre || ''} ${cliente?.apellido || ''}`.trim(),
+          dni: cliente?.dni || '',
+          codigo: usuario_id.slice(0, 8)
         },
-        plan: {
-          nombre: plan?.nombre || '',
-          precio: plan?.precio || monto
-        },
-        monto_total: monto,
+        moneda: 'SOL',
+        metodo_pago: metodo_pago,
+        items: [item],
+        subtotal: valorUnitario,
+        igv: igv,
+        total: total,
+        total_letras: montoEnLetras(total),
+        observaciones: `Periodo: ${fechaInicio} al ${fechaFinDate.toISOString().split('T')[0]}`,
         fecha_inicio: fechaInicio,
         fecha_fin: fechaFinDate.toISOString().split('T')[0]
       }
 
       const boletaBase64 = await generarBoletaBase64(boletaData)
 
+      const supabaseAdmin = createServiceRoleClient()
+      await supabaseAdmin
+        .from('pagos')
+        .update({ referencia: numeroComprobante })
+        .eq('id', result.pago.id)
+
       return NextResponse.json({
         suscripcion: result.suscripcion,
         pago: result.pago,
         boleta: boletaBase64,
-        numero_boleta: boletaData.numero_boleta
+        numero_comprobante: numeroComprobante
       })
     }
 

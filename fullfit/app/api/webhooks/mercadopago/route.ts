@@ -4,6 +4,7 @@ import crypto from 'crypto'
 import { getMercadoPagoClient } from '@/lib/mercadopago'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { processPaymentActivation } from '@/lib/supabase/queries/pagos'
+import { obtenerSiguienteComprobante } from '@/lib/utils/boleta'
 
 function verificarFirma(request: NextRequest, body: string): boolean {
   const secret = process.env.MP_WEBHOOK_SECRET
@@ -55,6 +56,17 @@ export async function POST(request: NextRequest) {
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 400 })
+    }
+
+    if (result.success && result.subscription_id) {
+      const numeroComprobante = await obtenerSiguienteComprobante()
+
+      await supabaseAdmin
+        .from('pagos')
+        .update({ referencia: numeroComprobante })
+        .eq('suscripcion_id', result.subscription_id)
+        .eq('metodo_pago', 'mercadopago')
+        .eq('estado', 'completado')
     }
 
     return NextResponse.json({ received: true })

@@ -1,6 +1,5 @@
 export { ListaUsuarios } from './ListaUsuarios'
 export { ConfirmarDesactivacion } from './ConfirmarDesactivacion'
-export { FiltroRol } from './FiltroRol'
 export { FiltroEstado } from './FiltroEstado'
 export { FormularioCrearUsuario } from './FormularioCrearUsuario'
 export { FormularioEditarUsuario } from './FormularioEditarUsuario'

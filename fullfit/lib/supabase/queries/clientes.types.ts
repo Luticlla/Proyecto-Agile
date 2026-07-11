@@ -51,4 +51,5 @@ export type PagoResumen = {
   estado: string
   referencia: string | null
   fecha_pago: string
+  observaciones: string | null
 }

@@ -13,6 +13,9 @@ import { ArrowLeft, Edit, Loader2, CreditCard, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { downloadBoleta } from '@/lib/utils/boleta'
 import { base64ToBlob } from '@/lib/utils/blob'
+import { VENTANA_RENOVACION_DIAS } from '@/constants/memberships'
+import { calcularDiasRestantes } from '@/lib/utils/dates'
+import { cn } from '@/lib/utils'
 
 export default function ClienteDetailPage() {
   const params = useParams()
@@ -50,55 +53,50 @@ export default function ClienteDetailPage() {
     }
   }, [])
 
-  const fetchMembresiaActiva = useCallback(async (usuarioId: string) => {
-    setLoadingMembresiaActiva(true)
+  const fetchCliente = useCallback(async () => {
+    if (!params.id) return
+
+    const [clienteData, pagosData] = await Promise.all([
+      obtenerClienteConMembresia(params.id as string),
+      obtenerHistorialPagos(params.id as string, 5)
+    ])
+    setCliente(clienteData)
+    setMembresiaDetalle(clienteData)
+    setPagos(pagosData)
+
     try {
-      const response = await fetch(`/api/membresias/activa?usuario_id=${usuarioId}`)
+      const response = await fetch(`/api/membresias/activa?usuario_id=${params.id}`)
       if (response.ok) {
         const data = await response.json()
         setMembresiaActiva(data.membresia)
+      } else {
+        setMembresiaActiva(null)
       }
     } catch (error) {
       console.error('Error fetching membresía activa:', error)
-    } finally {
-      setLoadingMembresiaActiva(false)
     }
-  }, [])
+  }, [params.id])
 
   useEffect(() => {
-    const fetchCliente = async () => {
-      if (params.id) {
-        setLoadingMembresiaDetalle(true)
-        setLoadingPagos(true)
-        const [clienteData, pagosData] = await Promise.all([
-          obtenerClienteConMembresia(params.id as string),
-          obtenerHistorialPagos(params.id as string, 5)
-        ])
-        setCliente(clienteData)
-        setMembresiaDetalle(clienteData)
-        setPagos(pagosData)
-        setLoading(false)
-        setLoadingMembresiaDetalle(false)
-        setLoadingPagos(false)
-      }
-    }
-
-    fetchCliente()
-  }, [params.id])
+    setLoadingMembresiaDetalle(true)
+    setLoadingPagos(true)
+    setLoadingMembresiaActiva(true)
+    fetchCliente().finally(() => {
+      setLoading(false)
+      setLoadingMembresiaDetalle(false)
+      setLoadingPagos(false)
+      setLoadingMembresiaActiva(false)
+    })
+  }, [fetchCliente])
 
   useEffect(() => {
     if (action === 'registrar' || action === 'renovar') {
       if (planes.length === 0) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchPlanes()
       }
       setShowMembresiaForm(true)
-
-      if (action === 'renovar' && params.id) {
-        fetchMembresiaActiva(params.id as string)
-      }
     }
-  }, [action, params.id, planes.length, fetchPlanes, fetchMembresiaActiva])
+  }, [action, planes.length, fetchPlanes])
 
   const handleShowMembresiaForm = () => {
     if (planes.length === 0) {
@@ -153,11 +151,13 @@ export default function ClienteDetailPage() {
         }
 
         setShowMembresiaForm(false)
+        // Limpiar action de la URL para que el useEffect no reabra el formulario
+        router.replace(`/recepcionista/clientes/${params.id}`)
         const mensaje = esRenovacion
           ? 'Membresía renovada exitosamente'
           : 'Membresía registrada exitosamente'
         alert(mensaje)
-        router.refresh()
+        await fetchCliente()
       } else {
         const error = await response.json()
         alert(error.error || 'Error al procesar la membresía')
@@ -174,6 +174,16 @@ export default function ClienteDetailPage() {
     setCliente(updatedCliente)
     setEditing(false)
   }
+
+  // Determinar si el recepcionista puede registrar una nueva membresía
+  // Solo puede si: no tiene membresía activa, O tiene ≤7 días restantes
+  // También deshabilitar mientras se carga la membresía activa
+  const hoy = new Date().toISOString().split('T')[0]
+  const diasRestantes = membresiaActiva 
+    ? calcularDiasRestantes(membresiaActiva.fecha_fin, hoy) 
+    : 0
+  const puedeRegistrarNueva = !loadingMembresiaActiva && 
+    (!membresiaActiva || diasRestantes <= VENTANA_RENOVACION_DIAS)
 
   const handleCancel = () => {
     setEditing(false)
@@ -223,10 +233,20 @@ export default function ClienteDetailPage() {
             <>
               <Button
                 onClick={handleShowMembresiaForm}
-                className="bg-green-600 text-white hover:bg-green-700 font-mono text-xs uppercase tracking-wider"
+                disabled={!puedeRegistrarNueva}
+                className={cn(
+                  "font-mono text-xs uppercase tracking-wider",
+                  puedeRegistrarNueva
+                    ? "bg-green-600 text-white hover:bg-green-700"
+                    : "bg-zinc-700 text-zinc-400 cursor-not-allowed"
+                )}
               >
                 <CreditCard className="size-4 mr-2" />
-                Registrar Membresía
+                {puedeRegistrarNueva 
+                  ? 'Registrar Membresía' 
+                  : loadingMembresiaActiva 
+                    ? 'Verificando...'
+                    : `Aún tiene ${diasRestantes} días`}
               </Button>
               <Button
                 onClick={() => setEditing(true)}

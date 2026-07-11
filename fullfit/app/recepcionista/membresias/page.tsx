@@ -3,14 +3,13 @@
 import { useState } from 'react'
 import { ListaMembresias } from '@/components/membresias'
 import { ConfirmarAccion } from '@/components/membresias'
-import { downloadBoleta } from '@/lib/utils/boleta'
-import { base64ToBlob } from '@/lib/utils/blob'
 import { usePaginatedFetch } from '@/hooks'
 import type { MembresiaConCliente, EstadoMembresia } from '@/lib/supabase/queries/membresias.types'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 
 export default function MembresiasPage() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const estadoInicial = (searchParams.get('estado') as EstadoMembresia) || 'todos'
   
   const [buscar, setBuscar] = useState('')
@@ -40,7 +39,11 @@ export default function MembresiasPage() {
     setPage(1)
   }
 
-  const handleAccion = (id: number, accion: 'cancelar' | 'pausar' | 'reactivar' | 'renovar') => {
+  const handleAccion = (id: number, accion: 'cancelar' | 'pausar' | 'reactivar' | 'renovar', usuarioId?: string) => {
+    if (accion === 'renovar' && usuarioId) {
+      router.push(`/recepcionista/clientes/${usuarioId}?action=renovar`)
+      return
+    }
     setAccionPendiente({ id, accion })
     setConfirmOpen(true)
   }
@@ -52,36 +55,16 @@ export default function MembresiasPage() {
     try {
       const { id, accion } = accionPendiente
 
-      if (accion === 'renovar') {
-        const response = await fetch(`/api/membresias/${id}/renovar`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            plan_id: 1,
-            metodo_pago: 'efectivo',
-            monto: 100
-          })
-        })
+      const response = await fetch(`/api/membresias/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accion })
+      })
 
-        if (response.ok) {
-          const data = await response.json()
-          if (data.boleta) {
-            const blob = base64ToBlob(data.boleta, 'application/pdf')
-            downloadBoleta(blob, data.numero_boleta)
-          }
-        }
-      } else {
-        const response = await fetch(`/api/membresias/${id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ accion })
-        })
-
-        if (!response.ok) {
-          const data = await response.json()
-          alert(data.error || 'Error al procesar la acción')
-          return
-        }
+      if (!response.ok) {
+        const data = await response.json()
+        alert(data.error || 'Error al procesar la acción')
+        return
       }
 
       refresh()

@@ -4,8 +4,17 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus, Search, Loader2, CreditCard } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus, Search, Loader2, CreditCard, AlertTriangle } from 'lucide-react'
 import { ListaPlanesAdmin, FormularioPlan, ConfirmarEliminarPlan } from '@/components/planes'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { toast } from 'sonner'
 import type { PlanAdmin } from '@/lib/supabase/queries/planes.types'
 
@@ -29,6 +38,7 @@ export default function PlanesPage() {
     nombre: string
     suscripcionesActivas?: number
   } | null>(null)
+  const [errorEliminar, setErrorEliminar] = useState<string | null>(null)
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -139,45 +149,11 @@ export default function PlanesPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al eliminar el plan')
-      }
-
-      if (data.confirmRequired) {
-        const plan = planes.find(p => p.id === id)
-        setPlanEliminarConfirmar({
-          id,
-          nombre: plan?.nombre || '',
-          suscripcionesActivas: data.suscripcionesActivas,
-        })
+        setErrorEliminar(data.error || 'Error al eliminar el plan')
         return
       }
 
       toast.success('Plan eliminado exitosamente')
-      const activo = filtroEstado === 'todos' ? undefined : filtroEstado === 'activos'
-      cargarPlanes({ busqueda, activo, page, limit: limite })
-    } catch (error: any) {
-      toast.error(error.message)
-    }
-  }
-
-  const handleConfirmEliminar = async () => {
-    if (!planEliminarConfirmar) return
-
-    try {
-      const response = await fetch(`/api/planes/${planEliminarConfirmar.id}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ confirm: true }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Error al eliminar el plan')
-      }
-
-      toast.success('Plan eliminado exitosamente')
-      setPlanEliminarConfirmar(null)
       const activo = filtroEstado === 'todos' ? undefined : filtroEstado === 'activos'
       cargarPlanes({ busqueda, activo, page, limit: limite })
     } catch (error: any) {
@@ -326,10 +302,37 @@ export default function PlanesPage() {
       <ConfirmarEliminarPlan
         isOpen={!!planEliminarConfirmar}
         onClose={() => setPlanEliminarConfirmar(null)}
-        onConfirm={handleConfirmEliminar}
+        onConfirm={() => {
+          if (planEliminarConfirmar) {
+            handleEliminar(planEliminarConfirmar.id)
+          }
+        }}
         nombrePlan={planEliminarConfirmar?.nombre || ''}
         suscripcionesActivas={planEliminarConfirmar?.suscripcionesActivas}
       />
+
+      {/* Dialog de error al eliminar */}
+      <AlertDialog open={!!errorEliminar} onOpenChange={(open) => !open && setErrorEliminar(null)}>
+        <AlertDialogContent className="bg-zinc-900 border-zinc-800">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white flex items-center gap-2">
+              <AlertTriangle className="size-5 text-yellow-400" />
+              No se puede eliminar
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-400">
+              {errorEliminar}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={() => setErrorEliminar(null)}
+              className="bg-zinc-700 text-white hover:bg-zinc-600"
+            >
+              Entendido
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

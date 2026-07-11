@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus, Search, Loader2, Users } from 'lucide-react'
 import {
   ListaUsuarios,
-  FiltroRol,
   FiltroEstado,
   FormularioCrearUsuario,
   FormularioEditarUsuario
@@ -28,7 +27,6 @@ export default function UsuariosPage() {
 
   const [loading, setLoading] = useState(true)
   const [busqueda, setBusqueda] = useState('')
-  const [filtroRol, setFiltroRol] = useState<number | undefined>(undefined)
   const [filtroActivo, setFiltroActivo] = useState<boolean | undefined>(undefined)
   const [limite, setLimite] = useState(10)
 
@@ -39,7 +37,6 @@ export default function UsuariosPage() {
 
   const cargarUsuarios = useCallback(async (opts: {
     busqueda?: string
-    filtro_rol?: number
     filtro_activo?: boolean
     page?: number
     limit?: number
@@ -48,7 +45,6 @@ export default function UsuariosPage() {
     try {
       const data = await listarUsuarios({
         busqueda: opts.busqueda || undefined,
-        rol_id: opts.filtro_rol,
         activo: opts.filtro_activo,
         page: opts.page ?? 1,
         limit: opts.limit ?? 10,
@@ -62,8 +58,8 @@ export default function UsuariosPage() {
   }, [])
 
   useEffect(() => {
-    cargarUsuarios({ filtro_rol: filtroRol, filtro_activo: filtroActivo, limit: limite })
-  }, [cargarUsuarios, filtroRol, filtroActivo, limite])
+    cargarUsuarios({ filtro_activo: filtroActivo, limit: limite })
+  }, [cargarUsuarios, filtroActivo, limite])
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -71,12 +67,12 @@ export default function UsuariosPage() {
 
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
-      cargarUsuarios({ busqueda: value, filtro_rol: filtroRol, filtro_activo: filtroActivo, page: 1, limit: limite })
+      cargarUsuarios({ busqueda: value, filtro_activo: filtroActivo, page: 1, limit: limite })
     }, DEBOUNCE_MS)
   }
 
   const handlePageChange = (newPage: number) => {
-    cargarUsuarios({ busqueda, filtro_rol: filtroRol, filtro_activo: filtroActivo, page: newPage, limit: limite })
+    cargarUsuarios({ busqueda, filtro_activo: filtroActivo, page: newPage, limit: limite })
   }
 
   const handleToggleEstado = async (id: string, activo: boolean) => {
@@ -90,7 +86,7 @@ export default function UsuariosPage() {
         const data = await res.json()
         throw new Error(data.error || 'Error al cambiar estado')
       }
-      cargarUsuarios({ busqueda, filtro_rol: filtroRol, filtro_activo: filtroActivo, page: result.page, limit: limite })
+      cargarUsuarios({ busqueda, filtro_activo: filtroActivo, page: result.page, limit: limite })
     } catch (error: any) {
       alert(error.message)
     }
@@ -98,12 +94,12 @@ export default function UsuariosPage() {
 
   const handleSuccessCrear = () => {
     setIsCrearOpen(false)
-    cargarUsuarios({ busqueda, filtro_rol: filtroRol, filtro_activo: filtroActivo, page: 1, limit: limite })
+    cargarUsuarios({ busqueda, filtro_activo: filtroActivo, page: 1, limit: limite })
   }
 
   const handleSuccessEditar = () => {
     setUsuarioEditar(null)
-    cargarUsuarios({ busqueda, filtro_rol: filtroRol, filtro_activo: filtroActivo, page: result.page, limit: limite })
+    cargarUsuarios({ busqueda, filtro_activo: filtroActivo, page: result.page, limit: limite })
   }
 
   const textoResultados = result.count === 0
@@ -143,7 +139,6 @@ export default function UsuariosPage() {
             className="pl-10 bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500"
           />
         </div>
-        <FiltroRol value={filtroRol} onChange={(rol) => setFiltroRol(rol)} />
         <FiltroEstado value={filtroActivo} onChange={(activo) => setFiltroActivo(activo)} />
         <div className="text-sm text-zinc-400 min-w-[120px] text-right">
           {textoResultados}

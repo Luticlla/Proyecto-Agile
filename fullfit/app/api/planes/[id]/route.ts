@@ -144,14 +144,6 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
       return NextResponse.json({ error: 'Solo los administradores pueden eliminar planes' }, { status: 403 })
     }
 
-    let confirm = false
-    try {
-      const body = await request.json()
-      confirm = body.confirm === true
-    } catch {
-      // GET/DELETE sin body
-    }
-
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -167,20 +159,15 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
       return NextResponse.json({ error: 'Plan no encontrado' }, { status: 404 })
     }
 
-    if (!confirm) {
-      const { count: suscripcionesActivas } = await supabaseAdmin
-        .from('suscripciones')
-        .select('*', { count: 'exact', head: true })
-        .eq('plan_id', planId)
-        .eq('estado', 'activa')
+    const { count: totalSuscripciones } = await supabaseAdmin
+      .from('suscripciones')
+      .select('*', { count: 'exact', head: true })
+      .eq('plan_id', planId)
 
-      if (suscripcionesActivas && suscripcionesActivas > 0) {
-        return NextResponse.json({
-          confirmRequired: true,
-          suscripcionesActivas,
-          warning: `Este plan tiene ${suscripcionesActivas} suscripción(es) activa(s). Los miembros actuales mantendrán su acceso hasta la fecha de vencimiento.`
-        }, { status: 200 })
-      }
+    if (totalSuscripciones && totalSuscripciones > 0) {
+      return NextResponse.json({
+        error: 'El plan no se puede eliminar hasta que ya no tenga suscripciones, solo se puede inhabilitar'
+      }, { status: 400 })
     }
 
     const { error: deleteError } = await supabaseAdmin

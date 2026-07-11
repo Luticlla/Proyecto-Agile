@@ -50,18 +50,30 @@ export type RenovarMembresiaDTO = {
   monto: number
 }
 
+export type BoletaItem = {
+  descripcion: string
+  cantidad: number
+  valor_unitario: number  // base sin IGV
+  precio_unitario: number // con IGV
+  valor_total: number     // valor_unitario * cantidad
+}
+
 export type BoletaData = {
-  numero_boleta: string
-  fecha: string
+  numero_comprobante: string    // B026-0001
+  fecha_emision: string         // DD-MM-YYYY
   cliente: {
     nombre: string
     dni: string
+    codigo?: string
   }
-  plan: {
-    nombre: string
-    precio: number
-  }
-  monto_total: number
+  moneda: string                // SOL
+  metodo_pago: string           // efectivo, mercadopago, yape, plin, etc.
+  items: BoletaItem[]
+  subtotal: number              // base gravada
+  igv: number                   // 18%
+  total: number                 // subtotal + igv
+  total_letras: string
+  observaciones?: string
   fecha_inicio: string
   fecha_fin: string
 }

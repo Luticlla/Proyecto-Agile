@@ -277,7 +277,7 @@ export async function obtenerHistorialPagos(
 ): Promise<PagoResumen[]> {
   const { data, error } = await supabase
     .from('pagos')
-    .select('id, monto, metodo_pago, estado, referencia, fecha_pago')
+    .select('id, monto, metodo_pago, estado, referencia, fecha_pago, observaciones')
     .eq('usuario_id', usuarioId)
     .order('fecha_pago', { ascending: false })
     .limit(limit)
@@ -295,7 +295,8 @@ export async function obtenerHistorialPagos(
       metodo_pago: row.metodo_pago as string,
       estado: row.estado as string,
       referencia: row.referencia as string | null,
-      fecha_pago: row.fecha_pago as string
+      fecha_pago: row.fecha_pago as string,
+      observaciones: row.observaciones as string | null
     }
   })
 }

@@ -107,8 +107,7 @@ export function FormularioCrearUsuario({ isOpen, onClose, onSuccess }: Formulari
     reniecValidado &&
     formData.email.trim() !== '' &&
     (formData.password ?? '').trim() !== '' &&
-    passwordError === null &&
-    formData.rol_id != null
+    passwordError === null
 
   // ─── Submit ──────────────────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
@@ -310,28 +309,12 @@ export function FormularioCrearUsuario({ isOpen, onClose, onSuccess }: Formulari
             )}
           </div>
 
-          {/* Rol */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">Rol *</label>
-            <Select
-              value={formData.rol_id.toString()}
-              onValueChange={(v) => handleChange('rol_id', Number(v))}
-              disabled={loading}
-            >
-              <SelectTrigger className="bg-zinc-950 border-zinc-800">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-zinc-800">
-                <SelectItem value="1" className="text-white hover:bg-zinc-800">Administrador</SelectItem>
-                <SelectItem value="2" className="text-white hover:bg-zinc-800">Recepcionista</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+
 
           {/* Hint de condiciones pendientes */}
           {!allConditionsMet && (
             <p className="text-xs text-zinc-500">
-              Para habilitar el registro: valida el DNI con RENIEC, completa el email, la contraseña y el rol.
+              Para habilitar el registro: valida el DNI con RENIEC, completa el email y la contraseña.
             </p>
           )}
 

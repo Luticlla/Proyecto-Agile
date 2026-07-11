@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/hooks'
 import { useRouter, usePathname } from 'next/navigation'
-import { Loader2, Users, CreditCard, BarChart3, LogOut, Home, Dumbbell } from 'lucide-react'
+import { Loader2, Users, CreditCard, LogOut } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -67,7 +67,6 @@ export default function RecepcionistaLayout({
   const navLinks = [
     { href: '/recepcionista/clientes', label: 'Clientes', icon: Users },
     { href: '/recepcionista/membresias', label: 'Membresías', icon: CreditCard },
-    { href: '/recepcionista/reportes', label: 'Reportes', icon: BarChart3 },
   ]
 
   return (

@@ -13,7 +13,7 @@ import {
   Download,
   Building2,
   MapPin,
-  Phone,
+  Loader2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -76,8 +76,12 @@ function formatFechaCorta(fechaStr: string): string {
 }
 
 function getNumeroBoleta(pago: PagoHistorial): string {
-  const ref = pago.referencia ? String(pago.referencia).slice(-8) : String(pago.id).padStart(8, '0')
-  return `FF-${ref}`
+  if (pago.referencia && /^B\d{2}-\d{4}$/.test(pago.referencia)) {
+    return pago.referencia
+  }
+  const year = new Date().getFullYear().toString().slice(-2)
+  const id = pago.id || 0
+  return `B${year}-${id.toString().padStart(4, '0')}`
 }
 
 /* ─── Modal Boleta ─────────────────────────────────────────────────────────── */
@@ -88,12 +92,37 @@ function ModalBoleta({ pago, onClose }: { pago: PagoHistorial; onClose: () => vo
   const numero = getNumeroBoleta(pago)
   const MetodoIcon = metodo.icon
   const EstadoIcon = estado.icon
+  const [downloading, setDownloading] = useState(false)
+
+  const handleDownload = async () => {
+    setDownloading(true)
+    try {
+      const response = await fetch(`/api/boleta?pago_id=${pago.id}`)
+      if (!response.ok) throw new Error('Error al descargar boleta')
+      
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `boleta_${numero}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Error downloading boleta:', error)
+      alert('Error al descargar la boleta')
+    } finally {
+      setDownloading(false)
+    }
+  }
 
   // Extraer nombre del plan de observaciones si existe
   const planNombre = pago.observaciones
     ?.replace('MercadoPago - ', '')
     ?.replace('Extensión de membresía -', 'Renovación -')
     ?.replace('Ya posee membresía activa - pago registrado sin suscripción', 'Membresía ya activa')
+    ?.replace('Periodo:', 'Membresía -')
     || 'Membresía FULLFORMA'
 
   return (
@@ -126,7 +155,7 @@ function ModalBoleta({ pago, onClose }: { pago: PagoHistorial; onClose: () => vo
           <div className="flex items-center gap-2">
             <Receipt className="size-4 text-gym-logo" />
             <span className="font-arcade text-gym-logo text-[10px] tracking-widest uppercase">
-              Comprobante de Pago
+              Boleta de Venta
             </span>
           </div>
           <button
@@ -139,33 +168,32 @@ function ModalBoleta({ pago, onClose }: { pago: PagoHistorial; onClose: () => vo
 
         {/* Body */}
         <div className="relative z-10 p-5 space-y-4">
-          {/* Gimnasio info */}
+          {/* Empresa info */}
           <div className="text-center space-y-1 pb-3 border-b border-white/10">
-            <p className="font-arcade text-white text-sm tracking-widest uppercase">
-              FULL<span className="text-gym-logo">FORMA</span>
+            <p className="font-arcade text-white text-[10px] tracking-widest uppercase">
+              ENTERPRISE FITNESS ELITE S.A.C.
+            </p>
+            <p className="font-arcade text-gym-logo text-sm tracking-widest uppercase">
+              FULL<span className="text-white">FORMA</span>
             </p>
             <div className="flex items-center justify-center gap-1 text-white/30">
               <Building2 className="size-2.5" />
-              <span className="font-mono text-[9px]">FULLFORMA Gym</span>
+              <span className="font-mono text-[8px]">RUC: 20482468692</span>
             </div>
             <div className="flex items-center justify-center gap-1 text-white/30">
               <MapPin className="size-2.5" />
-              <span className="font-mono text-[9px]">Av. Principal 123, Trujillo</span>
-            </div>
-            <div className="flex items-center justify-center gap-1 text-white/30">
-              <Phone className="size-2.5" />
-              <span className="font-mono text-[9px]">(044) 123456</span>
+              <span className="font-mono text-[8px]">Jr. Bolognesi N° 231, Trujillo</span>
             </div>
           </div>
 
           {/* Número y fecha */}
           <div className="flex justify-between items-start">
             <div>
-              <p className="font-mono text-white/30 text-[9px] uppercase tracking-widest">N° Boleta</p>
+              <p className="font-mono text-white/30 text-[9px] uppercase tracking-widest">N° Comprobante</p>
               <p className="font-mono text-gym-logo text-xs font-semibold">{numero}</p>
             </div>
             <div className="text-right">
-              <p className="font-mono text-white/30 text-[9px] uppercase tracking-widest">Fecha</p>
+              <p className="font-mono text-white/30 text-[9px] uppercase tracking-widest">Fecha Emisión</p>
               <p className="font-mono text-white/70 text-[10px]">{formatFechaLarga(pago.creado_en)}</p>
             </div>
           </div>
@@ -175,7 +203,7 @@ function ModalBoleta({ pago, onClose }: { pago: PagoHistorial; onClose: () => vo
 
           {/* Detalle */}
           <div className="space-y-2">
-            <p className="font-mono text-white/30 text-[9px] uppercase tracking-widest">Detalle</p>
+            <p className="font-mono text-white/30 text-[9px] uppercase tracking-widest">Detalle del Comprobante</p>
             <div className="flex justify-between items-start">
               <span className="font-mono text-white text-sm flex-1 pr-4">{planNombre}</span>
               <span className="font-mono text-gym-logo text-sm font-semibold shrink-0">
@@ -189,7 +217,7 @@ function ModalBoleta({ pago, onClose }: { pago: PagoHistorial; onClose: () => vo
 
           {/* Total */}
           <div className="flex justify-between items-center">
-            <span className="font-arcade text-white/60 text-[10px] tracking-widest uppercase">Total</span>
+            <span className="font-arcade text-white/60 text-[10px] tracking-widest uppercase">Importe Total</span>
             <span className="font-arcade text-gym-logo text-lg [text-shadow:0_0_12px_rgba(255,223,0,0.4)]">
               S/ {Number(pago.monto).toFixed(2)}
             </span>
@@ -228,7 +256,21 @@ function ModalBoleta({ pago, onClose }: { pago: PagoHistorial; onClose: () => vo
         </div>
 
         {/* Footer */}
-        <div className="relative z-10 px-5 pb-5">
+        <div className="relative z-10 px-5 pb-5 space-y-2">
+          {pago.estado === 'completado' && (
+            <Button
+              onClick={handleDownload}
+              disabled={downloading}
+              className="w-full bg-gym-logo text-black hover:bg-gym-logo/80 font-arcade text-[9px] tracking-widest uppercase gap-2"
+            >
+              {downloading ? (
+                <Loader2 className="size-3 animate-spin" />
+              ) : (
+                <Download className="size-3" />
+              )}
+              {downloading ? 'Generando...' : 'Descargar Boleta PDF'}
+            </Button>
+          )}
           <Button
             onClick={onClose}
             variant="outline"
@@ -330,7 +372,7 @@ export function HistorialPagos({ pagos }: HistorialPagosProps) {
                       </p>
                       {pago.referencia && (
                         <p className="font-mono text-white/20 text-[9px] mt-0.5">
-                          #{String(pago.referencia).slice(-8)}
+                          {getNumeroBoleta(pago)}
                         </p>
                       )}
                     </div>

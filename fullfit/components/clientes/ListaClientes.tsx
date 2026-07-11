@@ -11,7 +11,7 @@ import Link from 'next/link'
 import { BadgeDiasRestantes } from './BadgeDiasRestantes'
 import { formatDate } from '@/lib/utils/dates'
 
-type SortKey = 'nombre' | 'dni' | 'creado_en' | 'membresia_plan_nombre' | 'membresia_fecha_fin' | 'membresia_dias_restantes' | 'membresia_estado' | 'activo'
+type SortKey = 'nombre' | 'dni' | 'creado_en' | 'membresia_plan_nombre' | 'membresia_fecha_fin' | 'membresia_dias_restantes' | 'membresia_estado'
 type SortDir = 'asc' | 'desc'
 
 type ListaClientesProps = {
@@ -112,7 +112,6 @@ function sortClientes(clientes: ClienteConMembresia[], key: SortKey, dir: SortDi
       case 'membresia_fecha_fin': va = a.membresia_fecha_fin ?? ''; vb = b.membresia_fecha_fin ?? ''; break
       case 'membresia_dias_restantes': va = a.membresia_dias_restantes ?? -Infinity; vb = b.membresia_dias_restantes ?? -Infinity; break
       case 'membresia_estado': va = a.membresia_estado ?? ''; vb = b.membresia_estado ?? ''; break
-      case 'activo': va = a.activo ? 1 : 0; vb = b.activo ? 1 : 0; break
     }
 
     if (va === vb) return 0
@@ -146,7 +145,7 @@ export function ListaClientes({
         <Table>
           <TableHeader>
             <TableRow className="bg-zinc-900">
-              {['Nombre', 'DNI', 'Teléfono', 'F. Registro', 'Plan', 'Vencimiento', 'Días', 'Membresía', 'Estado', 'Acciones'].map(h => (
+              {['Nombre', 'DNI', 'Teléfono', 'F. Registro', 'Plan', 'Vencimiento', 'Días', 'Membresía', 'Acciones'].map(h => (
                 <TableHead key={h} className="text-zinc-300">{h}</TableHead>
               ))}
             </TableRow>
@@ -154,7 +153,7 @@ export function ListaClientes({
           <TableBody>
             {[...Array(5)].map((_, i) => (
               <TableRow key={i} className="border-zinc-800">
-                {[...Array(10)].map((__, j) => (
+                {[...Array(9)].map((__, j) => (
                   <TableCell key={j}>
                     <div className="h-4 bg-zinc-800 rounded animate-pulse" />
                   </TableCell>
@@ -208,7 +207,6 @@ export function ListaClientes({
                 <SortableHead col="membresia_fecha_fin" label="Vencimiento" className="hidden xl:table-cell text-right" />
                 <SortableHead col="membresia_dias_restantes" label="Días" className="text-right" />
                 <SortableHead col="membresia_estado" label="Membresía" />
-                <SortableHead col="activo" label="Estado" />
               </>
             )}
             <TableHead className="text-zinc-300 text-right">Acciones</TableHead>
@@ -270,17 +268,6 @@ export function ListaClientes({
                         diasRestantes={cliente.membresia_dias_restantes}
                         planNombre={cliente.membresia_plan_nombre}
                       />
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={cliente.activo ? 'default' : 'secondary'}
-                        className={cliente.activo
-                          ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                          : 'bg-zinc-500/20 text-zinc-400 border-zinc-500/30'
-                        }
-                      >
-                        {cliente.activo ? 'Activo' : 'Inactivo'}
-                      </Badge>
                     </TableCell>
                   </>
                 )}
