@@ -118,5 +118,9 @@ CREATE TABLE public.sedes (
   actualizado_en timestamp without time zone NOT NULL DEFAULT now(),
   apertura_dom time without time zone,
   cierre_dom time without time zone,
+  clase_yoga_inicio time without time zone DEFAULT '10:00:00'::time without time zone,
+  clase_yoga_fin time without time zone DEFAULT '11:00:00'::time without time zone,
+  clase_mma_inicio time without time zone DEFAULT '19:00:00'::time without time zone,
+  clase_mma_fin time without time zone DEFAULT '20:00:00'::time without time zone,
   CONSTRAINT sedes_pkey PRIMARY KEY (id)
 );

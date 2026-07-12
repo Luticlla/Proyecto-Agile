@@ -20,6 +20,10 @@ type Sede = {
   cierre_sab: string
   apertura_dom: string | null
   cierre_dom: string | null
+  clase_yoga_inicio: string
+  clase_yoga_fin: string
+  clase_mma_inicio: string
+  clase_mma_fin: string
   estado: 'activa' | 'inactiva'
   creado_en: string
   actualizado_en: string
@@ -127,7 +131,7 @@ const SedeCard = ({
         {/* Panel expandido */}
         <div
           className={`overflow-hidden transition-all duration-500 ease-in-out ${
-            isExpanded ? 'max-h-64 opacity-100 mt-4' : 'max-h-0 opacity-0'
+            isExpanded ? 'max-h-80 opacity-100 mt-4' : 'max-h-0 opacity-0'
           }`}
         >
           <div className="border border-white/10 p-3 bg-white/2 space-y-1.5">
@@ -150,6 +154,26 @@ const SedeCard = ({
                 <span className="text-red-400/70 text-[9px] font-mono">Cerrado</span>
               )}
             </div>
+          </div>
+
+          {/* Clases Grupales */}
+          <div className="border border-white/10 p-3 bg-white/2 space-y-1.5 mt-2">
+            <p className="font-arcade text-gym-logo text-[8px] uppercase tracking-wider mb-3">
+              Clases Grupales
+            </p>
+            <div className="flex justify-between">
+              <span className="text-white/40 text-[9px] font-mono">Yoga</span>
+              <span className="text-white/80 text-[9px] font-mono">
+                {formatHora(sede.clase_yoga_inicio)} – {formatHora(sede.clase_yoga_fin)}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-white/40 text-[9px] font-mono">MMA</span>
+              <span className="text-white/80 text-[9px] font-mono">
+                {formatHora(sede.clase_mma_inicio)} – {formatHora(sede.clase_mma_fin)}
+              </span>
+            </div>
+            <p className="text-white/30 text-[8px] font-mono mt-2">Lunes a Viernes</p>
           </div>
         </div>
 
