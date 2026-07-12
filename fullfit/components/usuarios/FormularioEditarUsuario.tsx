@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2 } from 'lucide-react'
+import { Loader2, XCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import type { ActualizarUsuarioPayload, UsuarioSistema } from '@/lib/supabase/queries/usuarios.types'
 
@@ -16,9 +16,33 @@ interface FormularioEditarUsuarioProps {
   onSuccess: () => void
 }
 
+function getMaxBirthDate() {
+  const d = new Date()
+  d.setFullYear(d.getFullYear() - 18)
+  return d.toISOString().split('T')[0]
+}
+
+function getMinBirthDate() {
+  const d = new Date()
+  d.setFullYear(d.getFullYear() - 100)
+  return d.toISOString().split('T')[0]
+}
+
+function validateAge(fechaNacimiento: string): string | null {
+  if (!fechaNacimiento) return null
+  const birthDate = new Date(fechaNacimiento + 'T00:00:00')
+  const today = new Date()
+  let age = today.getFullYear() - birthDate.getFullYear()
+  const monthDiff = today.getMonth() - birthDate.getMonth()
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) age--
+  if (age < 18) return 'El usuario debe ser mayor de 18 años'
+  return null
+}
+
 export function FormularioEditarUsuario({ usuario, isOpen, onClose, onSuccess }: FormularioEditarUsuarioProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [ageError, setAgeError] = useState<string | null>(null)
   
   const [formData, setFormData] = useState<ActualizarUsuarioPayload & { email?: string }>({})
 
@@ -42,6 +66,9 @@ export function FormularioEditarUsuario({ usuario, isOpen, onClose, onSuccess }:
     if (field === 'nombre' || field === 'apellido') {
       value = (value as string).replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '')
     }
+    if (field === 'fecha_nacimiento') {
+      setAgeError(validateAge(value as string))
+    }
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
@@ -64,6 +91,14 @@ export function FormularioEditarUsuario({ usuario, isOpen, onClose, onSuccess }:
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       setError('El formato del correo electrónico no es válido')
       return
+    }
+
+    if (formData.fecha_nacimiento) {
+      const ageErr = validateAge(formData.fecha_nacimiento)
+      if (ageErr) {
+        setAgeError(ageErr)
+        return
+      }
     }
 
     setLoading(true)
@@ -166,9 +201,16 @@ export function FormularioEditarUsuario({ usuario, isOpen, onClose, onSuccess }:
                 type="date"
                 value={formData.fecha_nacimiento || ''}
                 onChange={(e) => handleChange('fecha_nacimiento', e.target.value)}
-                className="bg-zinc-950 border-zinc-800"
+                max={getMaxBirthDate()}
+                min={getMinBirthDate()}
+                className={`bg-zinc-950 border-zinc-800 ${ageError ? 'border-red-500' : ''}`}
                 disabled={loading}
               />
+              {ageError && (
+                <p className="flex items-center gap-1 text-xs text-red-400">
+                  <XCircle className="size-3 shrink-0" /> {ageError}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-zinc-300">Sexo</label>

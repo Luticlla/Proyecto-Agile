@@ -25,7 +25,7 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
     }
 
     const body = await request.json()
-    const { activo } = body
+    const { activo, confirm } = body
 
     if (typeof activo !== 'boolean') {
       return NextResponse.json({ error: 'El campo "activo" debe ser un booleano' }, { status: 400 })
@@ -52,7 +52,7 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
       .eq('plan_id', planId)
       .eq('estado', 'activa')
 
-    if (!activo && suscripcionesActivas && suscripcionesActivas > 0) {
+    if (!activo && suscripcionesActivas && suscripcionesActivas > 0 && !confirm) {
       return NextResponse.json({
         warning: `Este plan tiene ${suscripcionesActivas} suscripción(es) activa(s). Los miembros actuales mantendrán su acceso hasta la fecha de vencimiento.`,
         confirmRequired: true

@@ -28,6 +28,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 })
     }
 
+    if (!body.fecha_nacimiento) {
+      return NextResponse.json({ error: 'La fecha de nacimiento es requerida' }, { status: 400 })
+    }
+
+    const birthDate = new Date(body.fecha_nacimiento + 'T00:00:00')
+    const today = new Date()
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const monthDiff = today.getMonth() - birthDate.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) age--
+    if (age < 18) {
+      return NextResponse.json({ error: 'El usuario debe ser mayor de 18 años' }, { status: 400 })
+    }
+
     // Inicializar cliente Service Role para bypassing RLS
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

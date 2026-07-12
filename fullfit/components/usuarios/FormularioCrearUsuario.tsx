@@ -23,11 +23,35 @@ function validatePassword(password: string | undefined): string | null {
   return null
 }
 
+function getMaxBirthDate() {
+  const d = new Date()
+  d.setFullYear(d.getFullYear() - 18)
+  return d.toISOString().split('T')[0]
+}
+
+function getMinBirthDate() {
+  const d = new Date()
+  d.setFullYear(d.getFullYear() - 100)
+  return d.toISOString().split('T')[0]
+}
+
+function validateAge(fechaNacimiento: string): string | null {
+  if (!fechaNacimiento) return null
+  const birthDate = new Date(fechaNacimiento + 'T00:00:00')
+  const today = new Date()
+  let age = today.getFullYear() - birthDate.getFullYear()
+  const monthDiff = today.getMonth() - birthDate.getMonth()
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) age--
+  if (age < 18) return 'El usuario debe ser mayor de 18 años'
+  return null
+}
+
 export function FormularioCrearUsuario({ isOpen, onClose, onSuccess }: FormularioCrearUsuarioProps) {
   const [loading, setLoading] = useState(false)
   const [validating, setValidating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [passwordError, setPasswordError] = useState<string | null>(null)
+  const [ageError, setAgeError] = useState<string | null>(null)
 
   /** true cuando RENIEC ya devolvió datos válidos */
   const [reniecValidado, setReniecValidado] = useState(false)
@@ -54,6 +78,9 @@ export function FormularioCrearUsuario({ isOpen, onClose, onSuccess }: Formulari
     }
     if (field === 'password') {
       setPasswordError(validatePassword(value as string))
+    }
+    if (field === 'fecha_nacimiento') {
+      setAgeError(validateAge(value as string))
     }
     setFormData(prev => ({ ...prev, [field]: value }))
   }
@@ -107,7 +134,9 @@ export function FormularioCrearUsuario({ isOpen, onClose, onSuccess }: Formulari
     reniecValidado &&
     formData.email.trim() !== '' &&
     (formData.password ?? '').trim() !== '' &&
-    passwordError === null
+    passwordError === null &&
+    formData.fecha_nacimiento !== '' &&
+    ageError === null
 
   // ─── Submit ──────────────────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
@@ -118,6 +147,17 @@ export function FormularioCrearUsuario({ isOpen, onClose, onSuccess }: Formulari
     const pwdErr = validatePassword(formData.password)
     if (pwdErr) {
       setPasswordError(pwdErr)
+      return
+    }
+
+    if (!formData.fecha_nacimiento) {
+      setError('La fecha de nacimiento es requerida')
+      return
+    }
+
+    const ageErr = validateAge(formData.fecha_nacimiento)
+    if (ageErr) {
+      setAgeError(ageErr)
       return
     }
 
@@ -156,6 +196,7 @@ export function FormularioCrearUsuario({ isOpen, onClose, onSuccess }: Formulari
     setReniecValidado(false)
     setError(null)
     setPasswordError(null)
+    setAgeError(null)
     onClose()
   }
 
@@ -250,14 +291,22 @@ export function FormularioCrearUsuario({ isOpen, onClose, onSuccess }: Formulari
 
           {/* Fecha de nacimiento */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">Fecha de Nacimiento</label>
+            <label className="text-sm font-medium text-zinc-300">Fecha de Nacimiento *</label>
             <Input
               type="date"
               value={formData.fecha_nacimiento || ''}
               onChange={(e) => handleChange('fecha_nacimiento', e.target.value)}
-              className="bg-zinc-950 border-zinc-800"
+              max={getMaxBirthDate()}
+              min={getMinBirthDate()}
+              required
+              className={`bg-zinc-950 border-zinc-800 ${ageError ? 'border-red-500' : ''}`}
               disabled={loading}
             />
+            {ageError && (
+              <p className="flex items-center gap-1 text-xs text-red-400">
+                <XCircle className="size-3 shrink-0" /> {ageError}
+              </p>
+            )}
           </div>
 
           {/* Sexo */}
@@ -332,7 +381,7 @@ export function FormularioCrearUsuario({ isOpen, onClose, onSuccess }: Formulari
           {/* Hint de condiciones pendientes */}
           {!allConditionsMet && (
             <p className="text-xs text-zinc-500">
-              Para habilitar el registro: valida el DNI con RENIEC, completa el email y la contraseña.
+              Para habilitar el registro: valida el DNI con RENIEC, completa la fecha de nacimiento (mayor de 18 años), el email y la contraseña.
             </p>
           )}
 

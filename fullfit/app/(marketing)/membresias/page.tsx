@@ -4,6 +4,8 @@ import Link from 'next/link'
 import Container from '@/components/layout/Container'
 import { ListaPlanesMembresia } from '@/components/membresias'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata = {
   title: 'Membresías | FULLFORMA',
   description: 'Elige tu plan de entrenamiento. Acceso a toda nuestra sede en Trujillo.',

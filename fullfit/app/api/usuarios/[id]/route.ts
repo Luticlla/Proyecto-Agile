@@ -39,6 +39,17 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       return NextResponse.json({ error: 'No se puede asignar el rol Administrador desde esta interfaz' }, { status: 400 })
     }
 
+    if (body.fecha_nacimiento) {
+      const birthDate = new Date(body.fecha_nacimiento + 'T00:00:00')
+      const today = new Date()
+      let age = today.getFullYear() - birthDate.getFullYear()
+      const monthDiff = today.getMonth() - birthDate.getMonth()
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) age--
+      if (age < 18) {
+        return NextResponse.json({ error: 'El usuario debe ser mayor de 18 años' }, { status: 400 })
+      }
+    }
+
     // Validar que no se bloquee al último admin
     if (body.activo === false || (body.rol_id !== undefined && body.rol_id !== 1)) {
       const { data: targetUser } = await supabase.from('profiles').select('rol_id').eq('id', id).single()
