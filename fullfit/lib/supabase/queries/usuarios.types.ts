@@ -36,6 +36,7 @@ export type ActualizarUsuarioPayload = {
   apellido?: string
   dni?: string
   telefono?: string
+  email?: string
   rol_id?: number
   activo?: boolean
   fecha_nacimiento?: string | null

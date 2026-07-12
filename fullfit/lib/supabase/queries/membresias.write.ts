@@ -101,7 +101,7 @@ export async function cambiarEstadoMembresia(
 
   const { data: membresia, error: fetchError } = await db
     .from('suscripciones')
-    .select('estado')
+    .select('estado, veces_pausada')
     .eq('id', id)
     .single()
 
@@ -123,6 +123,17 @@ export async function cambiarEstadoMembresia(
     }
   }
 
+  // Verificar límite de pausas (máximo 2 por membresía)
+  if (dto.accion === 'pausar') {
+    const vecesPausada = (membresia as Record<string, unknown>).veces_pausada as number ?? 0
+    if (vecesPausada >= 2) {
+      return {
+        success: false,
+        error: 'Esta membresía ya fue pausada 2 veces. No se puede pausar nuevamente.'
+      }
+    }
+  }
+
   const estadoMap: Record<string, string> = {
     'cancelar': 'cancelada',
     'pausar': 'suspendida',
@@ -131,9 +142,16 @@ export async function cambiarEstadoMembresia(
 
   const nuevoEstado = estadoMap[dto.accion]
 
+  // Si es pausa, incrementar contador
+  const updateData: Record<string, unknown> = { estado: nuevoEstado }
+  if (dto.accion === 'pausar') {
+    const vecesPausada = (membresia as Record<string, unknown>).veces_pausada as number ?? 0
+    updateData.veces_pausada = vecesPausada + 1
+  }
+
   const { error } = await db
     .from('suscripciones')
-    .update({ estado: nuevoEstado })
+    .update(updateData)
     .eq('id', id)
 
   if (error) {

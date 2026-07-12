@@ -95,11 +95,15 @@ export function ListaUsuarios({ usuarios, loading, onEditar, onToggleEstado }: L
                 <TableCell>
                   <Badge 
                     variant="outline" 
-                    className={usuario.rol_id === 1 
-                      ? 'border-yellow-500/30 bg-yellow-500/20 text-yellow-400' 
-                      : 'border-blue-500/30 bg-blue-500/20 text-blue-400'}
+                    className={
+                      usuario.rol_id === 1 
+                        ? 'border-yellow-500/30 bg-yellow-500/20 text-yellow-400' 
+                        : usuario.rol_id === 4
+                          ? 'border-emerald-500/30 bg-emerald-500/20 text-emerald-400'
+                          : 'border-blue-500/30 bg-blue-500/20 text-blue-400'
+                    }
                   >
-                    {usuario.rol_id === 1 ? 'Admin' : 'Recepcionista'}
+                    {usuario.rol_id === 1 ? 'Admin' : usuario.rol_id === 4 ? 'Coach' : 'Recepcionista'}
                   </Badge>
                 </TableCell>
                 <TableCell>

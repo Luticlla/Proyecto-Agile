@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
 
     let numeroComprobante = pago.referencia
     if (!numeroComprobante || !/^B\d{2}-\d{4}$/.test(numeroComprobante)) {
-      numeroComprobante = await obtenerSiguienteComprobante(supabaseAdmin)
+      numeroComprobante = await obtenerSiguienteComprobante()
       await supabaseAdmin
         .from('pagos')
         .update({ referencia: numeroComprobante })

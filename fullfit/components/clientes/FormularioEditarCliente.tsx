@@ -41,11 +41,11 @@ export function FormularioEditarCliente({ cliente, onSave, onCancel }: Formulari
     } else {
       setDni(digits)
     }
-    setError(null)
+    setError('')
   }
 
   const handleValidarReniec = async () => {
-    setError(null)
+    setError('')
     if (dni.length !== 8) {
       setError('Ingresa los 8 dígitos del DNI antes de validar')
       return

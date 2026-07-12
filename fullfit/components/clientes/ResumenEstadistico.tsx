@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Users, CreditCard, AlertTriangle, XCircle, CheckCircle, UserX } from 'lucide-react'
+import { Users, CreditCard, AlertTriangle, XCircle } from 'lucide-react'
 import { contarClientesPorEstado, contarMembresiasPorEstado } from '@/lib/supabase/queries/clientes'
 
 interface EstadisticasData {
@@ -87,18 +87,6 @@ export function ResumenEstadistico() {
       colorClass: 'bg-zinc-700/60 text-zinc-300',
     },
     {
-      label: 'Activos',
-      value: data?.clientesActivos ?? 0,
-      icon: CheckCircle,
-      colorClass: 'bg-green-500/15 text-green-400',
-    },
-    {
-      label: 'Inactivos',
-      value: data?.clientesInactivos ?? 0,
-      icon: UserX,
-      colorClass: 'bg-zinc-600/30 text-zinc-400',
-    },
-    {
       label: 'Membresías Activas',
       value: data?.membresiasActivas ?? 0,
       icon: CreditCard,
@@ -123,7 +111,7 @@ export function ResumenEstadistico() {
       <p className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-3">
         Resumen
       </p>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">
         {stats.map((stat) => (
           <StatCard
             key={stat.label}

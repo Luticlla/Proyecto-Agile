@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { BuscadorCliente, ListaClientes, FiltroMembresia, ResumenEstadistico, ExportarCSV } from '@/components/clientes'
+import { BuscadorCliente, ListaClientes, FiltroMembresia, ResumenEstadistico, ExportarCSV, ModalRegistrarCliente } from '@/components/clientes'
 import { listarClientes, ClienteListResult, EstadoSuscripcion, ClienteConMembresia } from '@/lib/supabase/queries/clientes'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, UserPlus2 } from 'lucide-react'
 
 const OPCIONES_LIMITE = [10, 25, 50, 100]
 const DEBOUNCE_MS = 300
@@ -25,6 +25,7 @@ export default function ClientesPage() {
   const [filtroMembresia, setFiltroMembresia] = useState<EstadoSuscripcion>('todos')
   const [limite, setLimite] = useState(10)
   const [paginaInput, setPaginaInput] = useState('1')
+  const [showModalRegistrar, setShowModalRegistrar] = useState(false)
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const latestRequestRef = useRef(0)
@@ -119,13 +120,29 @@ export default function ClientesPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* ── Encabezado ─────────────────────────────────────────────────── */}
+      {/* Modal de registro de cliente */}
+      <ModalRegistrarCliente
+        open={showModalRegistrar}
+        onClose={() => setShowModalRegistrar(false)}
+        onSuccess={() => cargarClientes({ filtro: filtroMembresia, limit: limite })}
+      />
+
+      {/* ── Encabezado ────────────────────────────────────────────────────────────────── */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gym-logo/20 pb-4">
         <div>
           <h1 className="font-arcade text-2xl md:text-3xl text-white uppercase tracking-widest">Clientes</h1>
           <p className="font-mono text-white/40 text-xs md:text-sm mt-2">Gestiona los perfiles y membresías de los clientes</p>
         </div>
-        <span className="font-mono text-gym-logo/80 text-xs uppercase tracking-wider">{textoResultados}</span>
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={() => setShowModalRegistrar(true)}
+            className="bg-yellow-400 text-zinc-950 hover:bg-yellow-300 font-mono text-xs uppercase tracking-wider gap-2"
+          >
+            <UserPlus2 className="size-4" />
+            Registrar nuevo cliente
+          </Button>
+          <span className="font-mono text-gym-logo/80 text-xs uppercase tracking-wider">{textoResultados}</span>
+        </div>
       </div>
 
       {/* ── Resumen estadístico ────────────────────────────────────────── */}

@@ -9,6 +9,7 @@ import { Loader2, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { buscarEmailPorDni } from '@/lib/supabase/queries/auth'
+import { supabase } from '@/lib/supabase/client'
 
 function LoginForm() {
   const { signIn } = useAuth()
@@ -56,6 +57,24 @@ function LoginForm() {
       setError(error.message)
       setLoading(false)
     } else {
+      // Verificar si la cuenta está pausada o cancelada
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user?.id) {
+          const res = await fetch(`/api/membresias/estado-acceso?usuario_id=${user.id}`)
+          const statusData = await res.json()
+          if (statusData.bloqueado) {
+            // Cerrar sesión inmediatamente y mostrar mensaje
+            await supabase.auth.signOut()
+            setError('Su cuenta está pausada o cancelada, comuníquese con el recepcionista.')
+            setLoading(false)
+            return
+          }
+        }
+      } catch {
+        // Si falla la verificación, permitir acceso (no bloquear por error de red)
+      }
+
       if (redirectTo) {
         router.replace(redirectTo)
         return

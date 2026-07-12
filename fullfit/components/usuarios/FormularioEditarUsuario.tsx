@@ -20,7 +20,7 @@ export function FormularioEditarUsuario({ usuario, isOpen, onClose, onSuccess }:
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   
-  const [formData, setFormData] = useState<ActualizarUsuarioPayload>({})
+  const [formData, setFormData] = useState<ActualizarUsuarioPayload & { email?: string }>({})
 
   useEffect(() => {
     if (usuario && isOpen) {
@@ -29,6 +29,7 @@ export function FormularioEditarUsuario({ usuario, isOpen, onClose, onSuccess }:
         apellido: usuario.apellido,
         dni: usuario.dni || '',
         telefono: usuario.telefono || '',
+        email: usuario.email || '',
         rol_id: usuario.rol_id,
         fecha_nacimiento: (usuario as any).fecha_nacimiento || '',
         genero: (usuario as any).genero || '',
@@ -37,7 +38,7 @@ export function FormularioEditarUsuario({ usuario, isOpen, onClose, onSuccess }:
     }
   }, [usuario, isOpen])
 
-  const handleChange = (field: keyof ActualizarUsuarioPayload, value: any) => {
+  const handleChange = (field: keyof (ActualizarUsuarioPayload & { email?: string }), value: any) => {
     if (field === 'nombre' || field === 'apellido') {
       value = (value as string).replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '')
     }
@@ -57,6 +58,11 @@ export function FormularioEditarUsuario({ usuario, isOpen, onClose, onSuccess }:
 
     if (formData.dni && formData.dni.length !== 8) {
       setError('El DNI debe tener 8 dígitos')
+      return
+    }
+
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setError('El formato del correo electrónico no es válido')
       return
     }
 
@@ -97,14 +103,17 @@ export function FormularioEditarUsuario({ usuario, isOpen, onClose, onSuccess }:
             </div>
           )}
 
+          {/* Email editable */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-zinc-300">Email</label>
             <Input
-              value={usuario?.email || ''}
-              disabled
-              className="bg-zinc-900 border-zinc-800 text-zinc-500"
+              type="email"
+              value={formData.email || ''}
+              onChange={(e) => handleChange('email', e.target.value)}
+              className="bg-zinc-950 border-zinc-800"
+              disabled={loading}
+              placeholder="correo@ejemplo.com"
             />
-            <p className="text-xs text-zinc-500">El email no se puede modificar.</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -191,8 +200,8 @@ export function FormularioEditarUsuario({ usuario, isOpen, onClose, onSuccess }:
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-zinc-900 border-zinc-800">
-                <SelectItem value="1" className="text-white hover:bg-zinc-800">Administrador</SelectItem>
                 <SelectItem value="2" className="text-white hover:bg-zinc-800">Recepcionista</SelectItem>
+                <SelectItem value="4" className="text-white hover:bg-zinc-800">Coach</SelectItem>
               </SelectContent>
             </Select>
           </div>

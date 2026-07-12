@@ -24,7 +24,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     }
 
     // Un administrador no puede desactivarse a sí mismo por seguridad (debe hacerlo otro admin)
-    const body: ActualizarUsuarioPayload = await request.json()
+    const body: ActualizarUsuarioPayload & { email?: string } = await request.json()
     
     if (id === user.id && body.activo === false) {
       return NextResponse.json({ error: 'No puedes desactivar tu propia cuenta' }, { status: 400 })
@@ -32,6 +32,11 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     
     if (id === user.id && body.rol_id !== undefined && body.rol_id !== 1) {
       return NextResponse.json({ error: 'No puedes degradar tu propio rol' }, { status: 400 })
+    }
+
+    // Validar que no se asigne rol Administrador desde este endpoint
+    if (body.rol_id === 1) {
+      return NextResponse.json({ error: 'No se puede asignar el rol Administrador desde esta interfaz' }, { status: 400 })
     }
 
     // Validar que no se bloquee al último admin
@@ -51,10 +56,25 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    // Actualizar el profile
+    // Si se envía email, actualizar en Supabase Auth primero
+    const { email, ...profileBody } = body
+    if (email && email.trim() !== '') {
+      const { error: authEmailError } = await supabaseAdmin.auth.admin.updateUserById(id, { email })
+      if (authEmailError) {
+        console.error('Error actualizando email en auth:', authEmailError)
+        return NextResponse.json({ error: `Error al actualizar el correo: ${authEmailError.message}` }, { status: 400 })
+      }
+    }
+
+    // Actualizar el profile (sin el campo email separado, pero con email en profiles también)
+    const profileUpdate: Record<string, any> = { ...profileBody }
+    if (email && email.trim() !== '') {
+      profileUpdate.email = email
+    }
+
     const { error: profileError } = await supabaseAdmin
       .from('profiles')
-      .update(body as any)
+      .update(profileUpdate)
       .eq('id', id)
 
     if (profileError) {

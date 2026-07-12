@@ -279,6 +279,24 @@ export function FormularioCrearUsuario({ isOpen, onClose, onSuccess }: Formulari
             </Select>
           </div>
 
+          {/* Rol */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-zinc-300">Rol *</label>
+            <Select
+              value={formData.rol_id?.toString() || '2'}
+              onValueChange={(v) => handleChange('rol_id', Number(v))}
+              disabled={loading}
+            >
+              <SelectTrigger className="bg-zinc-950 border-zinc-800">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-zinc-900 border-zinc-800">
+                <SelectItem value="2" className="text-white hover:bg-zinc-800">Recepcionista</SelectItem>
+                <SelectItem value="4" className="text-white hover:bg-zinc-800">Coach</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Email (siempre editable) */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-zinc-300">Email *</label>
