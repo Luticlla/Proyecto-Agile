@@ -39,6 +39,57 @@ export type Database = {
           activo?: boolean
         }
       }
+      clases_grupales: {
+        Row: {
+          id: number
+          nombre: string
+          descripcion: string | null
+          entrenador: string | null
+          capacidad: number | null
+          color_hex: string
+          activa: boolean
+          creado_en: string
+        }
+        Insert: {
+          id?: number
+          nombre: string
+          descripcion?: string | null
+          entrenador?: string | null
+          capacidad?: number | null
+          color_hex?: string
+          activa?: boolean
+        }
+        Update: {
+          nombre?: string
+          descripcion?: string | null
+          entrenador?: string | null
+          capacidad?: number | null
+          color_hex?: string
+          activa?: boolean
+        }
+      }
+      horarios_clases: {
+        Row: {
+          id: number
+          clase_id: number
+          dia_semana: number
+          hora_inicio: string
+          hora_fin: string
+        }
+        Insert: {
+          id?: number
+          clase_id: number
+          dia_semana: number
+          hora_inicio: string
+          hora_fin: string
+        }
+        Update: {
+          clase_id?: number
+          dia_semana?: number
+          hora_inicio?: string
+          hora_fin?: string
+        }
+      }
       roles: {
         Row: {
           id: number

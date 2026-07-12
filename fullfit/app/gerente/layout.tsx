@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Users, CreditCard, LogOut, Dumbbell, ShieldCheck, DollarSign } from 'lucide-react'
+import { Users, CreditCard, LogOut, Dumbbell, ShieldCheck, DollarSign, Calendar } from 'lucide-react'
 
 export default function GerenteLayout({
   children,
@@ -85,6 +85,7 @@ export default function GerenteLayout({
     { href: '/gerente/usuarios', label: 'Usuarios', icon: Users },
     { href: '/gerente/planes', label: 'Planes', icon: CreditCard },
     { href: '/gerente/ingresos', label: 'Ingresos', icon: DollarSign },
+    { href: '/gerente/horarios', label: 'Horarios', icon: Calendar },
   ]
 
   return (
