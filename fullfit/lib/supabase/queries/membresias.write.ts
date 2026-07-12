@@ -217,7 +217,8 @@ export async function renovarMembresia(
     .from('suscripciones')
     .update({
       plan_id: dto.plan_id,
-      fecha_fin: fechaFinStr
+      fecha_fin: fechaFinStr,
+      veces_pausada: 0
     })
     .eq('id', id)
 
@@ -258,7 +259,8 @@ async function extenderSuscripcion(
   const nuevaFechaFinStr = fechaFinDate.toISOString().split('T')[0]
 
   const updateData: Record<string, unknown> = {
-    fecha_fin: nuevaFechaFinStr
+    fecha_fin: nuevaFechaFinStr,
+    veces_pausada: 0
   }
   if (planId) {
     updateData.plan_id = planId
