@@ -60,7 +60,7 @@ export async function proxy(request: NextRequest) {
     if (!isAllowed) {
       const url = request.nextUrl.clone()
       url.pathname = '/login'
-      url.searchParams.set('error', 'Tu cuenta está desactivada')
+      url.searchParams.set('error', 'Tu sesión está inhabilitada, no tienes acceso al sistema')
       return NextResponse.redirect(url)
     }
   }
@@ -214,7 +214,6 @@ export const config = {
     '/mi-membresia/:path*',
     '/pasarelapago/:path*',
     '/membresias/:path*',
-    '/sedes/:path*',
     '/login',
     '/register',
     '/',

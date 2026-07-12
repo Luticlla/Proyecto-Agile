@@ -43,6 +43,23 @@ export default function RecepcionistaLayout({
     )
   }
 
+  if (profile.activo === false) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="text-center space-y-4">
+          <p className="text-red-400 font-mono text-sm mb-2">Tu sesión está inhabilitada, no tienes acceso al sistema</p>
+          <p className="text-white/40 font-mono text-xs mb-4">Comunícate con el administrador para más información.</p>
+          <Button
+            onClick={() => { signOut(); router.push('/login') }}
+            className="bg-gym-logo text-black hover:bg-gym-logo/80 font-arcade text-xs tracking-widest uppercase"
+          >
+            Cerrar sesión
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   if (profile.rol_id !== 1 && profile.rol_id !== 2) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">

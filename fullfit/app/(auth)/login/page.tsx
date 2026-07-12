@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, Suspense, useEffect } from 'react'
 import { useAuth } from '@/hooks'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Loader2, ArrowLeft } from 'lucide-react'
+import { Loader2, ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { buscarEmailPorDni } from '@/lib/supabase/queries/auth'
@@ -16,11 +16,17 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect')
+  const urlError = searchParams.get('error')
   
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+  const [error, setError] = useState(urlError || '')
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+
+  useEffect(() => {
+    if (urlError) setError(urlError)
+  }, [urlError])
 
   const isEmail = (input: string) => input.includes('@')
   const isDNI = (input: string) => /^\d{8}$/.test(input)
@@ -75,6 +81,26 @@ function LoginForm() {
         // Si falla la verificación, permitir acceso (no bloquear por error de red)
       }
 
+      // Verificar si el perfil está deshabilitado
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user?.id) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('activo')
+            .eq('id', user.id)
+            .single()
+          if (profile && (profile as { activo: boolean }).activo === false) {
+            await supabase.auth.signOut()
+            setError('Tu sesión está inhabilitada, no tienes acceso al sistema')
+            setLoading(false)
+            return
+          }
+        }
+      } catch {
+        // Si falla la verificación, permitir acceso
+      }
+
       if (redirectTo) {
         router.replace(redirectTo)
         return
@@ -124,15 +150,25 @@ function LoginForm() {
                   ¿Olvidaste tu contraseña?
                 </Link>
               </div>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-200 transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
+              </div>
             </div>
 
             <Button

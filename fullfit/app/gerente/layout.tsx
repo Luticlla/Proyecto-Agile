@@ -43,6 +43,23 @@ export default function GerenteLayout({
     )
   }
 
+  if (profile.activo === false) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950">
+        <div className="text-center">
+          <p className="text-red-400 text-lg font-semibold mb-2">Tu sesión está inhabilitada, no tienes acceso al sistema</p>
+          <p className="text-zinc-500 mb-4">Comunícate con el administrador para más información.</p>
+          <Button
+            onClick={() => { signOut(); router.push('/login') }}
+            className="bg-yellow-500 text-zinc-900 hover:bg-yellow-400"
+          >
+            Cerrar sesión
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   if (profile.rol_id !== 1) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-950">

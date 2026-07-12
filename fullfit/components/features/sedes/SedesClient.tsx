@@ -20,10 +20,10 @@ type Sede = {
   cierre_sab: string
   apertura_dom: string | null
   cierre_dom: string | null
-  clase_yoga_inicio: string
-  clase_yoga_fin: string
-  clase_mma_inicio: string
-  clase_mma_fin: string
+  clase_funcional_inicio: string
+  clase_funcional_fin: string
+  clase_gap_inicio: string
+  clase_gap_fin: string
   estado: 'activa' | 'inactiva'
   creado_en: string
   actualizado_en: string
@@ -162,15 +162,15 @@ const SedeCard = ({
               Clases Grupales
             </p>
             <div className="flex justify-between">
-              <span className="text-white/40 text-[9px] font-mono">Yoga</span>
+              <span className="text-white/40 text-[9px] font-mono">Funcional</span>
               <span className="text-white/80 text-[9px] font-mono">
-                {formatHora(sede.clase_yoga_inicio)} – {formatHora(sede.clase_yoga_fin)}
+                {formatHora(sede.clase_funcional_inicio)} – {formatHora(sede.clase_funcional_fin)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-white/40 text-[9px] font-mono">MMA</span>
+              <span className="text-white/40 text-[9px] font-mono">Gap</span>
               <span className="text-white/80 text-[9px] font-mono">
-                {formatHora(sede.clase_mma_inicio)} – {formatHora(sede.clase_mma_fin)}
+                {formatHora(sede.clase_gap_inicio)} – {formatHora(sede.clase_gap_fin)}
               </span>
             </div>
             <p className="text-white/30 text-[8px] font-mono mt-2">Lunes a Viernes</p>

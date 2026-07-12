@@ -1,6 +1,52 @@
-import React from 'react'
+'use client'
+
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useAuth } from '@/hooks/useAuth'
+
+const InscribiteButton = () => {
+  const { user, loading: authLoading } = useAuth()
+  const [href, setHref] = useState('/membresias')
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (authLoading) return
+
+    if (!user) {
+      setHref('/membresias')
+      setLoading(false)
+      return
+    }
+
+    const checkMembresia = async () => {
+      try {
+        const res = await fetch('/api/mi-membresia')
+        const data = await res.json()
+        setHref(data.tieneMembresia ? '/mi-membresia' : '/membresias')
+      } catch {
+        setHref('/membresias')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    checkMembresia()
+  }, [user, authLoading])
+
+  return (
+    <Link
+      href={href}
+      className="absolute top-3 right-3 sm:top-6 sm:right-6 md:top-10 md:right-10 lg:top-12 lg:right-12 
+                 bg-red-600 hover:bg-primary hover:text-black text-white font-arcade 
+                 text-[8px] sm:text-xs md:text-base lg:text-lg uppercase tracking-wider
+                 py-2 px-3 sm:py-3 sm:px-6 md:py-4 md:px-8 
+                 rounded-lg shadow-lg hover:shadow-2xl hoverEffect"
+    >
+      {loading ? '...' : '¡Inscríbete ya!'}
+    </Link>
+  )
+}
 
 const HomeBanner = () => {
   return (
@@ -14,16 +60,7 @@ const HomeBanner = () => {
           className="object-cover rounded-2xl md:rounded-[2rem] shadow-xl"
           priority
         />  
-        <Link 
-          href="/sedes"
-          className="absolute top-3 right-3 sm:top-6 sm:right-6 md:top-10 md:right-10 lg:top-12 lg:right-12 
-                     bg-red-600 hover:bg-primary hover:text-black text-white font-arcade 
-                     text-[8px] sm:text-xs md:text-base lg:text-lg uppercase tracking-wider
-                     py-2 px-3 sm:py-3 sm:px-6 md:py-4 md:px-8 
-                     rounded-lg shadow-lg hover:shadow-2xl hoverEffect"
-        >
-          ¡Inscríbete ya!
-        </Link>
+        <InscribiteButton />
       </div>
     </section>
   )

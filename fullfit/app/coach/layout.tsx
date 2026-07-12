@@ -43,6 +43,23 @@ export default function CoachLayout({
     )
   }
 
+  if (profile.activo === false) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="text-center space-y-4">
+          <p className="text-red-400 font-mono text-sm mb-2">Tu sesión está inhabilitada, no tienes acceso al sistema</p>
+          <p className="text-white/40 font-mono text-xs mb-4">Comunícate con el administrador para más información.</p>
+          <Button
+            onClick={() => { signOut(); router.push('/login') }}
+            className="bg-emerald-500 text-black hover:bg-emerald-400 font-mono text-xs tracking-widest uppercase"
+          >
+            Cerrar sesión
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   // Solo coaches (rol_id = 4) acceden a esta ruta
   if (profile.rol_id !== 4) {
     return (

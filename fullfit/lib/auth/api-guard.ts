@@ -36,7 +36,7 @@ export async function requireAuthenticatedRecepcionista(
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('rol_id')
+    .select('rol_id, activo')
     .eq('id', user.id)
     .single()
 
@@ -45,6 +45,16 @@ export async function requireAuthenticatedRecepcionista(
       success: false,
       response: NextResponse.json(
         { error: 'No tiene permisos de recepcionista' },
+        { status: 403 }
+      )
+    }
+  }
+
+  if (profile.activo === false) {
+    return {
+      success: false,
+      response: NextResponse.json(
+        { error: 'Tu sesión está inhabilitada, no tienes acceso al sistema' },
         { status: 403 }
       )
     }
@@ -85,9 +95,19 @@ export async function requireAuthenticated(
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('rol_id')
+    .select('rol_id, activo')
     .eq('id', user.id)
     .single()
+
+  if (profile?.activo === false) {
+    return {
+      success: false,
+      response: NextResponse.json(
+        { error: 'Tu sesión está inhabilitada, no tienes acceso al sistema' },
+        { status: 403 }
+      )
+    }
+  }
 
   return { 
     success: true, 

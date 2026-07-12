@@ -384,7 +384,7 @@ export default function MiMembresiaPage() {
       <section className="border-t border-white/5 pt-6">
         <p className="text-center font-mono text-white/30 text-xs md:text-sm">
           ¿Necesitas ayuda?{' '}
-          <Link href="/sedes" className="text-gym-logo hover:underline">
+          <Link href="/#sedes" className="text-gym-logo hover:underline">
             Visítanos en nuestra sede
           </Link>{' '}
           o llama al{' '}

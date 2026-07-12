@@ -101,7 +101,7 @@ const MembresiasPage = async () => {
           <div className="text-center">
             <p className="text-white/40 text-xs md:text-sm font-mono">
               ¿Tienes dudas sobre qué plan elegir?{' '}
-              <Link href="/sedes" className="text-gym-logo hover:underline">
+              <Link href="/#sedes" className="text-gym-logo hover:underline">
                 Visítanos en nuestra sede
               </Link>
             </p>

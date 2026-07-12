@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2, ArrowLeft, ShieldCheck, CheckCircle2, XCircle, MailCheck } from 'lucide-react'
+import { Loader2, ArrowLeft, ShieldCheck, CheckCircle2, XCircle, MailCheck, Eye, EyeOff } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import Link from 'next/link'
 
@@ -46,6 +46,8 @@ export default function RegisterPage() {
   const [validating, setValidating] = useState(false)
   const [reniecValidado, setReniecValidado] = useState(false)
   const [registeredEmail, setRegisteredEmail] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   // ─── Handlers ────────────────────────────────────────────────────────────────
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -433,18 +435,28 @@ export default function RegisterPage() {
             {/* Contraseña */}
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm text-zinc-300">Contraseña *</label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Mínimo 8 caracteres, no solo números"
-                required
-                className={`bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 ${
-                  passwordError ? 'border-red-500' : ''
-                }`}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Mínimo 8 caracteres, no solo números"
+                  required
+                  className={`bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 pr-10 ${
+                    passwordError ? 'border-red-500' : ''
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-200 transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
+              </div>
               {passwordError && (
                 <p className="flex items-center gap-1 text-xs text-red-400">
                   <XCircle className="size-3 shrink-0" /> {passwordError}
@@ -457,20 +469,30 @@ export default function RegisterPage() {
               <label htmlFor="confirmPassword" className="text-sm text-zinc-300">
                 Confirmar Contraseña *
               </label>
-              <Input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="••••••••"
-                required
-                className={`bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 ${
-                  formData.confirmPassword && formData.password !== formData.confirmPassword
-                    ? 'border-red-500'
-                    : ''
-                }`}
-              />
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  required
+                  className={`bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 pr-10 ${
+                    formData.confirmPassword && formData.password !== formData.confirmPassword
+                      ? 'border-red-500'
+                      : ''
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-200 transition-colors"
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
+              </div>
               {formData.confirmPassword && formData.password !== formData.confirmPassword && (
                 <p className="flex items-center gap-1 text-xs text-red-400">
                   <XCircle className="size-3 shrink-0" /> Las contraseñas no coinciden
