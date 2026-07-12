@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Loader2, RefreshCw, ShieldCheck, ShieldOff, CreditCard, Clock, Calendar, AlertTriangle } from 'lucide-react'
+import { Loader2, RefreshCw, ShieldCheck, ShieldOff, CreditCard, Clock, Calendar, AlertTriangle, Copy, Check } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/hooks'
 import { HistorialPagos, type PagoHistorial } from '@/components/mi-membresia/HistorialPagos'
 import { ListaPlanesMembresia } from '@/components/membresias/ListaPlanesMembresia'
 import type { MiMembresiaData } from '@/lib/supabase/queries/mi-membresia'
@@ -208,10 +209,12 @@ function TarjetaMembresiaArcade({
 /* ─── Main page ───────────────────────────────────────────────────────────── */
 
 export default function MiMembresiaPage() {
+  const { profile } = useAuth()
   const [data, setData] = useState<PageData | null>(null)
   const [planes, setPlanes] = useState<PlanMembresia[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [copiedId, setCopiedId] = useState(false)
 
   useEffect(() => {
     const loadData = async () => {
@@ -241,6 +244,14 @@ export default function MiMembresiaPage() {
 
     loadData()
   }, [])
+
+  const handleCopyId = () => {
+    if (profile?.id) {
+      navigator.clipboard.writeText(profile.id)
+      setCopiedId(true)
+      setTimeout(() => setCopiedId(false), 2000)
+    }
+  }
 
   /* Loading */
   if (loading) {
@@ -280,12 +291,16 @@ export default function MiMembresiaPage() {
     ? <><span className="text-gym-logo [text-shadow:0_0_20px_rgba(255,223,0,0.5)]">Mi</span> Membresía</>
     : data?.membresiaVencida
     ? <>Membresía <span className="text-red-400 [text-shadow:0_0_20px_rgba(239,68,68,0.4)]">Vencida</span></>
+    : data?.membresiaBloqueada
+    ? <>Membresía <span className="text-red-400 [text-shadow:0_0_20px_rgba(239,68,68,0.4)]">{data.membresiaBloqueada.estado === 'suspendida' ? 'Pausada' : 'Cancelada'}</span></>
     : <>¡Únete a <span className="text-gym-logo [text-shadow:0_0_20px_rgba(255,223,0,0.5)]">FULLFORMA</span>!</>
 
   const heroDesc = data?.membresiaActiva
     ? 'Consulta el estado de tu plan y tu historial de pagos.'
     : data?.membresiaVencida
     ? <><span className="text-gym-logo/80">Renueva tu membresía</span> para seguir entrenando.</>
+    : data?.membresiaBloqueada
+    ? 'Puedes consultar tu historial de pagos a continuación.'
     : <>Elige un plan y comienza tu transformación. <span className="text-gym-logo/80">Sin contratos largos.</span></>
 
   return (
@@ -301,6 +316,29 @@ export default function MiMembresiaPage() {
             </span>
             <div className="h-px w-8 md:w-16 bg-gym-logo" />
           </div>
+
+          {profile && (
+            <div className="flex flex-col items-center gap-2">
+              <p className="font-arcade text-white text-sm md:text-base tracking-widest">
+                Hola, <span className="text-gym-logo">{profile.nombre}</span>
+              </p>
+              <button
+                onClick={handleCopyId}
+                className="group flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-gym-logo/30 hover:bg-gym-logo/5 transition-all duration-200 cursor-pointer"
+                title="Copiar ID"
+              >
+                <span className="font-mono text-white/30 text-[10px] tracking-wider">ID:</span>
+                <span className="font-mono text-white/50 text-[10px] tracking-wider group-hover:text-white/70 transition-colors">
+                  {profile.id}
+                </span>
+                {copiedId ? (
+                  <Check className="size-3 text-green-400" />
+                ) : (
+                  <Copy className="size-3 text-white/20 group-hover:text-gym-logo transition-colors" />
+                )}
+              </button>
+            </div>
+          )}
 
           <h1 className="font-arcade text-white text-xl md:text-3xl lg:text-4xl tracking-wide uppercase leading-relaxed">
             {heroTitle}
@@ -345,6 +383,18 @@ export default function MiMembresiaPage() {
               </div>
             </div>
           )}
+          {data?.membresiaBloqueada && !data?.membresiaActiva && !data?.membresiaVencida && (
+            <div className="flex items-center gap-8 mt-2 pt-4 border-t border-white/10 w-full max-w-xs justify-center">
+              <div className="flex flex-col items-center gap-1">
+                <span className="font-arcade text-gym-logo text-lg md:text-2xl">
+                  {historialPagos.filter(p => p.estado === 'completado').length}
+                </span>
+                <span className="font-arcade text-[8px] md:text-[10px] text-white/30 uppercase tracking-wider">
+                  Pagos
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -364,8 +414,26 @@ export default function MiMembresiaPage() {
         </>
       )}
 
+      {/* Content — membresía bloqueada (suspensión o cancelación) */}
+      {!data?.membresiaActiva && !data?.membresiaVencida && data?.membresiaBloqueada && (
+        <>
+          <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-6 text-center space-y-3">
+            <AlertTriangle className="size-8 text-red-400 mx-auto" />
+            <p className="font-arcade text-red-400 text-sm tracking-widest uppercase">
+              Membresía {data.membresiaBloqueada.estado === 'suspendida' ? 'Pausada' : 'Cancelada'}
+            </p>
+            <p className="font-mono text-white/40 text-xs max-w-sm mx-auto">
+              Tu membresía del plan <span className="text-white/60">{data.membresiaBloqueada.plan_nombre}</span> se encuentra{' '}
+              {data.membresiaBloqueada.estado === 'suspendida' ? 'pausada' : 'cancelada'}.
+              Comunícate con el recepcionista para más información.
+            </p>
+          </div>
+          {historialPagos.length > 0 && <HistorialPagos pagos={historialPagos} />}
+        </>
+      )}
+
       {/* Content — sin membresía */}
-      {!data?.membresiaActiva && !data?.membresiaVencida && (
+      {!data?.membresiaActiva && !data?.membresiaVencida && !data?.membresiaBloqueada && (
         <>
           <section>
             <SectionLabel>Planes Disponibles</SectionLabel>

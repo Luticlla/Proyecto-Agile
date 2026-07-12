@@ -8,6 +8,7 @@ export type MiMembresiaData = {
   tieneMembresia: boolean
   membresiaActiva: MembresiaConCliente | null
   membresiaVencida: MembresiaConCliente | null
+  membresiaBloqueada: { estado: string; plan_nombre: string } | null
   historial: MembresiaConCliente[]
 }
 
@@ -82,6 +83,16 @@ export async function obtenerMiMembresia(
     .order('fecha_inicio', { ascending: false })
     .limit(5)
 
+  // Buscar membresía bloqueada (suspendida o cancelada)
+  const { data: bloqueadaData } = await db
+    .from('suscripciones')
+    .select('estado, planes_membresia:plan_id (nombre)')
+    .eq('usuario_id', usuarioId)
+    .in('estado', ['suspendida', 'cancelada'])
+    .order('creado_en', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
   const mapRow = (row: Record<string, unknown>): MembresiaConCliente => {
     const profiles = row.profiles as Record<string, string> | null
     const planes = row.planes_membresia as Record<string, unknown> | null
@@ -109,10 +120,16 @@ export async function obtenerMiMembresia(
   const membresiaVencida = vencidaData ? mapRow(vencidaData as Record<string, unknown>) : null
   const historial = (historialData || []).map((row) => mapRow(row as Record<string, unknown>))
 
+  const bloqueadaPlanes = (bloqueadaData?.planes_membresia as unknown as { nombre: string } | null)
+  const membresiaBloqueada = bloqueadaData
+    ? { estado: bloqueadaData.estado as string, plan_nombre: bloqueadaPlanes?.nombre || '' }
+    : null
+
   return {
     tieneMembresia: !!membresiaActiva || !!membresiaVencida,
     membresiaActiva,
     membresiaVencida,
+    membresiaBloqueada,
     historial,
   }
 }

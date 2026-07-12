@@ -27,6 +27,22 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Verificar si el DNI ya está registrado
+    if (metadata.dni) {
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('dni', metadata.dni)
+        .maybeSingle()
+
+      if (existingProfile) {
+        return NextResponse.json(
+          { error: 'Este DNI ya está registrado' },
+          { status: 400 }
+        )
+      }
+    }
+
     const { data: userData, error: createError } = await supabase.auth.admin.createUser({
       email: email.toLowerCase().trim(),
       password,

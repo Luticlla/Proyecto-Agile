@@ -70,10 +70,12 @@ function LoginForm() {
           const res = await fetch(`/api/membresias/estado-acceso?usuario_id=${user.id}`)
           const statusData = await res.json()
           if (statusData.bloqueado) {
-            // Cerrar sesión inmediatamente y mostrar mensaje
-            await supabase.auth.signOut()
-            setError('Su cuenta está pausada o cancelada, comuníquese con el recepcionista.')
-            setLoading(false)
+            // No cerrar sesión — redirigir a vista limitada con solo historial de pagos
+            if (redirectTo) {
+              router.replace(redirectTo)
+            } else {
+              window.location.href = '/mi-membresia'
+            }
             return
           }
         }

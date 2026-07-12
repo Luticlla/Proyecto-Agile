@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import {
   Loader2, ShieldCheck, CheckCircle2, XCircle, UserPlus2
 } from 'lucide-react'
+import { toast } from 'sonner'
 
 // ─── Validaciones ─────────────────────────────────────────────────────────────
 const validateEmail = (email: string) =>
@@ -123,6 +124,13 @@ export function ModalRegistrarCliente({ open, onClose, onSuccess }: ModalRegistr
     }
   }
 
+  // ─── Limpiar datos RENIEC ──────────────────────────────────────────────────
+  const handleClearReniec = () => {
+    setFormData(prev => ({ ...prev, dni: '', nombre: '', apellido: '' }))
+    setReniecValidado(false)
+    setError('')
+  }
+
   const getMaxBirthDate = () => {
     const d = new Date(); d.setFullYear(d.getFullYear() - 18); return d.toISOString().split('T')[0]
   }
@@ -192,6 +200,11 @@ export function ModalRegistrarCliente({ open, onClose, onSuccess }: ModalRegistr
 
       const data = await res.json()
       if (!res.ok) {
+        if (data.error?.includes('DNI ya está registrado')) {
+          toast.error('Este DNI ya está registrado en el sistema', {
+            description: 'Verifica el número e intenta con otro DNI'
+          })
+        }
         setError(data.error || 'Error al registrar el cliente')
       } else {
         setSuccess(true)
@@ -258,14 +271,24 @@ export function ModalRegistrarCliente({ open, onClose, onSuccess }: ModalRegistr
                   disabled={validating || reniecValidado}
                   className={`bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 flex-1 ${reniecValidado ? 'opacity-60 cursor-not-allowed' : ''}`}
                 />
-                <Button
-                  type="button"
-                  onClick={handleValidarReniec}
-                  disabled={loading || validating || reniecValidado || formData.dni.length !== 8}
-                  className="shrink-0 bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-40"
-                >
-                  {validating ? <Loader2 className="size-4 animate-spin" /> : reniecValidado ? <ShieldCheck className="size-4" /> : 'Validar'}
-                </Button>
+                {reniecValidado ? (
+                  <Button
+                    type="button"
+                    onClick={handleClearReniec}
+                    className="shrink-0 bg-red-600 hover:bg-red-500 text-white"
+                  >
+                    <XCircle className="size-4" />
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={handleValidarReniec}
+                    disabled={loading || validating || formData.dni.length !== 8}
+                    className="shrink-0 bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-40"
+                  >
+                    {validating ? <Loader2 className="size-4 animate-spin" /> : 'Validar'}
+                  </Button>
+                )}
               </div>
             </div>
 

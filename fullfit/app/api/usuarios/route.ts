@@ -41,6 +41,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'El usuario debe ser mayor de 18 años' }, { status: 400 })
     }
 
+    // Verificar si el DNI ya está registrado
+    const { data: existingDni } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('dni', dni)
+      .maybeSingle()
+
+    if (existingDni) {
+      return NextResponse.json({ error: 'Este DNI ya está registrado' }, { status: 400 })
+    }
+
     // Inicializar cliente Service Role para bypassing RLS
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

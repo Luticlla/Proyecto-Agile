@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, Lock } from 'lucide-react'
 import { Suspense } from 'react'
+import { toast } from 'sonner'
 
 function UpdatePasswordForm() {
   const { updatePassword } = useAuth()
@@ -50,6 +51,11 @@ function UpdatePasswordForm() {
     const { error } = await updatePassword(password, token)
 
     if (error) {
+      if (error.message?.includes('igual a la actual')) {
+        toast.error('La nueva contraseña no puede ser igual a la actual', {
+          description: 'Elige una contraseña diferente'
+        })
+      }
       setError(error.message)
       setLoading(false)
     } else {
@@ -76,7 +82,7 @@ function UpdatePasswordForm() {
             </div>
             <CardTitle className="text-2xl font-bold text-white">Contraseña Actualizada</CardTitle>
             <CardDescription className="text-zinc-400">
-              Tu contraseña se ha actualizado correctamente. Serás redirigido al inicio de sesión...
+              Tu contraseña se ha actualizado correctamente. Serás redirigido al inicio de sesión en unos segundos...
             </CardDescription>
           </CardHeader>
         </Card>

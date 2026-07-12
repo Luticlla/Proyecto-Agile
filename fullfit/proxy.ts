@@ -65,6 +65,27 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  // 0.1. Bloquear miembros con membresía suspendida/cancelada — solo permitir /mi-membresia y /login
+  if (isSoloMiembro && profile?.activo !== false) {
+    const { data: sub } = await supabase
+      .from('suscripciones')
+      .select('estado')
+      .eq('usuario_id', user!.id)
+      .order('creado_en', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (sub && (sub.estado === 'suspendida' || sub.estado === 'cancelada')) {
+      const isAllowedBlocked = pathname.startsWith('/mi-membresia') ||
+        pathname.startsWith('/login')
+      if (!isAllowedBlocked) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/mi-membresia'
+        return NextResponse.redirect(url)
+      }
+    }
+  }
+
   // 1. Proteger rutas de recepcionista (solo rol_id === 2)
   if (pathname.startsWith('/recepcionista')) {
     if (!user) {

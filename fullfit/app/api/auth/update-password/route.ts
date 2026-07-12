@@ -32,6 +32,20 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServiceRoleClient()
 
+    // Verificar si la nueva contraseña es igual a la actual
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: payload.email as string,
+      password,
+    })
+
+    // Si el login es exitoso, la contraseña es la misma
+    if (!signInError) {
+      return NextResponse.json(
+        { error: 'La nueva contraseña no puede ser igual a la actual' },
+        { status: 400 }
+      )
+    }
+
     const { error } = await supabase.auth.admin.updateUserById(
       payload.userId as string,
       { password }

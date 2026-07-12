@@ -129,6 +129,13 @@ export function FormularioCrearUsuario({ isOpen, onClose, onSuccess }: Formulari
     }
   }
 
+  // ─── Limpiar datos RENIEC ──────────────────────────────────────────────────
+  const handleClearReniec = () => {
+    setFormData(prev => ({ ...prev, dni: '', nombre: '', apellido: '' }))
+    setReniecValidado(false)
+    setError(null)
+  }
+
   // ─── Condiciones para habilitar el botón Registrar ──────────────────────────
   const allConditionsMet =
     reniecValidado &&
@@ -177,6 +184,11 @@ export function FormularioCrearUsuario({ isOpen, onClose, onSuccess }: Formulari
       const data = await response.json()
 
       if (!response.ok) {
+        if (data.error?.includes('DNI ya está registrado')) {
+          toast.error('Este DNI ya está registrado en el sistema', {
+            description: 'Verifica el número e intenta con otro DNI'
+          })
+        }
         throw new Error(data.error || 'Error al crear el usuario')
       }
 
@@ -237,18 +249,24 @@ export function FormularioCrearUsuario({ isOpen, onClose, onSuccess }: Formulari
                 className={`bg-zinc-950 border-zinc-800 flex-1 ${reniecValidado ? 'opacity-60 cursor-not-allowed' : ''}`}
                 disabled={loading || validating || reniecValidado}
               />
-              <Button
-                type="button"
-                onClick={handleValidarReniec}
-                disabled={loading || validating || reniecValidado || formData.dni.length !== 8}
-                className="shrink-0 bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-40"
-              >
-                {validating
-                  ? <Loader2 className="size-4 animate-spin" />
-                  : reniecValidado
-                    ? <ShieldCheck className="size-4" />
-                    : 'Validar'}
-              </Button>
+              {reniecValidado ? (
+                <Button
+                  type="button"
+                  onClick={handleClearReniec}
+                  className="shrink-0 bg-red-600 hover:bg-red-500 text-white"
+                >
+                  <XCircle className="size-4" />
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={handleValidarReniec}
+                  disabled={loading || validating || formData.dni.length !== 8}
+                  className="shrink-0 bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-40"
+                >
+                  {validating ? <Loader2 className="size-4 animate-spin" /> : 'Validar'}
+                </Button>
+              )}
             </div>
           </div>
 

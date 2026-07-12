@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, ArrowLeft, ShieldCheck, CheckCircle2, XCircle, MailCheck, Eye, EyeOff } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import Link from 'next/link'
+import { toast } from 'sonner'
 
 // ─── Validaciones ────────────────────────────────────────────────────────────
 const validateEmail = (email: string) =>
@@ -118,6 +119,13 @@ export default function RegisterPage() {
     }
   }
 
+  // ─── Limpiar datos RENIEC ──────────────────────────────────────────────────
+  const handleClearReniec = () => {
+    setFormData(prev => ({ ...prev, dni: '', nombre: '', apellido: '' }))
+    setReniecValidado(false)
+    setError('')
+  }
+
   // ─── Condiciones para habilitar "Crear Cuenta" ────────────────────────────────
   const allConditionsMet =
     reniecValidado &&
@@ -197,6 +205,11 @@ export default function RegisterPage() {
     })
 
     if (error) {
+      if (error.message?.includes('DNI ya está registrado')) {
+        toast.error('Este DNI ya está registrado en el sistema', {
+          description: 'Verifica el número e intenta con otro DNI'
+        })
+      }
       setError(error.message)
       setLoading(false)
     } else {
@@ -309,20 +322,28 @@ export default function RegisterPage() {
                     reniecValidado ? 'opacity-60 cursor-not-allowed' : ''
                   }`}
                 />
-                <Button
-                  type="button"
-                  onClick={handleValidarReniec}
-                  disabled={loading || validating || reniecValidado || formData.dni.length !== 8}
-                  className="shrink-0 bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-40"
-                >
-                  {validating ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : reniecValidado ? (
-                    <ShieldCheck className="size-4" />
-                  ) : (
-                    'Validar'
-                  )}
-                </Button>
+                {reniecValidado ? (
+                  <Button
+                    type="button"
+                    onClick={handleClearReniec}
+                    className="shrink-0 bg-red-600 hover:bg-red-500 text-white"
+                  >
+                    <XCircle className="size-4" />
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={handleValidarReniec}
+                    disabled={loading || validating || formData.dni.length !== 8}
+                    className="shrink-0 bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-40"
+                  >
+                    {validating ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      'Validar'
+                    )}
+                  </Button>
+                )}
               </div>
             </div>
 
