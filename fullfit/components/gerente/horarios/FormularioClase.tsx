@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Loader2, Plus, Trash2, X } from 'lucide-react'
-import { useToast } from '@/components/ui/use-toast'
+import { toast } from 'sonner'
 
 interface FormularioClaseProps {
   claseExistente: any | null
@@ -25,7 +25,6 @@ const DIAS = [
 ]
 
 export default function FormularioClase({ claseExistente, onClose, onSuccess }: FormularioClaseProps) {
-  const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   
   const [clase, setClase] = useState({
@@ -102,10 +101,10 @@ export default function FormularioClase({ claseExistente, onClose, onSuccess }: 
         throw new Error(text || 'Error al guardar')
       }
 
-      toast({ title: `Clase ${claseExistente ? 'actualizada' : 'creada'} exitosamente` })
+      toast.success(`Clase ${claseExistente ? 'actualizada' : 'creada'} exitosamente`)
       onSuccess()
     } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' })
+      toast.error(error.message || 'Error al guardar')
     } finally {
       setLoading(false)
     }

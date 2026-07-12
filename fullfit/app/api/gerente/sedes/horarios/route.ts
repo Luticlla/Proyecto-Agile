@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/server'
 
 export async function PUT(request: Request) {
-  const supabase = createServerClient()
+  const supabase = createServiceRoleClient()
   
   // Basic Auth Check
   const { data: { user } } = await supabase.auth.getUser()

@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/server'
 import { updateClaseConHorarios, deleteClase } from '@/lib/supabase/queries/clases'
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
-  const supabase = createServerClient()
+  const supabase = createServiceRoleClient()
   
   // Basic Auth Check
   const { data: { user } } = await supabase.auth.getUser()
@@ -35,7 +35,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-  const supabase = createServerClient()
+  const supabase = createServiceRoleClient()
   
   // Basic Auth Check
   const { data: { user } } = await supabase.auth.getUser()

@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Plus, Trash2, Edit, Clock, CalendarDays } from 'lucide-react'
 import FormularioClase from './FormularioClase'
-import { useToast } from '@/components/ui/use-toast'
+import { toast } from 'sonner'
 
 interface GestorClasesProps {
   clases: any[]
@@ -14,7 +14,6 @@ interface GestorClasesProps {
 const DIAS_SEMANA = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
 
 export default function GestorClases({ clases, onReload }: GestorClasesProps) {
-  const { toast } = useToast()
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [claseEditar, setClaseEditar] = useState<any | null>(null)
   const [deletingId, setDeletingId] = useState<number | null>(null)
@@ -32,10 +31,10 @@ export default function GestorClases({ clases, onReload }: GestorClasesProps) {
       const res = await fetch(`/api/gerente/clases/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('Error al eliminar')
       
-      toast({ title: 'Clase eliminada exitosamente' })
+      toast.success('Clase eliminada exitosamente')
       onReload()
     } catch (error) {
-      toast({ title: 'Error', description: 'No se pudo eliminar la clase', variant: 'destructive' })
+      toast.error('No se pudo eliminar la clase')
     } finally {
       setDeletingId(null)
     }

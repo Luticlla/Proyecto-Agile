@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/server'
 import { getClasesConHorarios, createClaseConHorarios } from '@/lib/supabase/queries/clases'
 
 export async function GET() {
-  const supabase = createServerClient()
+  const supabase = createServiceRoleClient()
   const clases = await getClasesConHorarios(supabase)
   return NextResponse.json(clases)
 }
 
 export async function POST(request: Request) {
-  const supabase = createServerClient()
+  const supabase = createServiceRoleClient()
   
   // Basic Auth Check
   const { data: { user } } = await supabase.auth.getUser()
