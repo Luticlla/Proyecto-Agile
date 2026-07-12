@@ -231,10 +231,14 @@ export default function TerminosYCondicionesPage() {
                 </AccordionTrigger>
                 <AccordionContent className="px-6 pb-6">
                   <div className="text-zinc-300 space-y-3 text-sm leading-relaxed pl-11">
+                    <div className="bg-gym-logo/10 border border-gym-logo/30 rounded-lg p-4 my-4">
+                      <p className="text-gym-logo font-bold text-center text-sm">SOLO PERSONAS CON DNI PUEDEN REGISTRARSE Y ADQUIRIR UNA MEMBRESÍA</p>
+                      <p className="text-zinc-400 text-xs text-center mt-1">El registro está exclusivamente reservado para personas que posean Documento Nacional de Identidad (DNI) peruano. No se permite el registro con pasaporte, carnet de extranjería u otro documento de identidad.</p>
+                    </div>
                     <p><strong className="text-white">4.1.</strong> Para afiliarse a FULLFORMA, EL SOCIO debe cumplir con los siguientes requisitos obligatorios:</p>
                     <ol className="list-decimal list-inside space-y-2 ml-4">
                       <li>Ser <strong className="text-white">mayor de dieciocho (18) años de edad</strong> al momento del registro.</li>
-                      <li>Poseer un <strong className="text-white">Documento Nacional de Identidad (DNI)</strong> válido y vigente, con un número de ocho (8) dígitos.</li>
+                      <li>Poseer un <strong className="text-white">Documento Nacional de Identidad (DNI)</strong> peruano válido y vigente, con un número de ocho (8) dígitos.</li>
                       <li>Completar el formulario de registro con los <strong className="text-white">datos de registro</strong> solicitados: nombres, apellidos, DNI, correo electrónico, fecha de nacimiento, sexo/género.</li>
                       <li>Crear una contraseña segura con un mínimo de ocho (8) caracteres.</li>
                       <li>Aceptar de manera <strong className="text-white">expresa e inequívoca</strong> los presentes Términos y Condiciones.</li>
@@ -242,6 +246,7 @@ export default function TerminosYCondicionesPage() {
                     <p><strong className="text-white">4.2.</strong> La validación del DNI se realizará a través de RENIEC. Los datos de nombre y apellido quedarán bloqueados para su edición.</p>
                     <p><strong className="text-white">4.3.</strong> El registro no se considerará completo hasta que EL SOCIO haya confirmado su correo electrónico.</p>
                     <p><strong className="text-white">4.4.</strong> EL SOCIO declara que toda la información proporcionada es verdadera, completa y precisa. La falsedad podrá dar lugar a la cancelación inmediata de la membresía.</p>
+                    <p><strong className="text-white">4.5.</strong> <strong className="text-white">Queda estrictamente prohibido</strong> el registro y adquisición de membresías sin DNI peruano. Las personas que no cuenten con este documento no podrán acceder a los servicios de FULLFORMA bajo ninguna modalidad.</p>
                   </div>
                 </AccordionContent>
               </AccordionItem>
