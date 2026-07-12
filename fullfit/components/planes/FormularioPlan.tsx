@@ -109,7 +109,7 @@ export function FormularioPlan({ isOpen, onClose, onSuccess, plan }: FormularioP
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, nombre: formData.nombre.trim() }),
       })
 
       const data = await response.json()

@@ -60,6 +60,8 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
     const body: ActualizarPlanPayload = await request.json()
 
+    if (body.nombre !== undefined) body.nombre = body.nombre.trim()
+
     if (body.precio !== undefined && body.precio < 3) {
       return NextResponse.json({ error: 'El precio debe ser mayor a S/ 3.00' }, { status: 400 })
     }

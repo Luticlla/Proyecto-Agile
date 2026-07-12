@@ -73,7 +73,8 @@ export async function POST(request: NextRequest) {
     }
 
     const body: CrearPlanPayload = await request.json()
-    const { nombre, precio, duracion_dias } = body
+    const nombre = body.nombre?.trim()
+    const { precio, duracion_dias } = body
 
     if (!nombre || precio === undefined || !duracion_dias) {
       return NextResponse.json({ error: 'Faltan campos requeridos (nombre, precio, duracion_dias)' }, { status: 400 })
@@ -109,7 +110,7 @@ export async function POST(request: NextRequest) {
     const { data: newPlan, error: insertError } = await supabaseAdmin
       .from('planes_membresia')
       .insert({
-        nombre,
+        nombre: nombre,
         descripcion: body.descripcion || null,
         precio,
         duracion_dias,
