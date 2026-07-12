@@ -44,6 +44,7 @@ CREATE TABLE public.suscripciones (
   estado character varying NOT NULL DEFAULT 'activa'::character varying CHECK (estado::text = ANY (ARRAY['activa'::character varying, 'vencida'::character varying, 'cancelada'::character varying, 'suspendida'::character varying]::text[])),
   creado_por uuid NOT NULL,
   creado_en timestamp without time zone NOT NULL DEFAULT now(),
+  veces_pausada integer NOT NULL DEFAULT 0,
   CONSTRAINT suscripciones_pkey PRIMARY KEY (id),
   CONSTRAINT suscripciones_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.profiles(id),
   CONSTRAINT suscripciones_creado_por_fkey FOREIGN KEY (creado_por) REFERENCES public.profiles(id),

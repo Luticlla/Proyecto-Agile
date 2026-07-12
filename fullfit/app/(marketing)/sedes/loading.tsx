@@ -9,7 +9,7 @@ export default function SedesLoading() {
           <div className="flex flex-col items-center text-center gap-6">
             <Loader2 className="size-8 text-gym-logo animate-spin" />
             <p className="font-arcade text-white/40 text-xs uppercase tracking-wider">
-              Cargando sedes...
+              Cargando sede...
             </p>
           </div>
         </Container>

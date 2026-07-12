@@ -22,7 +22,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       .single()
 
     if (profile?.rol_id !== 1) {
-      return NextResponse.json({ error: 'Solo los administradores pueden actualizar sedes' }, { status: 403 })
+      return NextResponse.json({ error: 'Solo los administradores pueden actualizar sede' }, { status: 403 })
     }
 
     const body: ActualizarSedePayload = await request.json()
@@ -101,7 +101,7 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
       .single()
 
     if (profile?.rol_id !== 1) {
-      return NextResponse.json({ error: 'Solo los administradores pueden cambiar estado de sedes' }, { status: 403 })
+      return NextResponse.json({ error: 'Solo los administradores pueden cambiar estado de sede' }, { status: 403 })
     }
 
     const body = await request.json()
@@ -159,7 +159,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
       .single()
 
     if (profile?.rol_id !== 1) {
-      return NextResponse.json({ error: 'Solo los administradores pueden eliminar sedes' }, { status: 403 })
+      return NextResponse.json({ error: 'Solo los administradores pueden eliminar sede' }, { status: 403 })
     }
 
     const supabaseAdmin = createClient(

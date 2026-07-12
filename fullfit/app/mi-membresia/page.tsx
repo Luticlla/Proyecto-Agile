@@ -385,7 +385,7 @@ export default function MiMembresiaPage() {
         <p className="text-center font-mono text-white/30 text-xs md:text-sm">
           ¿Necesitas ayuda?{' '}
           <Link href="/sedes" className="text-gym-logo hover:underline">
-            Visítanos en nuestras sedes
+            Visítanos en nuestra sede
           </Link>{' '}
           o llama al{' '}
           <span className="text-white/50">(01) 555-1234</span>

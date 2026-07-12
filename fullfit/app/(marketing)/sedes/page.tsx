@@ -4,8 +4,8 @@ import Container from '@/components/layout/Container'
 import SedesClient from '@/components/features/sedes/SedesClient'
 
 export const metadata = {
-  title: 'Sedes | FULLFORMA',
-  description: 'Encuentra tu FULLFORMA más cercano. Múltiples sedes en Trujillo con equipamiento de primera.',
+  title: 'Sede | FULLFORMA',
+  description: 'Encuentra tu FULLFORMA más cercano. Nuestra sede en Trujillo con equipamiento de primera.',
 }
 
 async function getSedes() {
@@ -54,22 +54,22 @@ const SedesPage = async () => {
             </div>
 
             <h1 className="font-arcade text-white text-xl md:text-3xl lg:text-4xl tracking-wide uppercase leading-relaxed">
-              Nuestras{' '}
+              Nuestra{' '}
               <span className="text-gym-logo [text-shadow:0_0_20px_rgba(255,223,0,0.5)]">
-                Sedes
+                Sede
               </span>
             </h1>
 
             <p className="text-white/60 text-xs md:text-sm max-w-lg leading-relaxed font-mono">
               Múltiples puntos de entrenamiento en Trujillo.{' '}
-              <span className="text-gym-logo/80">Tu membresía, todas las sedes.</span>
+              <span className="text-gym-logo/80">Tu membresía, toda la sede.</span>
             </p>
 
             {/* Stats bar */}
             <div className="flex items-center gap-8 md:gap-16 mt-4 pt-4 border-t border-white/10 w-full max-w-sm md:max-w-md justify-center">
               <div className="flex flex-col items-center gap-1">
                 <span className="font-arcade text-gym-logo text-lg md:text-2xl">{sedes.length}</span>
-                <span className="text-white/40 text-[8px] md:text-[10px] font-arcade uppercase tracking-wider">Sedes</span>
+                <span className="text-white/40 text-[8px] md:text-[10px] font-arcade uppercase tracking-wider">Sede</span>
               </div>
               <div className="h-8 w-px bg-white/10" />
               <div className="flex flex-col items-center gap-1">

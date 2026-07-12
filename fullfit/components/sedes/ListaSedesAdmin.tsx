@@ -52,7 +52,7 @@ export function ListaSedesAdmin({ sedes, loading, onEditar, onToggleEstado, onEl
     return (
       <div className="text-center py-12 text-zinc-400 rounded-lg border border-zinc-800 bg-zinc-900/30">
         <p className="text-lg font-medium">Sin resultados</p>
-        <p className="text-sm text-zinc-500 mt-1">No se encontraron sedes con los filtros actuales</p>
+        <p className="text-sm text-zinc-500 mt-1">No se encontró sede con los filtros actuales</p>
       </div>
     )
   }

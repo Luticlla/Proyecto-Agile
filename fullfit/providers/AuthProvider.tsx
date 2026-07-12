@@ -2,6 +2,7 @@
 
 import { useState, useEffect, createContext, useContext, ReactNode, useRef, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
+import { useInactivityLogout } from '@/hooks/useInactivityLogout'
 import type { Profile } from '@/lib/supabase/types'
 import type { User, Session } from '@supabase/supabase-js'
 
@@ -203,6 +204,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(profileData)
     }
   }
+
+  useInactivityLogout(session)
 
   return (
     <AuthContext.Provider value={{ user, session, profile, loading, isRecovery, signUp, signIn, signOut, resetPassword, updatePassword, refreshProfile }}>

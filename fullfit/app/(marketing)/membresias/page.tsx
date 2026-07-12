@@ -6,7 +6,7 @@ import { ListaPlanesMembresia } from '@/components/membresias'
 
 export const metadata = {
   title: 'Membresías | FULLFORMA',
-  description: 'Elige tu plan de entrenamiento. Acceso a todas nuestras sedes en Trujillo.',
+  description: 'Elige tu plan de entrenamiento. Acceso a toda nuestra sede en Trujillo.',
 }
 
 async function getPlanes() {
@@ -60,7 +60,7 @@ const MembresiasPage = async () => {
             </h1>
 
             <p className="text-white/60 text-xs md:text-sm max-w-lg leading-relaxed font-mono">
-              Entrena sin límites en cualquiera de nuestras sedes.{' '}
+              Entrena sin límites en nuestra sede.{' '}
               <span className="text-gym-logo/80">Sin contratos largos, cancela cuando quieras.</span>
             </p>
 
@@ -100,7 +100,7 @@ const MembresiasPage = async () => {
             <p className="text-white/40 text-xs md:text-sm font-mono">
               ¿Tienes dudas sobre qué plan elegir?{' '}
               <Link href="/sedes" className="text-gym-logo hover:underline">
-                Visítanos en cualquiera de nuestras sedes
+                Visítanos en nuestra sede
               </Link>
             </p>
           </div>

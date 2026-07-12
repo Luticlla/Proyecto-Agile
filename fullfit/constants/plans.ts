@@ -1,19 +1,19 @@
 export const planFeatures: Record<string, string[]> = {
   'Mensual': [
-    'Acceso a todas las sedes',
+    'Acceso a toda la sede',
     'Área de pesas y máquinas',
     'Vestuarios y locker',
     'App de seguimiento',
   ],
   'Trimestral': [
-    'Acceso a todas las sedes',
+    'Acceso a toda la sede',
     'Área de pesas y máquinas',
     'Clases grupales ilimitadas',
     'App de seguimiento',
     'Evaluación corporal mensual',
   ],
   'Anual': [
-    'Acceso a todas las sedes',
+    'Acceso a toda la sede',
     'Área de pesas y máquinas',
     'Clases grupales ilimitadas',
     'App de seguimiento',

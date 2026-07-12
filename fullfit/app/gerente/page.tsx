@@ -14,8 +14,8 @@ const cards = [
   {
     href: '/gerente/sedes',
     icon: Building2,
-    title: 'Gestión de Sedes',
-    description: 'Administra las sedes del gimnasio. Horarios, contacto, imágenes y visibilidad pública.',
+    title: 'Gestión de Sede',
+    description: 'Administra la sede del gimnasio. Horarios, contacto, imágenes y visibilidad pública.',
     color: 'from-emerald-500/20 to-emerald-600/10 border-emerald-500/20',
     iconColor: 'text-emerald-400',
     badgeColor: 'bg-emerald-500/10 text-emerald-400',

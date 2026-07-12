@@ -188,7 +188,7 @@ const SedesClient = ({ sedes }: SedesClientProps) => {
             Próximamente
           </p>
           <p className="font-arcade text-white/40 text-xs uppercase tracking-wider">
-            Estamos preparando nuestras sedes para ti
+            Estamos preparando nuestra sede para ti
           </p>
         </div>
       </Container>

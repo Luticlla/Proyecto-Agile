@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Error obteniendo sedes:', error)
-      return NextResponse.json({ error: 'Error al obtener sedes' }, { status: 500 })
+      return NextResponse.json({ error: 'Error al obtener sede' }, { status: 500 })
     }
 
     return NextResponse.json({
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (profile?.rol_id !== 1) {
-      return NextResponse.json({ error: 'Solo los administradores pueden crear sedes' }, { status: 403 })
+      return NextResponse.json({ error: 'Solo los administradores pueden crear sede' }, { status: 403 })
     }
 
     const body: CrearSedePayload = await request.json()
