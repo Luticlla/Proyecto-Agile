@@ -127,6 +127,12 @@ const params = useParams()
       }
       verificarPago()
     }
+
+    if (paymentStatus === 'failed') {
+      alert('Transacción no completada - El pago no fue procesado')
+      router.replace(`/recepcionista/clientes/${params.id}`)
+      await fetchCliente()
+    }
   }, [paymentStatus, paymentId, params.id, cliente, router, fetchCliente])
 
   const handleShowMembresiaForm = () => {

@@ -5,6 +5,7 @@ import { generarBoletaBase64, calcularIGV, obtenerSiguienteComprobante, formatea
 import { montoEnLetras } from '@/lib/utils/numero-a-letras'
 import { requireAuthenticatedRecepcionista } from '@/lib/auth/api-guard'
 import { createServiceRoleClient } from '@/lib/supabase/server'
+import { parsearFechaLima } from '@/lib/utils'
 import type { RenovarMembresiaDTO, BoletaData, BoletaItem } from '@/lib/supabase/queries/membresias.types'
 
 export async function POST(
@@ -50,6 +51,72 @@ export async function POST(
       )
     }
 
+    if (metodo_pago === 'mercadopago') {
+      const { data: plan } = await supabase
+        .from('planes_membresia')
+        .select('*')
+        .eq('id', plan_id)
+        .eq('activo', true)
+        .single()
+
+      if (!plan) {
+        return NextResponse.json(
+          { error: 'Plan no encontrado o inactivo' },
+          { status: 404 }
+        )
+      }
+
+      const { data: membresia } = await supabase
+        .from('suscripciones')
+        .select('usuario_id, fecha_fin')
+        .eq('id', membresiaId)
+        .single()
+
+      if (!membresia) {
+        return NextResponse.json(
+          { error: 'Membresía no encontrada' },
+          { status: 404 }
+        )
+      }
+
+      const fechaFinActual = parsearFechaLima(membresia.fecha_fin)
+      const nuevaFin = new Date(fechaFinActual)
+      nuevaFin.setDate(nuevaFin.getDate() + plan.duracion_dias)
+      const fechaInicio = membresia.fecha_fin
+      const fechaFin = nuevaFin.toISOString().split('T')[0]
+
+      const preferenceResult = await crearPreferenciaPago({
+        planId: plan_id,
+        planNombre: plan.nombre,
+        userId: membresia.usuario_id,
+        monto: Number(plan.precio),
+        siteUrl: request.nextUrl.origin,
+        returnTo: return_to,
+        metadata: {
+          plan_id: String(plan_id),
+          user_id: membresia.usuario_id,
+          fecha_inicio: fechaInicio,
+          fecha_fin: fechaFin,
+          dias_restantes: '0',
+          tipo: 'renovacion',
+          suscripcion_id: String(membresiaId),
+        }
+      })
+
+      if (!preferenceResult.init_point) {
+        return NextResponse.json(
+          { error: preferenceResult.error || 'Error al crear preferencia de pago' },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({
+        success: true,
+        init_point: preferenceResult.init_point
+      })
+    }
+
+    // Para efectivo: flujo original (renovarMembresia + boleta)
     const dto: RenovarMembresiaDTO = {
       plan_id,
       metodo_pago,
@@ -72,40 +139,6 @@ export async function POST(
       registro_id: membresiaId,
       detalle: { accion: 'renovar', membresia_id: membresiaId, plan_id }
     })
-
-    if (metodo_pago === 'mercadopago') {
-      const { data: plan } = await supabase
-        .from('planes_membresia')
-        .select('nombre')
-        .eq('id', plan_id)
-        .single()
-
-      const { data: membresia } = await supabase
-        .from('suscripciones')
-        .select('usuario_id')
-        .eq('id', membresiaId)
-        .single()
-
-      const preferenceResult = await crearPreferenciaPago({
-        planId: plan_id,
-        planNombre: plan?.nombre || '',
-        userId: membresia?.usuario_id || '',
-        monto,
-        siteUrl: request.nextUrl.origin,
-        returnTo: return_to,
-        metadata: {
-          plan_id: String(plan_id),
-          user_id: membresia?.usuario_id || '',
-          suscripcion_id: String(membresiaId),
-          tipo: 'renovacion'
-        }
-      })
-
-      return NextResponse.json({
-        success: true,
-        init_point: preferenceResult.init_point
-      })
-    }
 
     if (metodo_pago === 'efectivo') {
       const { data: plan } = await supabase

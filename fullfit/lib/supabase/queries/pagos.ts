@@ -57,6 +57,7 @@ export async function processPaymentActivation(
 
   const userId = metadata.user_id
   const planId = Number(metadata.plan_id)
+  const registradoPor = metadata.registrado_por || userId
 
   const { data: perfil } = await supabaseAdmin
     .from('profiles')
@@ -115,7 +116,7 @@ export async function processPaymentActivation(
       estado: 'completado',
       referencia,
       observaciones: `Extensión de membresía - ${plan.duracion_dias} días añadidos`,
-      registrado_por: userId,
+      registrado_por: registradoPor,
     })
 
     await supabaseAdmin.from('notificaciones').insert({
@@ -140,7 +141,7 @@ export async function processPaymentActivation(
       fecha_inicio: getFechaLima(),
       fecha_fin: formatearFechaLima(fechaFin),
       estado: 'activa',
-      creado_por: userId,
+      creado_por: registradoPor,
     })
     .select('id')
     .maybeSingle()
@@ -158,7 +159,7 @@ export async function processPaymentActivation(
     estado: 'completado',
     referencia,
     observaciones: `MercadoPago - ${payment.payment_type_id}`,
-    registrado_por: userId,
+    registrado_por: registradoPor,
   })
 
   await supabaseAdmin.from('notificaciones').insert({

@@ -5,6 +5,8 @@ import { generarBoletaBase64, calcularIGV, obtenerSiguienteComprobante, formatea
 import { montoEnLetras } from '@/lib/utils/numero-a-letras'
 import { requireAuthenticatedRecepcionista } from '@/lib/auth/api-guard'
 import { createServiceRoleClient } from '@/lib/supabase/server'
+import { getFechaLima, parsearFechaLima } from '@/lib/utils'
+import { calcularDiasRestantes } from '@/lib/utils/dates'
 import type { RegistrarMembresiaDTO, BoletaData, BoletaItem } from '@/lib/supabase/queries/membresias.types'
 
 export async function GET(request: NextRequest) {
@@ -81,33 +83,73 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (metodo_pago === 'mercadopago' && result.pago) {
+    if (metodo_pago === 'mercadopago') {
+      // Flujo MercadoPago: NO crear suscripción/pago en DB, solo preferencia (igual que /api/pagos)
       const { data: plan } = await supabase
         .from('planes_membresia')
-        .select('nombre')
+        .select('*')
         .eq('id', plan_id)
+        .eq('activo', true)
         .single()
 
+      if (!plan) {
+        return NextResponse.json(
+          { error: 'Plan no encontrado o inactivo' },
+          { status: 404 }
+        )
+      }
+
+      // Verificar si hay membresía activa para calcular fechas (igual que /api/pagos)
+      const { data: membresiaActiva } = await supabase
+        .from('suscripciones')
+        .select('fecha_fin')
+        .eq('usuario_id', usuario_id)
+        .eq('estado', 'activa')
+        .order('fecha_fin', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      let fechaInicio = getFechaLima()
+      let fechaFin = getFechaLima()
+      let diasRestantes = 0
+
+      if (membresiaActiva) {
+        const diffDias = calcularDiasRestantes(membresiaActiva.fecha_fin, getFechaLima())
+        if (diffDias > 0) {
+          diasRestantes = diffDias
+          const fechaFinActual = parsearFechaLima(membresiaActiva.fecha_fin)
+          const nuevaFin = new Date(fechaFinActual)
+          nuevaFin.setDate(nuevaFin.getDate() + plan.duracion_dias)
+          fechaInicio = membresiaActiva.fecha_fin
+          fechaFin = nuevaFin.toISOString().split('T')[0]
+        }
+      }
+
       const preferenceResult = await crearPreferenciaPago({
-        planId: plan_id,
-        planNombre: plan?.nombre || '',
+        planId: plan.id,
+        planNombre: plan.nombre,
         userId: usuario_id,
-        monto,
+        monto: Number(plan.precio),
         siteUrl: request.nextUrl.origin,
         returnTo: return_to,
         metadata: {
-          plan_id: String(plan_id),
+          plan_id: String(plan.id),
           user_id: usuario_id,
-          suscripcion_id: String(result.suscripcion?.id),
-          pago_id: String(result.pago?.id),
+          fecha_inicio: fechaInicio,
+          fecha_fin: fechaFin,
+          dias_restantes: String(diasRestantes),
+          registrado_por: user.id,
         }
       })
 
-      return NextResponse.json({
-        suscripcion: result.suscripcion,
-        pago: result.pago,
-        init_point: preferenceResult.init_point
-      })
+      if (!preferenceResult.init_point) {
+        return NextResponse.json(
+          { error: preferenceResult.error || 'Error al crear preferencia de pago' },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({ init_point: preferenceResult.init_point })
     }
 
     if (metodo_pago === 'efectivo' && result.pago) {
