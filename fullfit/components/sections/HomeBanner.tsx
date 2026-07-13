@@ -62,9 +62,6 @@ const HomeBanner = () => {
         />  
         <InscribiteButton />
       </div>
-      <p className="font-arcade text-gym-logo text-[8px] md:text-xs tracking-widest uppercase text-center mt-3">
-        Te ayudamos en nuestros horarios
-      </p>
     </section>
   )
 }
