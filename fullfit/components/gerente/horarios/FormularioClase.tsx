@@ -7,10 +7,11 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Loader2, Plus, Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
+
 interface FormularioClaseProps {
   claseExistente: any | null
   onClose: () => void
-  onSuccess: () => void
   sede: any | null
 }
 
@@ -73,7 +74,8 @@ function validarHorariosDentroDelGymClient(
   return null
 }
 
-export default function FormularioClase({ claseExistente, onClose, onSuccess, sede }: FormularioClaseProps) {
+export default function FormularioClase({ claseExistente, onClose, sede }: FormularioClaseProps) {
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   
 const [clase, setClase] = useState({
@@ -159,7 +161,8 @@ const [clase, setClase] = useState({
       }
 
       toast.success(`Clase ${claseExistente ? 'actualizada' : 'creada'} exitosamente`)
-      onSuccess()
+      router.refresh()
+      onClose()
     } catch (error: any) {
       toast.error('Error', { description: error.message })
     } finally {

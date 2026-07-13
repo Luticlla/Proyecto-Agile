@@ -6,13 +6,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2, Save } from 'lucide-react'
 import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 interface ConfiguracionGymProps {
   sede: any
-  onReload: () => void
 }
 
-export default function ConfiguracionGym({ sede, onReload }: ConfiguracionGymProps) {
+export default function ConfiguracionGym({ sede }: ConfiguracionGymProps) {
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     apertura_lv: sede.apertura_lv || '06:00',
@@ -54,7 +55,7 @@ export default function ConfiguracionGym({ sede, onReload }: ConfiguracionGymPro
       toast.success('Horarios actualizados', {
         description: 'El horario general de la sede ha sido guardado.',
       })
-      onReload()
+      router.refresh()
     } catch (error) {
       toast.error('No se pudieron guardar los horarios.')
     } finally {

@@ -5,16 +5,17 @@ import { Button } from '@/components/ui/button'
 import { Plus, Trash2, Edit, Clock, CalendarDays } from 'lucide-react'
 import FormularioClase from './FormularioClase'
 import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 interface GestorClasesProps {
   clases: any[]
-  onReload: () => void
   sede: any | null
 }
 
 const DIAS_SEMANA = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
 
-export default function GestorClases({ clases, onReload, sede }: GestorClasesProps) {
+export default function GestorClases({ clases, sede }: GestorClasesProps) {
+  const router = useRouter()
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [claseEditar, setClaseEditar] = useState<any | null>(null)
   const [deletingId, setDeletingId] = useState<number | null>(null)
@@ -33,7 +34,7 @@ export default function GestorClases({ clases, onReload, sede }: GestorClasesPro
       if (!res.ok) throw new Error('Error al eliminar')
       
       toast.success('Clase eliminada exitosamente')
-      onReload()
+      router.refresh()
     } catch (error) {
       toast.error('No se pudo eliminar la clase')
     } finally {
@@ -139,10 +140,6 @@ export default function GestorClases({ clases, onReload, sede }: GestorClasesPro
         <FormularioClase
           claseExistente={claseEditar}
           onClose={() => setIsFormOpen(false)}
-          onSuccess={() => {
-            setIsFormOpen(false)
-            onReload()
-          }}
           sede={sede}
         />
       )}
