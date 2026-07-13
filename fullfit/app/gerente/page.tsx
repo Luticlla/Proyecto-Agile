@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Users, Building2, CreditCard, ArrowRight, Dumbbell } from 'lucide-react'
+import { Users, Building2, CreditCard, ArrowRight, Dumbbell, CalendarDays } from 'lucide-react'
 
 const cards = [
   {
@@ -9,7 +9,6 @@ const cards = [
     description: 'Gestiona administradores y recepcionistas. Crea, edita y activa/desactiva cuentas.',
     color: 'from-blue-500/20 to-blue-600/10 border-blue-500/20',
     iconColor: 'text-blue-400',
-    badgeColor: 'bg-blue-500/10 text-blue-400',
   },
   {
     href: '/gerente/sedes',
@@ -18,7 +17,6 @@ const cards = [
     description: 'Administra la sede del gimnasio. Horarios, contacto, imágenes y visibilidad pública.',
     color: 'from-emerald-500/20 to-emerald-600/10 border-emerald-500/20',
     iconColor: 'text-emerald-400',
-    badgeColor: 'bg-emerald-500/10 text-emerald-400',
   },
   {
     href: '/gerente/planes',
@@ -27,7 +25,14 @@ const cards = [
     description: 'Configura los planes disponibles para los socios. Precios, duración y beneficios.',
     color: 'from-yellow-500/20 to-yellow-600/10 border-yellow-500/20',
     iconColor: 'text-yellow-400',
-    badgeColor: 'bg-yellow-500/10 text-yellow-400',
+  },
+  {
+    href: '/gerente/horarios',
+    icon: CalendarDays,
+    title: 'Horarios y Clases',
+    description: 'Gestiona el horario general del gimnasio y el calendario de clases grupales.',
+    color: 'from-purple-500/20 to-purple-600/10 border-purple-500/20',
+    iconColor: 'text-purple-400',
   },
 ]
 
@@ -48,7 +53,7 @@ export default function GerentePage() {
       </div>
 
       {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         {cards.map(({ href, icon: Icon, title, description, color, iconColor }) => (
           <Link key={href} href={href} className="group">
             <div className={`relative rounded-xl border bg-gradient-to-b ${color} p-6 h-full flex flex-col gap-4 hover:scale-[1.02] transition-all duration-200 hover:shadow-lg hover:shadow-black/20`}>

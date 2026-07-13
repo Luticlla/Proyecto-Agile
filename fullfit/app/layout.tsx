@@ -3,6 +3,7 @@ import "./globals.css";
 import { JetBrains_Mono, Press_Start_2P } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/hooks";
+import { Toaster } from "@/components/ui/sonner";
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
 const pressStart2P = Press_Start_2P({

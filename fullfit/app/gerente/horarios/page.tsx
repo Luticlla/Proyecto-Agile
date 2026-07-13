@@ -15,14 +15,15 @@ export default function HorariosPage() {
     setLoading(true)
     try {
       const [resSedes, resClases] = await Promise.all([
-        fetch('/api/sedes'), // Assuming this returns the active sede(s)
+        fetch('/api/sedes', { credentials: 'include' }),
         fetch('/api/gerente/clases')
       ])
       
       const sedesData = await resSedes.json()
-      // Use the first active sede
-      if (sedesData && sedesData.length > 0) {
-        setSede(sedesData[0])
+      // /api/sedes returns { data: [...], count, page, totalPages }
+      const sedesArray = sedesData?.data ?? sedesData
+      if (Array.isArray(sedesArray) && sedesArray.length > 0) {
+        setSede(sedesArray[0])
       }
 
       const clasesData = await resClases.json()
