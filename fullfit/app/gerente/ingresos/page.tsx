@@ -38,10 +38,11 @@ function formatFecha(fecha: Date, filtro: FiltroPeriodo): string {
     case 'dia':
       return fecha.toLocaleDateString('es-PE', { ...opciones, weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
     case 'semana': {
-      const inicio = new Date(fecha)
-      const diaSemana = fecha.getDay()
+      const fechaLima = new Date(fecha.toLocaleString('en-US', { timeZone: 'America/Lima' }))
+      const diaSemana = fechaLima.getDay()
       const diffLunes = diaSemana === 0 ? -6 : 1 - diaSemana
-      inicio.setDate(fecha.getDate() + diffLunes)
+      const inicio = new Date(fechaLima)
+      inicio.setDate(fechaLima.getDate() + diffLunes)
       const fin = new Date(inicio)
       fin.setDate(inicio.getDate() + 6)
       return `${inicio.toLocaleDateString('es-PE', { ...opciones, day: 'numeric', month: 'short' })} - ${fin.toLocaleDateString('es-PE', { ...opciones, day: 'numeric', month: 'short', year: 'numeric' })}`

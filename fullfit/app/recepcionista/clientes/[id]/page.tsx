@@ -355,7 +355,7 @@ const params = useParams()
               <Button
                 variant="outline"
                 onClick={() => setShowMembresiaForm(false)}
-                className="border-white/10 text-white/40 hover:bg-white/5 hover:text-white font-mono text-xs uppercase tracking-wider"
+                className="border-white/10 text-white/70 hover:bg-white/5 hover:text-white font-mono text-xs uppercase tracking-wider"
               >
                 Cancelar
               </Button>

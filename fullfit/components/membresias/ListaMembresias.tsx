@@ -93,7 +93,7 @@ export function ListaMembresias({
           <Button
             onClick={handleSearch}
             variant="outline"
-            className="border-white/10 text-white hover:bg-white/5 font-mono text-xs uppercase"
+            className="border-white/20 text-white hover:bg-white/10 font-mono text-xs uppercase"
           >
             Buscar
           </Button>

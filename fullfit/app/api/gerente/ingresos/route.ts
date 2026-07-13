@@ -4,44 +4,42 @@ import { createClient } from '@supabase/supabase-js'
 
 type FiltroPeriodo = 'dia' | 'semana' | 'mes' | 'anio'
 
-// Peru offset: UTC-5 (no DST)
-const PERU_OFFSET_HOURS = 5
+function pad(n: number): string {
+  return n.toString().padStart(2, '0')
+}
 
-function calcularRangoFechas(filtro: FiltroPeriodo, fechaPeru: string): { inicio: Date; fin: Date } {
+function calcularRangoFechas(filtro: FiltroPeriodo, fechaPeru: string): { inicio: string; fin: string } {
   const [year, month, day] = fechaPeru.split('-').map(Number)
 
   switch (filtro) {
     case 'dia': {
-      // Midnight Peru = 05:00 UTC
-      const inicio = new Date(Date.UTC(year, month - 1, day, PERU_OFFSET_HOURS, 0, 0, 0))
-      // Next day 04:59:59.999 UTC = end of day Peru
-      const fin = new Date(Date.UTC(year, month - 1, day + 1, PERU_OFFSET_HOURS - 1, 59, 59, 999))
+      const inicio = `${year}-${pad(month)}-${pad(day)} 00:00:00`
+      const fin = `${year}-${pad(month)}-${pad(day)} 23:59:59.999`
       return { inicio, fin }
     }
     case 'semana': {
-      // Create date at midnight Peru, then find Monday
-      const fechaUTC = new Date(Date.UTC(year, month - 1, day, PERU_OFFSET_HOURS, 0, 0, 0))
-      const diaSemana = fechaUTC.getUTCDay() // 0=Sunday
+      const refDate = new Date(year, month - 1, day)
+      const diaSemana = refDate.getDay()
       const diffLunes = diaSemana === 0 ? -6 : 1 - diaSemana
-      const inicio = new Date(Date.UTC(year, month - 1, day + diffLunes, PERU_OFFSET_HOURS, 0, 0, 0))
-      const fin = new Date(Date.UTC(year, month - 1, day + diffLunes + 6, PERU_OFFSET_HOURS - 1, 59, 59, 999))
+      const lunes = new Date(year, month - 1, day + diffLunes)
+      const domingo = new Date(lunes)
+      domingo.setDate(lunes.getDate() + 6)
+      const inicio = `${lunes.getFullYear()}-${pad(lunes.getMonth() + 1)}-${pad(lunes.getDate())} 00:00:00`
+      const fin = `${domingo.getFullYear()}-${pad(domingo.getMonth() + 1)}-${pad(domingo.getDate())} 23:59:59.999`
       return { inicio, fin }
     }
     case 'mes': {
-      const inicio = new Date(Date.UTC(year, month - 1, 1, PERU_OFFSET_HOURS, 0, 0, 0))
-      const fin = new Date(Date.UTC(year, month, 0, PERU_OFFSET_HOURS - 1, 59, 59, 999))
+      const inicio = `${year}-${pad(month)}-01 00:00:00`
+      const ultimoDia = new Date(year, month, 0).getDate()
+      const fin = `${year}-${pad(month)}-${pad(ultimoDia)} 23:59:59.999`
       return { inicio, fin }
     }
     case 'anio': {
-      const inicio = new Date(Date.UTC(year, 0, 1, PERU_OFFSET_HOURS, 0, 0, 0))
-      const fin = new Date(Date.UTC(year, 11, 31, PERU_OFFSET_HOURS - 1, 59, 59, 999))
+      const inicio = `${year}-01-01 00:00:00`
+      const fin = `${year}-12-31 23:59:59.999`
       return { inicio, fin }
     }
   }
-}
-
-function formatearFechaISO(fechaPeru: string): string {
-  return fechaPeru
 }
 
 export async function GET(request: NextRequest) {
@@ -60,6 +58,8 @@ export async function GET(request: NextRequest) {
 
     const fechaPeru = fechaParam || new Intl.DateTimeFormat('sv-SE', { timeZone: 'America/Lima' }).format(new Date())
     const { inicio, fin } = calcularRangoFechas(filtro, fechaPeru)
+    const fechaInicio = inicio.split(' ')[0]
+    const fechaFin = fin.split(' ')[0]
 
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -73,8 +73,8 @@ export async function GET(request: NextRequest) {
         registrado_por:profiles!pagos_registrado_por_fkey(id, nombre, apellido, rol_id)
       `)
       .eq('estado', 'completado')
-      .gte('fecha_pago', inicio.toISOString())
-      .lte('fecha_pago', fin.toISOString())
+      .gte('fecha_pago', inicio)
+      .lte('fecha_pago', fin)
 
     if (error) {
       console.error('Error obteniendo ingresos:', error)
@@ -128,8 +128,8 @@ export async function GET(request: NextRequest) {
         totalRecepcionistas: dataResultado.length,
       },
       filtro,
-      fechaInicio: formatearFechaISO(fechaPeru),
-      fechaFin: formatearFechaISO(fechaPeru),
+      fechaInicio,
+      fechaFin,
     })
   } catch (error: any) {
     console.error('Error en GET /api/gerente/ingresos:', error)
