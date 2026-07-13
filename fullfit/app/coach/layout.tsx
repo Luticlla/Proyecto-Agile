@@ -60,8 +60,8 @@ export default function CoachLayout({
     )
   }
 
-  // Solo coaches (rol_id = 4) acceden a esta ruta
-  if (profile.rol_id !== 4) {
+  // Solo coaches (rol_id = 5) acceden a esta ruta
+  if (profile.rol_id !== 5) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="text-center space-y-4">

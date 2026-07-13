@@ -44,9 +44,9 @@ USING (
   public.get_user_role(auth.uid()) IN (1, 2)
   -- Cualquier usuario ve su propio perfil
   OR id = auth.uid()
-  -- Coach (4): ve clientes (rol 3) con membresia grupal activa
+  -- Coach (5): ve clientes (rol 3) con membresia grupal activa
   OR (
-    public.get_user_role(auth.uid()) = 4
+    public.get_user_role(auth.uid()) = 5
     AND rol_id = 3
     AND id IN (SELECT public.get_coach_client_ids())
   )
@@ -60,7 +60,7 @@ DROP POLICY IF EXISTS "coach_select_suscripciones" ON public.suscripciones;
 CREATE POLICY "coach_select_suscripciones" ON public.suscripciones
 FOR SELECT TO authenticated
 USING (
-  public.get_user_role(auth.uid()) = 4
+  public.get_user_role(auth.uid()) = 5
   AND usuario_id IN (SELECT public.get_coach_client_ids())
 );
 

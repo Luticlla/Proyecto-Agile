@@ -359,7 +359,7 @@ export function FormularioCrearUsuario({ isOpen, onClose, onSuccess }: Formulari
               </SelectTrigger>
               <SelectContent className="bg-zinc-900 border-zinc-800">
                 <SelectItem value="2" className="text-white hover:bg-zinc-800">Recepcionista</SelectItem>
-                <SelectItem value="4" className="text-white hover:bg-zinc-800">Coach</SelectItem>
+                <SelectItem value="5" className="text-white hover:bg-zinc-800">Coach</SelectItem>
               </SelectContent>
             </Select>
           </div>
