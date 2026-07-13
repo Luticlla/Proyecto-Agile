@@ -44,11 +44,16 @@ function PaymentSummary({ plan, prices, features }: {
   )
 }
 
-function PaymentStatus({ status, verificationResult, verificationLoading }: { 
+function PaymentStatus({ status, verificationResult, verificationLoading, profile }: { 
   status: string
   verificationResult: { success: boolean; message?: string; error?: string } | null
   verificationLoading: boolean
+  profile: { rol_id: number } | null
 }) {
+  const isRecepcionista = profile?.rol_id === 2
+  const homeLink = isRecepcionista ? '/recepcionista' : '/'
+  const homeLinkText = isRecepcionista ? 'Volver al panel' : 'Volver al inicio'
+
   const config: Record<string, { title: string; desc: string; color: string }> = {
     approved: { title: '¡Pago aprobado!', desc: 'Tu membresía está activa.', color: 'text-green-400' },
     rejected: { title: 'Pago no procesado', desc: 'El pago no pudo ser completado.', color: 'text-red-400' },
@@ -89,9 +94,9 @@ function PaymentStatus({ status, verificationResult, verificationLoading }: {
         <CardContent className="flex flex-col items-center gap-4 pt-6">
           <h2 className="font-arcade text-xl text-green-400">¡Membresía activada!</h2>
           <p className="text-white/60 text-sm font-mono text-center">{verificationResult.message || 'Tu membresía está activa.'}</p>
-          <Link href="/">
+          <Link href={homeLink}>
             <Button className="font-arcade bg-gym-logo text-black hover:bg-gym-logo/80">
-              Volver al inicio
+              {homeLinkText}
             </Button>
           </Link>
         </CardContent>
@@ -104,9 +109,9 @@ function PaymentStatus({ status, verificationResult, verificationLoading }: {
       <CardContent className="flex flex-col items-center gap-4 pt-6">
         <h2 className={`font-arcade text-xl ${color}`}>{title}</h2>
         <p className="text-white/60 text-sm font-mono text-center">{desc}</p>
-        <Link href="/">
+        <Link href={homeLink}>
           <Button className="font-arcade bg-gym-logo text-black hover:bg-gym-logo/80">
-            Volver al inicio
+            {homeLinkText}
           </Button>
         </Link>
       </CardContent>
@@ -263,6 +268,7 @@ function PasarelaPagoContent() {
             status={status} 
             verificationResult={verificationResult} 
             verificationLoading={verificationLoading}
+            profile={{ rol_id: 3 }} // Default fallback, actual profile will come from useAuth in the component
           />
         </Container>
       </main>

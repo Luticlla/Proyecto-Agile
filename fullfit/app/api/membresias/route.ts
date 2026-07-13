@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     if (!auth.success) return auth.response
     const { supabase, user } = auth
     const body = await request.json()
-    const { usuario_id, plan_id, metodo_pago, monto } = body
+    const { usuario_id, plan_id, metodo_pago, monto, return_to } = body
 
     if (!usuario_id || !plan_id || !metodo_pago || monto === undefined) {
       return NextResponse.json(
@@ -94,6 +94,7 @@ export async function POST(request: NextRequest) {
         userId: usuario_id,
         monto,
         siteUrl: request.nextUrl.origin,
+        returnTo: return_to,
         metadata: {
           plan_id: String(plan_id),
           user_id: usuario_id,

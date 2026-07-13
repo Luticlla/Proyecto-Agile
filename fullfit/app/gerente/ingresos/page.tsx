@@ -94,7 +94,8 @@ export default function IngresosPage() {
   const cargarIngresos = useCallback(async () => {
     setLoading(true)
     try {
-      const params = new URLSearchParams({ filtro, fecha: fecha.toISOString() })
+      const fechaPeru = new Intl.DateTimeFormat('sv-SE', { timeZone: 'America/Lima' }).format(fecha)
+      const params = new URLSearchParams({ filtro, fecha: fechaPeru })
       const response = await fetch(`/api/gerente/ingresos?${params.toString()}`)
       if (response.ok) {
         const result = await response.json()

@@ -4,43 +4,44 @@ import { createClient } from '@supabase/supabase-js'
 
 type FiltroPeriodo = 'dia' | 'semana' | 'mes' | 'anio'
 
-function calcularRangoFechas(filtro: FiltroPeriodo, fechaRef: Date): { inicio: Date; fin: Date } {
-  const fecha = new Date(fechaRef)
+// Peru offset: UTC-5 (no DST)
+const PERU_OFFSET_HOURS = 5
+
+function calcularRangoFechas(filtro: FiltroPeriodo, fechaPeru: string): { inicio: Date; fin: Date } {
+  const [year, month, day] = fechaPeru.split('-').map(Number)
 
   switch (filtro) {
     case 'dia': {
-      const inicio = new Date(fecha)
-      inicio.setHours(0, 0, 0, 0)
-      const fin = new Date(fecha)
-      fin.setHours(23, 59, 59, 999)
+      // Midnight Peru = 05:00 UTC
+      const inicio = new Date(Date.UTC(year, month - 1, day, PERU_OFFSET_HOURS, 0, 0, 0))
+      // Next day 04:59:59.999 UTC = end of day Peru
+      const fin = new Date(Date.UTC(year, month - 1, day + 1, PERU_OFFSET_HOURS - 1, 59, 59, 999))
       return { inicio, fin }
     }
     case 'semana': {
-      const diaSemana = fecha.getDay()
+      // Create date at midnight Peru, then find Monday
+      const fechaUTC = new Date(Date.UTC(year, month - 1, day, PERU_OFFSET_HOURS, 0, 0, 0))
+      const diaSemana = fechaUTC.getUTCDay() // 0=Sunday
       const diffLunes = diaSemana === 0 ? -6 : 1 - diaSemana
-      const inicio = new Date(fecha)
-      inicio.setDate(fecha.getDate() + diffLunes)
-      inicio.setHours(0, 0, 0, 0)
-      const fin = new Date(inicio)
-      fin.setDate(inicio.getDate() + 6)
-      fin.setHours(23, 59, 59, 999)
+      const inicio = new Date(Date.UTC(year, month - 1, day + diffLunes, PERU_OFFSET_HOURS, 0, 0, 0))
+      const fin = new Date(Date.UTC(year, month - 1, day + diffLunes + 6, PERU_OFFSET_HOURS - 1, 59, 59, 999))
       return { inicio, fin }
     }
     case 'mes': {
-      const inicio = new Date(fecha.getFullYear(), fecha.getMonth(), 1)
-      const fin = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0, 23, 59, 59, 999)
+      const inicio = new Date(Date.UTC(year, month - 1, 1, PERU_OFFSET_HOURS, 0, 0, 0))
+      const fin = new Date(Date.UTC(year, month, 0, PERU_OFFSET_HOURS - 1, 59, 59, 999))
       return { inicio, fin }
     }
     case 'anio': {
-      const inicio = new Date(fecha.getFullYear(), 0, 1)
-      const fin = new Date(fecha.getFullYear(), 11, 31, 23, 59, 59, 999)
+      const inicio = new Date(Date.UTC(year, 0, 1, PERU_OFFSET_HOURS, 0, 0, 0))
+      const fin = new Date(Date.UTC(year, 11, 31, PERU_OFFSET_HOURS - 1, 59, 59, 999))
       return { inicio, fin }
     }
   }
 }
 
-function formatearFechaISO(fecha: Date): string {
-  return fecha.toISOString().split('T')[0]
+function formatearFechaISO(fechaPeru: string): string {
+  return fechaPeru
 }
 
 export async function GET(request: NextRequest) {
@@ -57,8 +58,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Filtro inválido' }, { status: 400 })
     }
 
-    const fechaRef = fechaParam ? new Date(fechaParam) : new Date()
-    const { inicio, fin } = calcularRangoFechas(filtro, fechaRef)
+    const fechaPeru = fechaParam || new Intl.DateTimeFormat('sv-SE', { timeZone: 'America/Lima' }).format(new Date())
+    const { inicio, fin } = calcularRangoFechas(filtro, fechaPeru)
 
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -127,8 +128,8 @@ export async function GET(request: NextRequest) {
         totalRecepcionistas: dataResultado.length,
       },
       filtro,
-      fechaInicio: formatearFechaISO(inicio),
-      fechaFin: formatearFechaISO(fin),
+      fechaInicio: formatearFechaISO(fechaPeru),
+      fechaFin: formatearFechaISO(fechaPeru),
     })
   } catch (error: any) {
     console.error('Error en GET /api/gerente/ingresos:', error)

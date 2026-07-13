@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Users, CreditCard, AlertTriangle, XCircle } from 'lucide-react'
+import { Users, AlertTriangle, XCircle } from 'lucide-react'
 import { contarClientesPorEstado, contarMembresiasPorEstado } from '@/lib/supabase/queries/clientes'
 
 interface EstadisticasData {
@@ -85,12 +85,6 @@ export function ResumenEstadistico() {
       value: data?.totalClientes ?? 0,
       icon: Users,
       colorClass: 'bg-zinc-700/60 text-zinc-300',
-    },
-    {
-      label: 'Membresías Activas',
-      value: data?.membresiasActivas ?? 0,
-      icon: CreditCard,
-      colorClass: 'bg-emerald-500/15 text-emerald-400',
     },
     {
       label: 'Por Vencer (7d)',

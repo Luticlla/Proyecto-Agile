@@ -18,7 +18,7 @@ import { calcularDiasRestantes } from '@/lib/utils/dates'
 import { cn } from '@/lib/utils'
 
 export default function ClienteDetailPage() {
-  const params = useParams()
+const params = useParams()
   const router = useRouter()
   const searchParams = useSearchParams()
   const [cliente, setCliente] = useState<ProfileWithEmail | null>(null)
@@ -36,6 +36,8 @@ export default function ClienteDetailPage() {
   const [loadingPagos, setLoadingPagos] = useState(false)
 
   const action = searchParams.get('action')
+  const paymentStatus = searchParams.get('payment')
+  const paymentId = searchParams.get('payment_id')
   const esRenovacion = action === 'renovar'
 
   const fetchPlanes = useCallback(async () => {
@@ -98,6 +100,35 @@ export default function ClienteDetailPage() {
     }
   }, [action, planes.length, fetchPlanes])
 
+  // Verificar pago al regresar de MercadoPago
+  useEffect(() => {
+    if (paymentStatus === 'completed' && paymentId) {
+      const verificarPago = async () => {
+        try {
+          const response = await fetch('/api/pagos/verificar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ payment_id: paymentId })
+          })
+          const data = await response.json()
+          if (data.success) {
+            alert(`Pago registrado - La membresía de ${cliente?.nombre} ${cliente?.apellido} fue activada correctamente`)
+          } else {
+            alert(`Error al verificar el pago: ${data.error || 'Desconocido'}`)
+          }
+        } catch (error) {
+          console.error('Error verifying payment:', error)
+          alert('Error al verificar el pago')
+        } finally {
+          // Limpiar params de la URL
+          router.replace(`/recepcionista/clientes/${params.id}`)
+          await fetchCliente()
+        }
+      }
+      verificarPago()
+    }
+  }, [paymentStatus, paymentId, params.id, cliente, router, fetchCliente])
+
   const handleShowMembresiaForm = () => {
     if (planes.length === 0) {
       fetchPlanes()
@@ -123,7 +154,8 @@ export default function ClienteDetailPage() {
           body: JSON.stringify({
             plan_id: datos.plan_id,
             metodo_pago: datos.metodo_pago,
-            monto: datos.monto
+            monto: datos.monto,
+            return_to: `/recepcionista/clientes/${params.id}`
           })
         })
       } else {
@@ -132,7 +164,8 @@ export default function ClienteDetailPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             usuario_id: cliente.id,
-            ...datos
+            ...datos,
+            return_to: `/recepcionista/clientes/${params.id}`
           })
         })
       }

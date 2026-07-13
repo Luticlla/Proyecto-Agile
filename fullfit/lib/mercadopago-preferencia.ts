@@ -10,6 +10,7 @@ type PreferenciaParams = {
   monto: number
   metadata: Record<string, string>
   siteUrl?: string
+  returnTo?: string
 }
 
 type PreferenciaResult = {
@@ -54,9 +55,9 @@ export async function crearPreferenciaPago(
         }],
         metadata: params.metadata,
         back_urls: {
-          success: `${cleanSiteUrl}/pasarelapago?status=approved`,
-          failure: `${cleanSiteUrl}/pasarelapago?status=rejected`,
-          pending: `${cleanSiteUrl}/pasarelapago?status=pending`,
+          success: `${cleanSiteUrl}${params.returnTo || '/pasarelapago'}?payment=completed`,
+          failure: `${cleanSiteUrl}${params.returnTo || '/pasarelapago'}?payment=failed`,
+          pending: `${cleanSiteUrl}${params.returnTo || '/pasarelapago'}?payment=pending`,
         },
         auto_return: 'approved',
       },
