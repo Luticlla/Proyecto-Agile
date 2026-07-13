@@ -45,7 +45,7 @@ export async function PATCH(
     await supabase.from('auditoria').insert({
       usuario_id: user.id,
       tabla_afectada: 'suscripciones',
-      accion: accion.toUpperCase(),
+      accion: 'UPDATE',
       registro_id: membresiaId,
       detalle: { accion, membresia_id: membresiaId }
     })
