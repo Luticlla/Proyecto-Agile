@@ -11,6 +11,7 @@ interface FormularioClaseProps {
   claseExistente: any | null
   onClose: () => void
   onSuccess: () => void
+  sede: any | null
 }
 
 const DIAS = [
@@ -23,16 +24,64 @@ const DIAS = [
   { value: 0, label: 'Domingo' },
 ]
 
-export default function FormularioClase({ claseExistente, onClose, onSuccess }: FormularioClaseProps) {
+const DIAS_NOMBRES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+
+function timeToMinutes(time: string): number {
+  const [h, m] = time.split(':').map(Number)
+  return h * 60 + m
+}
+
+function validarHorariosDentroDelGymClient(
+  horarios: { dia_semana: number; hora_inicio: string; hora_fin: string }[],
+  sede: any
+): string | null {
+  for (const h of horarios) {
+    let apertura: string | null = null
+    let cierre: string | null = null
+
+    if (h.dia_semana >= 1 && h.dia_semana <= 5) {
+      apertura = sede.apertura_lv
+      cierre = sede.cierre_lv
+    } else if (h.dia_semana === 6) {
+      apertura = sede.apertura_sab
+      cierre = sede.cierre_sab
+    } else if (h.dia_semana === 0) {
+      apertura = sede.apertura_dom
+      cierre = sede.cierre_dom
+    }
+
+    if (!apertura || !cierre) {
+      const dia = DIAS_NOMBRES[h.dia_semana]
+      return `El gym está cerrado los ${dia}s`
+    }
+
+    const inicioMin = timeToMinutes(h.hora_inicio)
+    const finMin = timeToMinutes(h.hora_fin)
+    const aperturaMin = timeToMinutes(apertura)
+    const cierreMin = timeToMinutes(cierre)
+
+    if (inicioMin < aperturaMin) {
+      const dia = DIAS_NOMBRES[h.dia_semana]
+      return `El horario ${dia} de ${h.hora_inicio} a ${h.hora_fin} empieza antes de la apertura del gym (${apertura})`
+    }
+
+    if (finMin > cierreMin) {
+      const dia = DIAS_NOMBRES[h.dia_semana]
+      return `El horario ${dia} de ${h.hora_inicio} a ${h.hora_fin} termina después del cierre del gym (${cierre})`
+    }
+  }
+  return null
+}
+
+export default function FormularioClase({ claseExistente, onClose, onSuccess, sede }: FormularioClaseProps) {
   const [loading, setLoading] = useState(false)
   
-  const [clase, setClase] = useState({
+const [clase, setClase] = useState({
     nombre: claseExistente?.nombre || '',
     entrenador: claseExistente?.entrenador || '',
     descripcion: claseExistente?.descripcion || '',
     color_hex: claseExistente?.color_hex || '#facc15',
-    activa: claseExistente ? claseExistente.activa : true,
-    capacidad: claseExistente?.capacidad || ''
+    activa: claseExistente ? claseExistente.activa : true
   })
 
   // Format existing schedules
@@ -68,13 +117,22 @@ export default function FormularioClase({ claseExistente, onClose, onSuccess }: 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Validación client-side: horarios dentro del horario del gym
+    if (horarios.length > 0 && sede) {
+      const error = validarHorariosDentroDelGymClient(horarios, sede)
+      if (error) {
+        toast.error('Horario inválido', { description: error })
+        return
+      }
+    }
+
     setLoading(true)
 
     try {
       const payload = {
         clase: {
-          ...clase,
-          capacidad: clase.capacidad ? parseInt(clase.capacidad as string) : null
+          ...clase
         },
         horarios: horarios.map(h => ({
           ...h,
@@ -121,7 +179,7 @@ export default function FormularioClase({ claseExistente, onClose, onSuccess }: 
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-6">
+        <form onSubmit={handleSubmit} id="formulario-clase" className="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5 md:col-span-2">
               <Label className="text-zinc-300">Nombre de la Clase *</Label>
@@ -131,7 +189,7 @@ export default function FormularioClase({ claseExistente, onClose, onSuccess }: 
                 onChange={handleClaseChange} 
                 required 
                 placeholder="Ej: Crossfit, Yoga, Funcional..."
-                className="bg-zinc-950 border-zinc-700 font-arcade uppercase tracking-wider"
+                className="bg-zinc-950 border-zinc-700 font-arcade uppercase tracking-wider text-zinc-200"
               />
             </div>
             
@@ -141,19 +199,7 @@ export default function FormularioClase({ claseExistente, onClose, onSuccess }: 
                 name="entrenador" 
                 value={clase.entrenador} 
                 onChange={handleClaseChange} 
-                className="bg-zinc-950 border-zinc-700"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label className="text-zinc-300">Capacidad Max. (Opcional)</Label>
-              <Input 
-                name="capacidad" 
-                type="number"
-                value={clase.capacidad} 
-                onChange={handleClaseChange} 
-                placeholder="Ej: 20"
-                className="bg-zinc-950 border-zinc-700"
+                className="bg-zinc-950 border-zinc-700 text-zinc-200"
               />
             </div>
 
@@ -163,7 +209,7 @@ export default function FormularioClase({ claseExistente, onClose, onSuccess }: 
                 name="descripcion" 
                 value={clase.descripcion} 
                 onChange={handleClaseChange} 
-                className="bg-zinc-950 border-zinc-700 resize-none h-20"
+                className="bg-zinc-950 border-zinc-700 resize-none h-20 text-zinc-200"
               />
             </div>
 
@@ -176,7 +222,7 @@ export default function FormularioClase({ claseExistente, onClose, onSuccess }: 
                     name="color_hex" 
                     value={clase.color_hex} 
                     onChange={handleClaseChange}
-                    className="w-12 h-10 p-1 bg-zinc-900 border-zinc-700 rounded cursor-pointer"
+                    className="w-12 h-10 p-1 bg-zinc-900 border-zinc-700 rounded cursor-pointer text-zinc-200"
                   />
                   <span className="text-zinc-500 font-mono text-sm">{clase.color_hex}</span>
                 </div>
@@ -230,7 +276,7 @@ export default function FormularioClase({ claseExistente, onClose, onSuccess }: 
                         value={h.hora_inicio} 
                         onChange={(e) => updateHorario(i, 'hora_inicio', e.target.value)}
                         required
-                        className="bg-zinc-900 border-zinc-700 h-10"
+                        className="bg-zinc-900 border-zinc-700 h-10 text-zinc-200"
                       />
                     </div>
                     <div className="space-y-1.5 flex-1 w-full">
@@ -240,7 +286,7 @@ export default function FormularioClase({ claseExistente, onClose, onSuccess }: 
                         value={h.hora_fin} 
                         onChange={(e) => updateHorario(i, 'hora_fin', e.target.value)}
                         required
-                        className="bg-zinc-900 border-zinc-700 h-10"
+                        className="bg-zinc-900 border-zinc-700 h-10 text-zinc-200"
                       />
                     </div>
                     <Button 
@@ -264,7 +310,8 @@ export default function FormularioClase({ claseExistente, onClose, onSuccess }: 
             Cancelar
           </Button>
           <Button 
-            onClick={handleSubmit} 
+            type="submit"
+            form="formulario-clase"
             disabled={loading}
             className="bg-yellow-500 text-zinc-950 hover:bg-yellow-400 min-w-[120px]"
           >

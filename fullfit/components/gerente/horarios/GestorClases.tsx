@@ -9,11 +9,12 @@ import { toast } from 'sonner'
 interface GestorClasesProps {
   clases: any[]
   onReload: () => void
+  sede: any | null
 }
 
 const DIAS_SEMANA = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
 
-export default function GestorClases({ clases, onReload }: GestorClasesProps) {
+export default function GestorClases({ clases, onReload, sede }: GestorClasesProps) {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [claseEditar, setClaseEditar] = useState<any | null>(null)
   const [deletingId, setDeletingId] = useState<number | null>(null)
@@ -142,6 +143,7 @@ export default function GestorClases({ clases, onReload }: GestorClasesProps) {
             setIsFormOpen(false)
             onReload()
           }}
+          sede={sede}
         />
       )}
     </div>

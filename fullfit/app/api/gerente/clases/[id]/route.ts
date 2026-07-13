@@ -1,26 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { updateClaseConHorarios, deleteClase } from '@/lib/supabase/queries/clases'
+import { requireAuthenticatedRecepcionista } from '@/lib/auth/api-guard'
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const supabase = createServiceRoleClient()
-  
-  // Basic Auth Check
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return new NextResponse('Unauthorized', { status: 401 })
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('rol_id')
-    .eq('id', user.id)
-    .single()
-    
-  if (profile?.rol_id !== 1 && profile?.rol_id !== 2) {
-    return new NextResponse('Forbidden', { status: 403 })
-  }
+  const auth = await requireAuthenticatedRecepcionista(request)
+  if (!auth.success) return auth.response
+  const { supabase } = auth
 
   try {
     const resolvedParams = await params
@@ -42,21 +31,9 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const supabase = createServiceRoleClient()
-  
-  // Basic Auth Check
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return new NextResponse('Unauthorized', { status: 401 })
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('rol_id')
-    .eq('id', user.id)
-    .single()
-    
-  if (profile?.rol_id !== 1 && profile?.rol_id !== 2) {
-    return new NextResponse('Forbidden', { status: 403 })
-  }
+  const auth = await requireAuthenticatedRecepcionista(request)
+  if (!auth.success) return auth.response
+  const { supabase } = auth
 
   try {
     const resolvedParams = await params

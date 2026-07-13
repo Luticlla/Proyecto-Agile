@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Users, Building2, CreditCard, ArrowRight, Dumbbell, CalendarDays } from 'lucide-react'
+import { Users, CreditCard, ArrowRight, Dumbbell, CalendarDays, BarChart3 } from 'lucide-react'
 
 const cards = [
   {
@@ -11,10 +11,10 @@ const cards = [
     iconColor: 'text-blue-400',
   },
   {
-    href: '/gerente/sedes',
-    icon: Building2,
-    title: 'Gestión de Sede',
-    description: 'Administra la sede del gimnasio. Horarios, contacto, imágenes y visibilidad pública.',
+    href: '/gerente/ingresos',
+    icon: BarChart3,
+    title: 'Informes',
+    description: 'Consulta los ingresos, pagos y movimientos financieros del gimnasio.',
     color: 'from-emerald-500/20 to-emerald-600/10 border-emerald-500/20',
     iconColor: 'text-emerald-400',
   },

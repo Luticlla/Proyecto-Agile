@@ -79,7 +79,7 @@ export default function ConfiguracionGym({ sede, onReload }: ConfiguracionGymPro
                 value={formData.apertura_lv} 
                 onChange={handleChange}
                 required
-                className="bg-zinc-900 border-zinc-700"
+                className="bg-zinc-900 border-zinc-700 text-zinc-200"
               />
             </div>
             <span className="text-zinc-500 mt-5">-</span>
@@ -91,7 +91,7 @@ export default function ConfiguracionGym({ sede, onReload }: ConfiguracionGymPro
                 value={formData.cierre_lv} 
                 onChange={handleChange}
                 required
-                className="bg-zinc-900 border-zinc-700"
+                className="bg-zinc-900 border-zinc-700 text-zinc-200"
               />
             </div>
           </div>
@@ -109,7 +109,7 @@ export default function ConfiguracionGym({ sede, onReload }: ConfiguracionGymPro
                 value={formData.apertura_sab} 
                 onChange={handleChange}
                 required
-                className="bg-zinc-900 border-zinc-700"
+                className="bg-zinc-900 border-zinc-700 text-zinc-200"
               />
             </div>
             <span className="text-zinc-500 mt-5">-</span>
@@ -121,7 +121,7 @@ export default function ConfiguracionGym({ sede, onReload }: ConfiguracionGymPro
                 value={formData.cierre_sab} 
                 onChange={handleChange}
                 required
-                className="bg-zinc-900 border-zinc-700"
+                className="bg-zinc-900 border-zinc-700 text-zinc-200"
               />
             </div>
           </div>
@@ -141,7 +141,7 @@ export default function ConfiguracionGym({ sede, onReload }: ConfiguracionGymPro
                 name="apertura_dom" 
                 value={formData.apertura_dom} 
                 onChange={handleChange}
-                className="bg-zinc-900 border-zinc-700"
+                className="bg-zinc-900 border-zinc-700 text-zinc-200"
               />
             </div>
             <span className="text-zinc-500 mt-5">-</span>
@@ -152,7 +152,7 @@ export default function ConfiguracionGym({ sede, onReload }: ConfiguracionGymPro
                 name="cierre_dom" 
                 value={formData.cierre_dom} 
                 onChange={handleChange}
-                className="bg-zinc-900 border-zinc-700"
+                className="bg-zinc-900 border-zinc-700 text-zinc-200"
               />
             </div>
           </div>

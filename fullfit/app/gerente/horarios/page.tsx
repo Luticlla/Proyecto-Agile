@@ -75,7 +75,7 @@ export default function HorariosPage() {
         </TabsList>
         
         <TabsContent value="clases" className="mt-6">
-          <GestorClases clases={clases} onReload={loadData} />
+          <GestorClases clases={clases} onReload={loadData} sede={sede} />
         </TabsContent>
         
         <TabsContent value="gym" className="mt-6">

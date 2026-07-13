@@ -51,6 +51,7 @@ export async function proxy(request: NextRequest) {
   const isSoloAdmin = profile?.rol_id === 1
   const isSoloRecepcionista = profile?.rol_id === 2
   const isSoloMiembro = profile?.rol_id === 3
+  const isSoloCoach = profile?.rol_id === 5
 
   // 0. Bloquear usuarios inactivos (excepto login, register y retornos MercadoPago)
   if (profile && profile.activo === false) {
@@ -118,6 +119,24 @@ export async function proxy(request: NextRequest) {
     return supabaseResponse
   }
 
+  // 2.1 Proteger rutas de coach (rol_id === 5)
+  if (pathname.startsWith('/coach')) {
+    if (!user) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      url.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(url)
+    }
+    if (!isSoloCoach) {
+      const url = request.nextUrl.clone()
+      if (isSoloAdmin) url.pathname = '/gerente'
+      else if (isSoloRecepcionista) url.pathname = '/recepcionista'
+      else url.pathname = '/'
+      return NextResponse.redirect(url)
+    }
+    return supabaseResponse
+  }
+
   // 3. Proteger rutas de miembro (solo rol_id === 3)
   if (pathname.startsWith('/mi-membresia')) {
     if (!user) {
@@ -172,6 +191,8 @@ export async function proxy(request: NextRequest) {
       url.pathname = '/gerente'
     } else if (isSoloRecepcionista) {
       url.pathname = '/recepcionista'
+    } else if (isSoloCoach) {
+      url.pathname = '/coach'
     } else {
       url.pathname = '/membresias'
     }
@@ -188,6 +209,8 @@ export async function proxy(request: NextRequest) {
       url.pathname = '/gerente'
     } else if (isSoloRecepcionista) {
       url.pathname = '/recepcionista'
+    } else if (isSoloCoach) {
+      url.pathname = '/coach'
     }
     return NextResponse.redirect(url)
   }
@@ -199,6 +222,8 @@ export async function proxy(request: NextRequest) {
       url.pathname = '/gerente'
     } else if (isSoloRecepcionista) {
       url.pathname = '/recepcionista'
+    } else if (isSoloCoach) {
+      url.pathname = '/coach'
     } else if (isSoloMiembro) {
       // Socios van al homepage con su sesión activa
       url.pathname = '/'
@@ -221,6 +246,11 @@ export async function proxy(request: NextRequest) {
       url.pathname = '/recepcionista'
       return NextResponse.redirect(url)
     }
+    if (isSoloCoach) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/coach'
+      return NextResponse.redirect(url)
+    }
     // Socios (rol_id=3) y roles desconocidos: quedan en el homepage con sesión activa
     return supabaseResponse
   }
@@ -232,6 +262,7 @@ export const config = {
   matcher: [
     '/recepcionista/:path*',
     '/gerente/:path*',
+    '/coach/:path*',
     '/mi-membresia/:path*',
     '/pasarelapago/:path*',
     '/membresias/:path*',

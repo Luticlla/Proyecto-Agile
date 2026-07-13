@@ -1,22 +1,11 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
+import { requireAuthenticatedRecepcionista } from '@/lib/auth/api-guard'
 
-export async function PUT(request: Request) {
-  const supabase = createServiceRoleClient()
-  
-  // Basic Auth Check
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return new NextResponse('Unauthorized', { status: 401 })
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('rol_id')
-    .eq('id', user.id)
-    .single()
-    
-  if (profile?.rol_id !== 1 && profile?.rol_id !== 2) {
-    return new NextResponse('Forbidden', { status: 403 })
-  }
+export async function PUT(request: NextRequest) {
+  const auth = await requireAuthenticatedRecepcionista(request)
+  if (!auth.success) return auth.response
+  const { supabase } = auth
 
   try {
     const body = await request.json()
