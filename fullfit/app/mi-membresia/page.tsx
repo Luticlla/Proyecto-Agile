@@ -150,7 +150,9 @@ function SeccionFreezeActivo({
         )}
 
         {freezeError && (
-          <p className="font-mono text-red-400 text-xs text-center">{freezeError}</p>
+          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30">
+            <p className="font-mono text-red-400 text-xs text-center">{freezeError}</p>
+          </div>
         )}
 
         <Button
@@ -198,7 +200,9 @@ function SeccionFreezeDisponible({
       </p>
 
       {freezeError && (
-        <p className="font-mono text-red-400 text-xs">{freezeError}</p>
+        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30">
+          <p className="font-mono text-red-400 text-xs text-center">{freezeError}</p>
+        </div>
       )}
 
       <Button
