@@ -42,11 +42,49 @@ function calcularRangoFechas(filtro: FiltroPeriodo, fechaPeru: string): { inicio
   }
 }
 
+function generarLabels(filtro: FiltroPeriodo, fechaPeru: string): string[] {
+  const [year, month, day] = fechaPeru.split('-').map(Number)
+
+  switch (filtro) {
+    case 'dia':
+      return Array.from({ length: 24 }, (_, i) => `${pad(i)}:00`)
+    case 'semana': {
+      const refDate = new Date(year, month - 1, day)
+      const diaSemana = refDate.getDay()
+      const diffLunes = diaSemana === 0 ? -6 : 1 - diaSemana
+      const lunes = new Date(year, month - 1, day + diffLunes)
+      const dias: string[] = []
+      const nombres = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(lunes)
+        d.setDate(lunes.getDate() + i)
+        dias.push(`${nombres[d.getDay()]} ${pad(d.getDate())}`)
+      }
+      return dias
+    }
+    case 'mes': {
+      const ultimoDia = new Date(year, month, 0).getDate()
+      return Array.from({ length: ultimoDia }, (_, i) => `${pad(i + 1)}`)
+    }
+    case 'anio':
+      return ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+  }
+}
+
+function extraerPeriodoKey(fecha: string, filtro: FiltroPeriodo): number {
+  const d = new Date(fecha)
+  switch (filtro) {
+    case 'dia': return d.getHours()
+    case 'semana': return d.getDay()
+    case 'mes': return d.getDate() - 1
+    case 'anio': return d.getMonth()
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const auth = await requireAuthenticatedRecepcionista(request)
     if (!auth.success) return auth.response
-    const { user } = auth
 
     const { searchParams } = new URL(request.url)
     const filtro = (searchParams.get('filtro') as FiltroPeriodo) || 'mes'
@@ -69,64 +107,80 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabaseAdmin
       .from('pagos')
       .select(`
+        id,
         monto,
-        registrado_por:profiles!pagos_registrado_por_fkey(id, nombre, apellido, rol_id)
+        metodo_pago,
+        fecha_pago,
+        suscripcion_id,
+        usuario_id,
+        registrado_por,
+        profiles!pagos_usuario_id_fkey(nombre, apellido),
+        profiles!pagos_registrado_por_fkey!inner(id, nombre, apellido)
       `)
       .eq('estado', 'completado')
       .gte('fecha_pago', inicio)
       .lte('fecha_pago', fin)
+      .order('fecha_pago', { ascending: true })
 
     if (error) {
       console.error('Error obteniendo ingresos:', error)
       return NextResponse.json({ error: 'Error al obtener ingresos' }, { status: 500 })
     }
 
-    const ingresosPorRecepcionista = new Map<string, {
-      id: string
-      nombre: string
-      apellido: string
-      total_ingresado: number
-      cantidad_pagos: number
-    }>()
+    const labels = generarLabels(filtro, fechaPeru)
+    const timeSeriesMap = new Map<number, number>()
+    labels.forEach((_, i) => timeSeriesMap.set(i, 0))
 
     let totalGeneral = 0
     let totalPagos = 0
 
+    const pagos: Array<{
+      id: number
+      fecha: string
+      hora: string
+      monto: number
+      metodo: string
+      cliente: string
+      recepcionista: string
+    }> = []
+
     for (const pago of data || []) {
-      const perfil = pago.registrado_por as unknown as Record<string, unknown> | null
-      if (!perfil) continue
-      if (perfil.rol_id !== 2) continue
-
-      const perfilId = perfil.id as string
-      const existing = ingresosPorRecepcionista.get(perfilId)
-
-      if (existing) {
-        existing.total_ingresado += pago.monto
-        existing.cantidad_pagos += 1
-      } else {
-        ingresosPorRecepcionista.set(perfilId, {
-          id: perfilId,
-          nombre: perfil.nombre as string,
-          apellido: perfil.apellido as string,
-          total_ingresado: pago.monto,
-          cantidad_pagos: 1,
-        })
-      }
-
-      totalGeneral += pago.monto
+      const monto = pago.monto as number
+      totalGeneral += monto
       totalPagos += 1
+
+      const fechaPago = pago.fecha_pago as string
+      const fechaDate = new Date(fechaPago)
+      const fechaLocal = fechaDate.toLocaleDateString('es-PE', { timeZone: 'America/Lima', day: '2-digit', month: '2-digit', year: 'numeric' })
+      const horaLocal = fechaDate.toLocaleTimeString('es-PE', { timeZone: 'America/Lima', hour: '2-digit', minute: '2-digit', hour12: false })
+
+      const cliente = pago.profiles as Record<string, string> | null
+      const recepcionista = pago.profiles as Record<string, string> | null
+
+      pagos.push({
+        id: pago.id as number,
+        fecha: fechaLocal,
+        hora: horaLocal,
+        monto,
+        metodo: pago.metodo_pago as string,
+        cliente: cliente ? `${cliente.nombre || ''} ${cliente.apellido || ''}`.trim() : '-',
+        recepcionista: recepcionista ? `${recepcionista.nombre || ''} ${recepcionista.apellido || ''}`.trim() : '-',
+      })
+
+      const periodoIdx = extraerPeriodoKey(fechaPago, filtro)
+      const current = timeSeriesMap.get(periodoIdx) || 0
+      timeSeriesMap.set(periodoIdx, current + monto)
     }
 
-    const dataResultado = Array.from(ingresosPorRecepcionista.values())
-      .sort((a, b) => b.total_ingresado - a.total_ingresado)
+    const timeSeries = labels.map((label, i) => ({
+      label,
+      total: timeSeriesMap.get(i) || 0,
+    }))
 
     return NextResponse.json({
-      data: dataResultado,
-      resumen: {
-        totalGeneral,
-        totalPagos,
-        totalRecepcionistas: dataResultado.length,
-      },
+      resumen: { totalGeneral, totalPagos },
+      timeSeries,
+      pagos,
       filtro,
       fechaInicio,
       fechaFin,
