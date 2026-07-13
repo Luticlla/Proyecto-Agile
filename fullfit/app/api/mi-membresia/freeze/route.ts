@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuthenticated } from '@/lib/auth/api-guard'
-import { cambiarEstadoMembresia } from '@/lib/supabase/queries/membresias'
+import { getFechaLima } from '@/lib/utils'
+import { autoReactivarFreezesExpirados, cambiarEstadoMembresia } from '@/lib/supabase/queries/membresias'
 
 export async function PATCH(request: NextRequest) {
   try {
@@ -28,7 +29,10 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
     }
 
-    const hoy = new Date().toISOString().split('T')[0]
+    // Asegurar que freezes expirados se reactiven antes
+    await autoReactivarFreezesExpirados(supabase)
+
+    const hoy = getFechaLima()
 
     const estadoBuscado = accion === 'pausar' ? 'activa' : 'suspendida'
     const { data: suscripcion } = await supabase

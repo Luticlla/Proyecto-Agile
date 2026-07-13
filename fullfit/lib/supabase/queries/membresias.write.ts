@@ -91,7 +91,8 @@ export async function registrarMembresia(
 
 /**
  * Reactiva automáticamente las membresías cuyo freeze ha expirado
- * (freeze_fin <= hoy). Busca y actualiza lotes.
+ * (freeze_fin < hoy, para que el freeze dure el día completo).
+ * Busca y actualiza lotes.
  */
 export async function autoReactivarFreezesExpirados(
   client?: SupabaseClient
@@ -104,7 +105,7 @@ export async function autoReactivarFreezesExpirados(
     .select('id')
     .eq('estado', 'suspendida')
     .not('freeze_fin', 'is', null)
-    .lte('freeze_fin', hoy)
+    .lt('freeze_fin', hoy)
 
   if (!expirados || expirados.length === 0) return
 
@@ -186,6 +187,14 @@ export async function cambiarEstadoMembresia(
       .single()
 
     const diasFreeze = (plan?.dias_freeze_maximo as number) || 0
+
+    if (diasFreeze <= 0) {
+      return {
+        success: false,
+        error: 'Este plan no tiene días de freeze configurados. Contacta al administrador.'
+      }
+    }
+
     const hoy = getFechaLima()
 
     const freezeFin = new Date(hoy)
