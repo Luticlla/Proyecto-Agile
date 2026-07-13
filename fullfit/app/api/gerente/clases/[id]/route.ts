@@ -1,8 +1,11 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { updateClaseConHorarios, deleteClase } from '@/lib/supabase/queries/clases'
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const supabase = createServiceRoleClient()
   
   // Basic Auth Check
@@ -20,7 +23,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 
   try {
-    const id = parseInt(params.id)
+    const resolvedParams = await params
+    const id = parseInt(resolvedParams.id)
     if (isNaN(id)) return new NextResponse('Bad Request: Invalid ID', { status: 400 })
 
     const body = await request.json()
@@ -29,12 +33,15 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     const updatedClase = await updateClaseConHorarios(supabase, id, clase, horarios || [])
     return NextResponse.json(updatedClase)
   } catch (error: any) {
-    console.error(`API Error PUT /clases/${params.id}:`, error)
+    console.error(`API Error PUT /clases:`, error)
     return new NextResponse(error.message || 'Internal Server Error', { status: 500 })
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const supabase = createServiceRoleClient()
   
   // Basic Auth Check
@@ -52,7 +59,8 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   }
 
   try {
-    const id = parseInt(params.id)
+    const resolvedParams = await params
+    const id = parseInt(resolvedParams.id)
     if (isNaN(id)) return new NextResponse('Bad Request: Invalid ID', { status: 400 })
 
     const success = await deleteClase(supabase, id)
@@ -62,7 +70,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error(`API Error DELETE /clases/${params.id}:`, error)
+    console.error(`API Error DELETE /clases:`, error)
     return new NextResponse(error.message || 'Internal Server Error', { status: 500 })
   }
 }
