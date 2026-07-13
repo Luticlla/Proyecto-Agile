@@ -113,6 +113,15 @@ export async function actualizarCliente(id: string, datos: ProfileUpdate): Promi
   return { success: true }
 }
 
+async function obtenerIdsCancelados(): Promise<string[]> {
+  const { data } = await supabase
+    .from('suscripciones')
+    .select('usuario_id')
+    .eq('estado', 'cancelada')
+
+  return [...new Set((data || []).map((s: { usuario_id: string }) => s.usuario_id))]
+}
+
 export async function listarClientes(filtros: ClienteFilters = {}): Promise<ClienteListResult> {
   const { busqueda, activo, rol_id = MIEMBRO_ROLE_ID, estado_suscripcion = 'todos', page = 1, limit = 10 } = filtros
   const from = (page - 1) * limit
@@ -126,7 +135,11 @@ export async function listarClientes(filtros: ClienteFilters = {}): Promise<Clie
     return listarClientesPorEstadoMembresia({ busqueda, activo, rol_id, estado_suscripcion, page, limit })
   }
 
-  const query = buildBaseQuery({ busqueda, activo, rol_id })
+  const idsCancelados = await obtenerIdsCancelados()
+  const query = buildBaseQuery({
+    busqueda, activo, rol_id,
+    idsExcluidos: idsCancelados.length > 0 ? idsCancelados : undefined
+  })
   const { data, count, error } = await query.order('nombre').range(from, to)
 
   if (error) {

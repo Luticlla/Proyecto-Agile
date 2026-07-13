@@ -118,9 +118,25 @@ CREATE TABLE public.sedes (
   actualizado_en timestamp without time zone NOT NULL DEFAULT now(),
   apertura_dom time without time zone,
   cierre_dom time without time zone,
-  clase_funcional_inicio time without time zone DEFAULT '10:00:00'::time without time zone,
-  clase_funcional_fin time without time zone DEFAULT '11:00:00'::time without time zone,
-  clase_gap_inicio time without time zone DEFAULT '19:00:00'::time without time zone,
-  clase_gap_fin time without time zone DEFAULT '20:00:00'::time without time zone,
   CONSTRAINT sedes_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.clases_grupales (
+  id integer NOT NULL DEFAULT nextval('clases_grupales_id_seq'::regclass),
+  nombre character varying NOT NULL,
+  descripcion text,
+  entrenador character varying,
+  capacidad integer,
+  color_hex character varying DEFAULT '#facc15'::character varying,
+  activa boolean DEFAULT true,
+  creado_en timestamp without time zone DEFAULT now(),
+  CONSTRAINT clases_grupales_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.horarios_clases (
+  id integer NOT NULL DEFAULT nextval('horarios_clases_id_seq'::regclass),
+  clase_id integer NOT NULL,
+  dia_semana integer NOT NULL CHECK (dia_semana >= 0 AND dia_semana <= 6),
+  hora_inicio time without time zone NOT NULL,
+  hora_fin time without time zone NOT NULL,
+  CONSTRAINT horarios_clases_pkey PRIMARY KEY (id),
+  CONSTRAINT horarios_clases_clase_id_fkey FOREIGN KEY (clase_id) REFERENCES public.clases_grupales(id)
 );

@@ -195,6 +195,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null)
     setIsRecovery(false)
     lastFetchedUserId.current = null
+    window.location.href = '/'
   }
 
   const refreshProfile = async () => {

@@ -29,13 +29,10 @@ export default function MiMembresiaLayout({
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="text-center space-y-4">
-          <p className="text-white/60 font-mono text-sm mb-4">Error al cargar el perfil</p>
-          <Button
-            onClick={() => signOut()}
-            className="bg-gym-logo text-black hover:bg-gym-logo/80 font-arcade text-xs tracking-widest uppercase"
-          >
-            Cerrar sesión
-          </Button>
+          <Loader2 className="size-10 text-gym-logo animate-spin" />
+          <p className="font-mono text-white/40 text-xs tracking-widest uppercase">
+            Redirigiendo...
+          </p>
         </div>
       </div>
     )
