@@ -28,6 +28,14 @@ IS 'Fecha de inicio del freeze activo (null si no está congelada)';
 COMMENT ON COLUMN public.suscripciones.freeze_fin 
 IS 'Fecha en que finaliza automáticamente el freeze activo (null si no está congelada)';
 
+-- 4. Permitir al socio actualizar su propia suscripción (para freeze/unfreeze)
+--    La lógica de negocio en cambiarEstadoMembresia valida las transiciones.
+DROP POLICY IF EXISTS "miembro_update_own_suscripcion" ON public.suscripciones;
+CREATE POLICY "miembro_update_own_suscripcion" ON public.suscripciones
+FOR UPDATE TO authenticated
+USING (public.get_user_role(auth.uid()) = 3 AND usuario_id = auth.uid())
+WITH CHECK (public.get_user_role(auth.uid()) = 3 AND usuario_id = auth.uid());
+
 -- ============================================
 -- FIN DE MIGRACIÓN
 -- ============================================
