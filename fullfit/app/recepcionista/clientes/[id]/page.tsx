@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { obtenerClienteConMembresia, obtenerHistorialPagos } from '@/lib/supabase/queries/clientes'
 import type { ClienteConMembresiaCompleta, PagoResumen } from '@/lib/supabase/queries/clientes.types'
@@ -34,6 +34,7 @@ const params = useParams()
   const [loadingMembresiaDetalle, setLoadingMembresiaDetalle] = useState(false)
   const [pagos, setPagos] = useState<PagoResumen[]>([])
   const [loadingPagos, setLoadingPagos] = useState(false)
+  const verificationInitiatedRef = useRef(false)
 
   const action = searchParams.get('action')
   const paymentStatus = searchParams.get('payment')
@@ -102,41 +103,44 @@ const params = useParams()
 
   // Verificar pago al regresar de MercadoPago
   useEffect(() => {
-    if (paymentStatus === 'completed' && paymentId) {
-      const verificarPago = async () => {
-        try {
-          const response = await fetch('/api/pagos/verificar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ payment_id: paymentId })
-          })
-          const data = await response.json()
-          if (data.success) {
-            alert(`Pago registrado - La membresía de ${cliente?.nombre} ${cliente?.apellido} fue activada correctamente`)
-          } else {
-            alert(`Error al verificar el pago: ${data.error || 'Desconocido'}`)
-          }
-        } catch (error) {
-          console.error('Error verifying payment:', error)
-          alert('Error al verificar el pago')
-        } finally {
-          // Limpiar params de la URL
-          router.replace(`/recepcionista/clientes/${params.id}`)
-          await fetchCliente()
-        }
-      }
-      verificarPago()
-    }
+    if (paymentStatus !== 'completed' || !paymentId || verificationInitiatedRef.current) return
 
-    if (paymentStatus === 'failed') {
-      const manejarFallo = async () => {
-        alert('Transacción no completada - El pago no fue procesado')
+    verificationInitiatedRef.current = true
+
+    const verificarPago = async () => {
+      try {
+        const response = await fetch('/api/pagos/verificar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ payment_id: paymentId })
+        })
+        const data = await response.json()
+        if (data.success) {
+          alert(`Pago registrado - La membresía fue activada correctamente`)
+        } else {
+          alert(`Error al verificar el pago: ${data.error || 'Desconocido'}`)
+        }
+      } catch (error) {
+        console.error('Error verifying payment:', error)
+        alert('Error al verificar el pago')
+      } finally {
         router.replace(`/recepcionista/clientes/${params.id}`)
         await fetchCliente()
       }
-      manejarFallo()
     }
-  }, [paymentStatus, paymentId, params.id, cliente, router, fetchCliente])
+    verificarPago()
+  }, [paymentStatus, paymentId, params.id, router, fetchCliente])
+
+  useEffect(() => {
+    if (paymentStatus !== 'failed') return
+
+    const manejarFallo = async () => {
+      alert('Transacción no completada - El pago no fue procesado')
+      router.replace(`/recepcionista/clientes/${params.id}`)
+      await fetchCliente()
+    }
+    manejarFallo()
+  }, [paymentStatus, params.id, router, fetchCliente])
 
   const handleShowMembresiaForm = () => {
     if (planes.length === 0) {

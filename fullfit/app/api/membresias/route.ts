@@ -67,24 +67,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const dto: RegistrarMembresiaDTO = {
-      usuario_id,
-      plan_id,
-      metodo_pago,
-      monto
-    }
-
-    const result = await registrarMembresia(dto, user.id, supabase)
-
-    if (result.error) {
-      return NextResponse.json(
-        { error: result.error },
-        { status: 400 }
-      )
-    }
-
     if (metodo_pago === 'mercadopago') {
-      // Flujo MercadoPago: NO crear suscripción/pago en DB, solo preferencia (igual que /api/pagos)
       const { data: plan } = await supabase
         .from('planes_membresia')
         .select('*')
@@ -99,7 +82,6 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // Verificar si hay membresía activa para calcular fechas (igual que /api/pagos)
       const { data: membresiaActiva } = await supabase
         .from('suscripciones')
         .select('fecha_fin')
@@ -152,75 +134,84 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ init_point: preferenceResult.init_point })
     }
 
-    if (metodo_pago === 'efectivo' && result.pago) {
-      const { data: plan } = await supabase
-        .from('planes_membresia')
-        .select('nombre, precio, duracion_dias')
-        .eq('id', plan_id)
-        .single()
-
-      const { data: cliente } = await supabase
-        .from('profiles')
-        .select('nombre, apellido, dni')
-        .eq('id', usuario_id)
-        .single()
-
-      const fechaInicio = new Date().toISOString().split('T')[0]
-      const fechaFinDate = new Date()
-      fechaFinDate.setDate(fechaFinDate.getDate() + (plan?.duracion_dias || 30))
-
-      const planPrecio = plan?.precio || monto
-      const { valorUnitario, igv, total } = calcularIGV(planPrecio)
-
-      const item: BoletaItem = {
-        descripcion: plan?.nombre || '',
-        cantidad: 1,
-        valor_unitario: valorUnitario,
-        precio_unitario: planPrecio,
-        valor_total: valorUnitario
-      }
-
-      const numeroComprobante = await obtenerSiguienteComprobante()
-
-      const boletaData: BoletaData = {
-        numero_comprobante: numeroComprobante,
-        fecha_emision: formatearFechaEmision(fechaInicio),
-        cliente: {
-          nombre: `${cliente?.nombre || ''} ${cliente?.apellido || ''}`.trim(),
-          dni: cliente?.dni || '',
-          codigo: usuario_id.slice(0, 8)
-        },
-        moneda: 'SOL',
-        metodo_pago: metodo_pago,
-        items: [item],
-        subtotal: valorUnitario,
-        igv: igv,
-        total: total,
-        total_letras: montoEnLetras(total),
-        observaciones: `Periodo: ${fechaInicio} al ${fechaFinDate.toISOString().split('T')[0]}`,
-        fecha_inicio: fechaInicio,
-        fecha_fin: fechaFinDate.toISOString().split('T')[0]
-      }
-
-      const boletaBase64 = await generarBoletaBase64(boletaData)
-
-      const supabaseAdmin = createServiceRoleClient()
-      await supabaseAdmin
-        .from('pagos')
-        .update({ referencia: numeroComprobante })
-        .eq('id', result.pago.id)
-
-      return NextResponse.json({
-        suscripcion: result.suscripcion,
-        pago: result.pago,
-        boleta: boletaBase64,
-        numero_comprobante: numeroComprobante
-      })
+    const dto: RegistrarMembresiaDTO = {
+      usuario_id,
+      plan_id,
+      metodo_pago,
+      monto
     }
+
+    const result = await registrarMembresia(dto, user.id, supabase)
+
+    if (result.error) {
+      return NextResponse.json(
+        { error: result.error },
+        { status: 400 }
+      )
+    }
+
+    const { data: plan } = await supabase
+      .from('planes_membresia')
+      .select('nombre, precio, duracion_dias')
+      .eq('id', plan_id)
+      .single()
+
+    const { data: cliente } = await supabase
+      .from('profiles')
+      .select('nombre, apellido, dni')
+      .eq('id', usuario_id)
+      .single()
+
+    const fechaInicio = new Date().toISOString().split('T')[0]
+    const fechaFinDate = new Date()
+    fechaFinDate.setDate(fechaFinDate.getDate() + (plan?.duracion_dias || 30))
+
+    const planPrecio = plan?.precio || monto
+    const { valorUnitario, igv, total } = calcularIGV(planPrecio)
+
+    const item: BoletaItem = {
+      descripcion: plan?.nombre || '',
+      cantidad: 1,
+      valor_unitario: valorUnitario,
+      precio_unitario: planPrecio,
+      valor_total: valorUnitario
+    }
+
+    const numeroComprobante = await obtenerSiguienteComprobante()
+
+    const boletaData: BoletaData = {
+      numero_comprobante: numeroComprobante,
+      fecha_emision: formatearFechaEmision(fechaInicio),
+      cliente: {
+        nombre: `${cliente?.nombre || ''} ${cliente?.apellido || ''}`.trim(),
+        dni: cliente?.dni || '',
+        codigo: usuario_id.slice(0, 8)
+      },
+      moneda: 'SOL',
+      metodo_pago: metodo_pago,
+      items: [item],
+      subtotal: valorUnitario,
+      igv: igv,
+      total: total,
+      total_letras: montoEnLetras(total),
+      observaciones: `Periodo: ${fechaInicio} al ${fechaFinDate.toISOString().split('T')[0]}`,
+      fecha_inicio: fechaInicio,
+      fecha_fin: fechaFinDate.toISOString().split('T')[0]
+    }
+
+    const boletaBase64 = await generarBoletaBase64(boletaData)
+
+    const supabaseAdmin = createServiceRoleClient()
+    await supabaseAdmin
+      .from('pagos')
+      .update({ referencia: numeroComprobante })
+      .eq('id', result.pago.id)
 
     return NextResponse.json({
       suscripcion: result.suscripcion,
-      pago: result.pago
+      pago: result.pago,
+      boleta: boletaBase64,
+      numero_comprobante: numeroComprobante
     })
 
   } catch (error) {
