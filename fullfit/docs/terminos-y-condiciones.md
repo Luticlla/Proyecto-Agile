@@ -117,7 +117,7 @@ f) Aceptar de manera **expresa e inequívoca** los presentes Términos y Condici
   - Clases grupales ilimitadas
   - App de seguimiento
   - Evaluación corporal mensual
-  - 2 días de freeze
+  - Hasta 2 suspensiones temporales (Freeze)
   - Acceso prioritario a eventos
 
 **5.3.** FULLFORMA se reserva el derecho de **modificar, actualizar, agregar o eliminar planes, precios y beneficios en cualquier momento y sin previo aviso**. Las modificaciones no afectarán a las membresías ya adquiridas y en vigencia al momento de la modificación.
@@ -386,22 +386,32 @@ d) Análisis estadísticos internos para mejorar el servicio.
 
 ---
 
-## CLÁUSULA 18: SUSPENSIÓN TEMPORAL DE LA MEMBRESÍA
+## CLÁUSULA 18: SUSPENSIÓN TEMPORAL DE LA MEMBRESÍA (FREEZE)
 
-**18.1.** EL SOCIO podrá solicitar la **suspensión temporal** de su membresía por motivos debidamente justificados, ante un Recepcionista en la sede de FULLFORMA.
+**18.1.** EL SOCIO podrá solicitar la **suspensión temporal** (en adelante, "Freeze") de su membresía, ya sea de forma presencial ante un Recepcionista en la sede de FULLFORMA o a través de su portal de socio en el Sistema.
 
-**18.2.** Cada membresía podrá ser suspendida un **máximo de dos (2) veces** durante su periodo de vigencia.
+**18.2.** Cada membresía podrá ser suspendida un **máximo de dos (2) veces** durante su periodo de vigencia. Las suspensiones no utilizadas se reinician al renovar la membresía.
 
-**18.3.** Durante el periodo de suspensión:
+**18.3.** La duración máxima de cada suspensión dependerá del tipo de plan contratado:
+
+| Plan | Duración máxima por freeze |
+|-----------|--------------------------------|
+| Mensual | 5 días calendario |
+| Trimestral | 1 mes calendario (30 días) |
+| Anual | 2 meses calendario (60 días) |
+
+**18.4.** Durante el periodo de suspensión:
 - EL SOCIO **no tendrá acceso** a las instalaciones de FULLFORMA.
 - El tiempo de suspensión **no se contabilizará** dentro de la duración de la membresía.
 - La fecha de vencimiento se **extenderá** por el número de días de suspensión.
 
-**18.4.** La solicitud de suspensión deberá indicar el periodo de inicio y fin de la misma.
+**18.5.** Al alcanzar la duración máxima del freeze, la membresía se **reactivará automáticamente** y EL SOCIO recuperará el acceso a las instalaciones. No será necesario realizar ningún trámite adicional.
 
-**18.5.** Si se supera el límite de dos (2) suspensiones, no se podrá solicitar una nueva suspensión hasta la renovación de la membresía.
+**18.6.** EL SOCIO podrá **reactivar su membresía de forma anticipada** en cualquier momento antes de que finalice el periodo máximo de freeze, recuperando el acceso inmediatamente. Esta reactivación no consumirá el tiempo restante del freeze.
 
-**18.6.** FULLFORMA se reserva el derecho de rechazar solicitudes de suspensión que no cuenten con justificación válida.
+**18.7.** Si se supera el límite de dos (2) suspensiones, no se podrá solicitar una nueva suspensión hasta la renovación de la membresía.
+
+**18.8.** FULLFORMA se reserva el derecho de rechazar solicitudes de suspensión que no cuenten con justificación válida, así como de modificar los plazos máximos de freeze establecidos en la presente cláusula.
 
 ---
 

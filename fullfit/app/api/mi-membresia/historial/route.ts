@@ -33,8 +33,11 @@ export async function GET(request: NextRequest) {
         fecha_fin,
         estado,
         creado_en,
+        veces_pausada,
+        freeze_inicio,
+        freeze_fin,
         profiles:usuario_id (nombre, apellido, dni),
-        planes_membresia:plan_id (nombre, precio, duracion_dias)
+        planes_membresia:plan_id (nombre, precio, duracion_dias, dias_freeze_maximo)
       `)
       .eq('usuario_id', user.id)
       .order('fecha_inicio', { ascending: false })
@@ -64,6 +67,10 @@ export async function GET(request: NextRequest) {
         fecha_fin: fechaFin,
         dias_restantes: calcularDiasRestantes(fechaFin, hoy),
         creado_en: row.creado_en as string,
+        freeze_inicio: (row.freeze_inicio as string) || null,
+        freeze_fin: (row.freeze_fin as string) || null,
+        veces_pausada: (row.veces_pausada as number) ?? 0,
+        dias_freeze_maximo: (planes?.dias_freeze_maximo as number) || 0,
       }
     })
 

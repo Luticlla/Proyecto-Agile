@@ -93,7 +93,7 @@ export default function MembresiasPage() {
     if (!accionPendiente) return ''
     const descripciones = {
       cancelar: '¿Estás seguro de cancelar esta membresía? El cliente perderá el acceso.',
-      pausar: '¿Estás seguro de pausar esta membresía? El acceso será suspendido temporalmente.',
+      pausar: '¿Estás seguro de pausar esta membresía? El freeze se activará automáticamente por la duración máxima del plan.',
       reactivar: '¿Estás seguro de reactivar esta membresía? El cliente recuperará el acceso.',
       renovar: '¿Confirmar la renovación de esta membresía?'
     }

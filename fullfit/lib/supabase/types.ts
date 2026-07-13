@@ -115,6 +115,7 @@ export type Database = {
           duracion_dias: number
           activo: boolean
           features: string[] | null
+          dias_freeze_maximo: number
           creado_en: string
         }
         Insert: {
@@ -125,6 +126,7 @@ export type Database = {
           duracion_dias: number
           activo?: boolean
           features?: string[] | null
+          dias_freeze_maximo?: number
         }
         Update: {
           nombre?: string
@@ -133,6 +135,7 @@ export type Database = {
           duracion_dias?: number
           activo?: boolean
           features?: string[] | null
+          dias_freeze_maximo?: number
         }
       }
       suscripciones: {
@@ -145,6 +148,9 @@ export type Database = {
           estado: string
           creado_por: string
           creado_en: string
+          veces_pausada: number
+          freeze_inicio: string | null
+          freeze_fin: string | null
         }
         Insert: {
           id?: number
@@ -154,6 +160,9 @@ export type Database = {
           fecha_fin: string
           estado?: string
           creado_por: string
+          veces_pausada?: number
+          freeze_inicio?: string | null
+          freeze_fin?: string | null
         }
         Update: {
           usuario_id?: string
@@ -162,6 +171,9 @@ export type Database = {
           fecha_fin?: string
           estado?: string
           creado_por?: string
+          veces_pausada?: number
+          freeze_inicio?: string | null
+          freeze_fin?: string | null
         }
       }
       pagos: {

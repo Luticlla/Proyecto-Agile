@@ -18,9 +18,15 @@ export const planFeatures: Record<string, string[]> = {
     'Clases grupales ilimitadas',
     'App de seguimiento',
     'Evaluación corporal mensual',
-    '2 días de freeze',
+    'Hasta 2 suspensiones temporales (Freeze)',
     'Acceso prioritario a eventos',
   ],
+}
+
+export const FREEZE_DIAS_MAXIMO: Record<string, number> = {
+  'Mensual': 5,
+  'Trimestral': 30,
+  'Anual': 60,
 }
 
 export const formatPrice = (price: number, days: number) => {

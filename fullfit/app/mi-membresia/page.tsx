@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Loader2, RefreshCw, ShieldCheck, ShieldOff, CreditCard, Clock, Calendar, AlertTriangle, Copy, Check } from 'lucide-react'
+import { Loader2, RefreshCw, ShieldCheck, ShieldOff, CreditCard, Clock, Calendar, AlertTriangle, Copy, Check, Snowflake, Play } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -9,7 +9,8 @@ import { useAuth } from '@/hooks'
 import { HistorialPagos, type PagoHistorial } from '@/components/mi-membresia/HistorialPagos'
 import { DatosPersonales } from '@/components/mi-membresia'
 import { ListaPlanesMembresia } from '@/components/membresias/ListaPlanesMembresia'
-import type { MiMembresiaData } from '@/lib/supabase/queries/mi-membresia'
+import { FREEZE_MAXIMO_VECES } from '@/constants/memberships'
+import type { MiMembresiaData, MembresiaBloqueadaData } from '@/lib/supabase/queries/mi-membresia'
 import type { PlanMembresia } from '@/lib/supabase/types'
 
 type PageData = MiMembresiaData & { historialPagos: PagoHistorial[] }
@@ -40,6 +41,18 @@ function getDiasGlow(dias: number): string {
   return '[text-shadow:0_0_20px_rgba(239,68,68,0.5)]'
 }
 
+function calcularDiasTranscurridos(inicio: string): number {
+  const hoy = new Date()
+  const inicioDate = new Date(inicio)
+  return Math.max(0, Math.floor((hoy.getTime() - inicioDate.getTime()) / (1000 * 60 * 60 * 24)))
+}
+
+function calcularDiasRestantesFreeze(fin: string): number {
+  const hoy = new Date()
+  const finDate = new Date(fin)
+  return Math.max(0, Math.ceil((finDate.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24)))
+}
+
 /* ─── sub-components ──────────────────────────────────────────────────────── */
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -66,6 +79,138 @@ function GridBackground() {
         backgroundSize: '40px 40px',
       }}
     />
+  )
+}
+
+/* ─── Freeze info ─────────────────────────────────────────────────────────── */
+
+function SeccionFreezeActivo({
+  bloqueada,
+  onFreezeAction,
+  freezeLoading,
+  freezeError,
+}: {
+  bloqueada: MembresiaBloqueadaData
+  onFreezeAction: (accion: 'pausar' | 'reactivar') => void
+  freezeLoading: boolean
+  freezeError: string | null
+}) {
+  const diasTranscurridos = bloqueada.freeze_inicio ? calcularDiasTranscurridos(bloqueada.freeze_inicio) : 0
+  const diasRestantes = bloqueada.freeze_fin ? calcularDiasRestantesFreeze(bloqueada.freeze_fin) : 0
+  const diasMaximo = bloqueada.dias_freeze_maximo
+
+  return (
+    <div className="rounded-xl border border-yellow-500/30 bg-gradient-to-br from-yellow-500/5 via-black to-black overflow-hidden relative">
+      <div
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(255,223,0,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,223,0,0.5) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+        }}
+      />
+      <div className="relative z-10 p-5 space-y-5">
+        <div className="flex items-center justify-between border-b border-white/5 pb-3">
+          <div className="flex items-center gap-2">
+            <Snowflake className="size-4 text-yellow-400" />
+            <span className="font-arcade text-white text-xs md:text-sm tracking-widest uppercase">
+              Freeze Activo
+            </span>
+          </div>
+          <span className="font-arcade text-[9px] tracking-widest uppercase px-2 py-1 rounded border text-yellow-400 bg-yellow-500/10 border-yellow-500/30">
+            ● Suspendida
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="text-center p-3 rounded-lg bg-white/5">
+            <p className="font-arcade text-yellow-400 text-xl md:text-2xl">{diasTranscurridos}</p>
+            <p className="font-mono text-white/30 text-[9px] uppercase tracking-widest mt-1">Días freezeado</p>
+          </div>
+          <div className="text-center p-3 rounded-lg bg-white/5">
+            <p className="font-arcade text-gym-logo text-xl md:text-2xl">{diasRestantes}</p>
+            <p className="font-mono text-white/30 text-[9px] uppercase tracking-widest mt-1">Días restantes</p>
+          </div>
+          <div className="text-center p-3 rounded-lg bg-white/5">
+            <p className="font-arcade text-white text-xl md:text-2xl">{bloqueada.veces_pausada} de {FREEZE_MAXIMO_VECES}</p>
+            <p className="font-mono text-white/30 text-[9px] uppercase tracking-widest mt-1">Freezes usados</p>
+          </div>
+          <div className="text-center p-3 rounded-lg bg-white/5">
+            <p className="font-arcade text-white text-sm md:text-base">{bloqueada.freeze_fin ? formatDate(bloqueada.freeze_fin) : '-'}</p>
+            <p className="font-mono text-white/30 text-[9px] uppercase tracking-widest mt-1">Fin del freeze</p>
+          </div>
+        </div>
+
+        {diasMaximo > 0 && (
+          <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-yellow-400 to-gym-logo rounded-full transition-all"
+              style={{ width: `${Math.min(100, (diasTranscurridos / diasMaximo) * 100)}%` }}
+            />
+          </div>
+        )}
+
+        {freezeError && (
+          <p className="font-mono text-red-400 text-xs text-center">{freezeError}</p>
+        )}
+
+        <Button
+          onClick={() => onFreezeAction('reactivar')}
+          disabled={freezeLoading}
+          className="w-full bg-green-500 text-white hover:bg-green-400 font-arcade text-[10px] tracking-widest uppercase gap-2"
+        >
+          <Play className="size-3.5" />
+          {freezeLoading ? 'Reactivando...' : 'Reactivar membresía'}
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+function SeccionFreezeDisponible({
+  vecesPausada,
+  diasFreezeMaximo,
+  onFreezeAction,
+  freezeLoading,
+  freezeError,
+}: {
+  vecesPausada: number
+  diasFreezeMaximo: number
+  onFreezeAction: (accion: 'pausar') => void
+  freezeLoading: boolean
+  freezeError: string | null
+}) {
+  const sesionesRestantes = Math.max(0, FREEZE_MAXIMO_VECES - vecesPausada)
+
+  if (sesionesRestantes <= 0) return null
+
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/5 p-5 space-y-4 relative overflow-hidden">
+      <div className="flex items-center gap-2">
+        <Snowflake className="size-4 text-blue-400" />
+        <span className="font-arcade text-white text-xs md:text-sm tracking-widest uppercase">
+          Freeze disponible
+        </span>
+      </div>
+
+      <p className="font-mono text-white/40 text-xs">
+        Has usado <span className="text-white/60">{vecesPausada}</span> de <span className="text-white/60">{FREEZE_MAXIMO_VECES}</span> freezes.
+        Puedes pausar tu membresía por hasta <span className="text-white/60">{diasFreezeMaximo}</span> días.
+      </p>
+
+      {freezeError && (
+        <p className="font-mono text-red-400 text-xs">{freezeError}</p>
+      )}
+
+      <Button
+        onClick={() => onFreezeAction('pausar')}
+        disabled={freezeLoading}
+        variant="outline"
+        className="border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 font-arcade text-[10px] tracking-widest uppercase gap-2"
+      >
+        <Snowflake className="size-3.5" />
+        {freezeLoading ? 'Freezando...' : 'Freezar membresía'}
+      </Button>
+    </div>
   )
 }
 
@@ -216,6 +361,8 @@ export default function MiMembresiaPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [copiedId, setCopiedId] = useState(false)
+  const [freezeLoading, setFreezeLoading] = useState(false)
+  const [freezeError, setFreezeError] = useState<string | null>(null)
 
   useEffect(() => {
     const loadData = async () => {
@@ -245,6 +392,33 @@ export default function MiMembresiaPage() {
 
     loadData()
   }, [])
+
+  const handleFreezeAction = async (accion: 'pausar' | 'reactivar') => {
+    setFreezeLoading(true)
+    setFreezeError(null)
+    try {
+      const res = await fetch('/api/mi-membresia/freeze', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accion }),
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        setFreezeError(err.error || 'Error al procesar la solicitud')
+        return
+      }
+      // Recargar datos
+      const membresiaRes = await fetch('/api/mi-membresia')
+      if (membresiaRes.ok) {
+        const membresiaData = await membresiaRes.json()
+        setData(membresiaData)
+      }
+    } catch {
+      setFreezeError('Error de conexión al procesar la solicitud')
+    } finally {
+      setFreezeLoading(false)
+    }
+  }
 
   const handleCopyId = () => {
     if (profile?.id) {
@@ -403,6 +577,13 @@ export default function MiMembresiaPage() {
       {data?.membresiaActiva && (
         <>
           <TarjetaMembresiaArcade membresia={data.membresiaActiva} estado="activa" />
+          <SeccionFreezeDisponible
+            vecesPausada={data.membresiaActiva.veces_pausada}
+            diasFreezeMaximo={data.membresiaActiva.dias_freeze_maximo}
+            onFreezeAction={handleFreezeAction}
+            freezeLoading={freezeLoading}
+            freezeError={freezeError}
+          />
           <DatosPersonales />
           <HistorialPagos pagos={historialPagos} />
         </>
@@ -417,17 +598,30 @@ export default function MiMembresiaPage() {
         </>
       )}
 
-      {/* Content — membresía bloqueada (suspensión o cancelación) */}
-      {!data?.membresiaActiva && !data?.membresiaVencida && data?.membresiaBloqueada && (
+      {/* Content — membresía suspendida (freeze activo) */}
+      {!data?.membresiaActiva && !data?.membresiaVencida && data?.membresiaBloqueada?.estado === 'suspendida' && (
+        <>
+          <SeccionFreezeActivo
+            bloqueada={data.membresiaBloqueada}
+            onFreezeAction={handleFreezeAction}
+            freezeLoading={freezeLoading}
+            freezeError={freezeError}
+          />
+          <DatosPersonales />
+          {historialPagos.length > 0 && <HistorialPagos pagos={historialPagos} />}
+        </>
+      )}
+
+      {/* Content — membresía cancelada */}
+      {!data?.membresiaActiva && !data?.membresiaVencida && data?.membresiaBloqueada?.estado === 'cancelada' && (
         <>
           <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-6 text-center space-y-3">
             <AlertTriangle className="size-8 text-red-400 mx-auto" />
             <p className="font-arcade text-red-400 text-sm tracking-widest uppercase">
-              Membresía {data.membresiaBloqueada.estado === 'suspendida' ? 'Pausada' : 'Cancelada'}
+              Membresía Cancelada
             </p>
             <p className="font-mono text-white/40 text-xs max-w-sm mx-auto">
-              Tu membresía del plan <span className="text-white/60">{data.membresiaBloqueada.plan_nombre}</span> se encuentra{' '}
-              {data.membresiaBloqueada.estado === 'suspendida' ? 'pausada' : 'cancelada'}.
+              Tu membresía del plan <span className="text-white/60">{data.membresiaBloqueada.plan_nombre}</span> se encuentra cancelada.
               Comunícate con el recepcionista para más información.
             </p>
           </div>

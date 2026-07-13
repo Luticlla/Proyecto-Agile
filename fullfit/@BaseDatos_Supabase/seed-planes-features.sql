@@ -17,7 +17,7 @@ WHERE nombre = 'Trimestral';
 
 -- Plan Anual
 UPDATE planes_membresia 
-SET features = '["Acceso a todas las sedes","Área de pesas y máquinas","Clases grupales ilimitadas","App de seguimiento","Evaluación corporal mensual","2 días de freeze","Acceso prioritario a eventos"]'::jsonb 
+SET features = '["Acceso a todas las sedes","Área de pesas y máquinas","Clases grupales ilimitadas","App de seguimiento","Evaluación corporal mensual","Hasta 2 suspensiones temporales (Freeze)","Acceso prioritario a eventos"]'::jsonb 
 WHERE nombre = 'Anual';
 
 -- ============================================

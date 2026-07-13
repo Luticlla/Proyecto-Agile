@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuthenticated } from '@/lib/auth/api-guard'
 import { obtenerMiMembresia } from '@/lib/supabase/queries/mi-membresia'
+import { autoReactivarFreezesExpirados } from '@/lib/supabase/queries/membresias'
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,6 +19,9 @@ export async function GET(request: NextRequest) {
     if (profile?.rol_id !== 3) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
     }
+
+    // Auto-reactivar freezes expirados del usuario antes de obtener datos
+    await autoReactivarFreezesExpirados(supabase)
 
     const [membresiaData, pagosData] = await Promise.all([
       obtenerMiMembresia(user.id, supabase),

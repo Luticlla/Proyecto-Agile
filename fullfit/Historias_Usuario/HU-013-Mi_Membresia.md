@@ -237,7 +237,7 @@
 - [ ] "Clases grupales ilimitadas"
 - [ ] "App de seguimiento"
 - [ ] "Evaluación corporal mensual"
-- [ ] "2 días de freeze"
+- [ ] "Hasta 2 suspensiones temporales (Freeze)"
 - [ ] "Acceso prioritario a eventos"
 
 ---

@@ -33,6 +33,7 @@ CREATE TABLE public.planes_membresia (
   activo boolean NOT NULL DEFAULT true,
   creado_en timestamp without time zone NOT NULL DEFAULT now(),
   features jsonb DEFAULT '[]'::jsonb,
+  dias_freeze_maximo integer NOT NULL DEFAULT 0,
   CONSTRAINT planes_membresia_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.suscripciones (
@@ -45,6 +46,8 @@ CREATE TABLE public.suscripciones (
   creado_por uuid NOT NULL,
   creado_en timestamp without time zone NOT NULL DEFAULT now(),
   veces_pausada integer NOT NULL DEFAULT 0,
+  freeze_inicio date,
+  freeze_fin date,
   CONSTRAINT suscripciones_pkey PRIMARY KEY (id),
   CONSTRAINT suscripciones_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.profiles(id),
   CONSTRAINT suscripciones_creado_por_fkey FOREIGN KEY (creado_por) REFERENCES public.profiles(id),

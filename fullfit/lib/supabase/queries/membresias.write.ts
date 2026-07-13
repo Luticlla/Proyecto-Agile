@@ -1,7 +1,8 @@
 import { supabase } from '../client'
 import { getFechaLima } from '@/lib/utils'
 import { calcularDiasRestantes } from '@/lib/utils/dates'
-import { VENTANA_RENOVACION_DIAS } from '@/constants/memberships'
+import { VENTANA_RENOVACION_DIAS, FREEZE_MAXIMO_VECES } from '@/constants/memberships'
+import { FREEZE_DIAS_MAXIMO } from '@/constants/plans'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { RegistrarMembresiaDTO, CambiarEstadoDTO, RenovarMembresiaDTO } from './membresias.types'
 
@@ -89,6 +90,37 @@ export async function registrarMembresia(
 }
 
 /**
+ * Reactiva automáticamente las membresías cuyo freeze ha expirado
+ * (freeze_fin <= hoy). Busca y actualiza lotes.
+ */
+export async function autoReactivarFreezesExpirados(
+  client?: SupabaseClient
+): Promise<void> {
+  const db = client || supabase
+  const hoy = getFechaLima()
+
+  const { data: expirados } = await db
+    .from('suscripciones')
+    .select('id')
+    .eq('estado', 'suspendida')
+    .not('freeze_fin', 'is', null)
+    .lte('freeze_fin', hoy)
+
+  if (!expirados || expirados.length === 0) return
+
+  const ids = expirados.map((s: { id: number }) => s.id)
+
+  await db
+    .from('suscripciones')
+    .update({
+      estado: 'activa',
+      freeze_inicio: null,
+      freeze_fin: null,
+    })
+    .in('id', ids)
+}
+
+/**
  * Cambia el estado de una membresía (cancelar, pausar, reactivar).
  * Valida las transiciones permitidas antes de actualizar.
  */
@@ -99,9 +131,12 @@ export async function cambiarEstadoMembresia(
 ): Promise<{ success: boolean; error?: string }> {
   const db = client || supabase
 
+  // Auto-reactivar freezes expirados antes de cualquier operación
+  await autoReactivarFreezesExpirados(db)
+
   const { data: membresia, error: fetchError } = await db
     .from('suscripciones')
-    .select('estado, veces_pausada')
+    .select('estado, veces_pausada, plan_id')
     .eq('id', id)
     .single()
 
@@ -123,17 +158,6 @@ export async function cambiarEstadoMembresia(
     }
   }
 
-  // Verificar límite de pausas (máximo 2 por membresía)
-  if (dto.accion === 'pausar') {
-    const vecesPausada = (membresia as Record<string, unknown>).veces_pausada as number ?? 0
-    if (vecesPausada >= 2) {
-      return {
-        success: false,
-        error: 'Esta membresía ya fue pausada 2 veces. No se puede pausar nuevamente.'
-      }
-    }
-  }
-
   const estadoMap: Record<string, string> = {
     'cancelar': 'cancelada',
     'pausar': 'suspendida',
@@ -141,12 +165,41 @@ export async function cambiarEstadoMembresia(
   }
 
   const nuevoEstado = estadoMap[dto.accion]
-
-  // Si es pausa, incrementar contador
   const updateData: Record<string, unknown> = { estado: nuevoEstado }
+
   if (dto.accion === 'pausar') {
     const vecesPausada = (membresia as Record<string, unknown>).veces_pausada as number ?? 0
+
+    if (vecesPausada >= FREEZE_MAXIMO_VECES) {
+      return {
+        success: false,
+        error: `Esta membresía ya fue pausada ${FREEZE_MAXIMO_VECES} veces. No se puede pausar nuevamente.`
+      }
+    }
+
+    // Obtener dias_freeze_maximo del plan
+    const planId = (membresia as Record<string, unknown>).plan_id as number
+    const { data: plan } = await db
+      .from('planes_membresia')
+      .select('dias_freeze_maximo')
+      .eq('id', planId)
+      .single()
+
+    const diasFreeze = (plan?.dias_freeze_maximo as number) || 0
+    const hoy = getFechaLima()
+
+    const freezeFin = new Date(hoy)
+    freezeFin.setDate(freezeFin.getDate() + diasFreeze)
+    const freezeFinStr = freezeFin.toISOString().split('T')[0]
+
     updateData.veces_pausada = vecesPausada + 1
+    updateData.freeze_inicio = hoy
+    updateData.freeze_fin = freezeFinStr
+  }
+
+  if (dto.accion === 'reactivar') {
+    updateData.freeze_inicio = null
+    updateData.freeze_fin = null
   }
 
   const { error } = await db

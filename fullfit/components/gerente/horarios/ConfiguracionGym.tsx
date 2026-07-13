@@ -30,8 +30,35 @@ export default function ConfiguracionGym({ sede }: ConfiguracionGymProps) {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
+  function timeToMinutes(time: string): number {
+    const [h, m] = time.split(':').map(Number)
+    return h * 60 + m
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Validar que cada bloque tenga al menos 1 hora de diferencia
+    const lvDiff = timeToMinutes(formData.cierre_lv) - timeToMinutes(formData.apertura_lv)
+    if (lvDiff < 60) {
+      toast.error('El horario de Lunes a Viernes debe tener al menos 1 hora de diferencia entre apertura y cierre')
+      return
+    }
+
+    const sabDiff = timeToMinutes(formData.cierre_sab) - timeToMinutes(formData.apertura_sab)
+    if (sabDiff < 60) {
+      toast.error('El horario de Sábados debe tener al menos 1 hora de diferencia entre apertura y cierre')
+      return
+    }
+
+    if (formData.apertura_dom && formData.cierre_dom) {
+      const domDiff = timeToMinutes(formData.cierre_dom) - timeToMinutes(formData.apertura_dom)
+      if (domDiff < 60) {
+        toast.error('El horario de Domingos debe tener al menos 1 hora de diferencia entre apertura y cierre')
+        return
+      }
+    }
+
     setLoading(true)
 
     try {

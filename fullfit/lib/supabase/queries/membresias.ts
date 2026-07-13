@@ -1,6 +1,6 @@
 // Barrel export - re-exporta todo desde los módulos divididos
 export { listarMembresias, obtenerMembresia, obtenerMembresiaActiva } from './membresias.read'
-export { registrarMembresia, cambiarEstadoMembresia, renovarMembresia } from './membresias.write'
+export { registrarMembresia, cambiarEstadoMembresia, renovarMembresia, autoReactivarFreezesExpirados } from './membresias.write'
 export { mapRowToMembresiaConCliente, generarNumeroBoleta } from './membresias.helpers'
 
 // Re-exportar tipos

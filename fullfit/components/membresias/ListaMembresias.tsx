@@ -158,6 +158,10 @@ export function ListaMembresias({
                     <BadgeDiasRestantes
                       diasRestantes={membresia.dias_restantes}
                       estado={membresia.estado}
+                      freezeInicio={membresia.freeze_inicio}
+                      freezeFin={membresia.freeze_fin}
+                      diasFreezeMaximo={membresia.dias_freeze_maximo}
+                      vecesPausada={membresia.veces_pausada}
                     />
                   </TableCell>
                   <TableCell className="text-right">

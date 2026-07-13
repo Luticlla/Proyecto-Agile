@@ -19,3 +19,8 @@ export const RECEPCIONISTA_ROLES = [1, 2] as const
  * ID del rol Coach en la base de datos.
  */
 export const COACH_ROLE_ID = 5
+
+/**
+ * Máximo número de veces que una membresía puede ser freezeada.
+ */
+export const FREEZE_MAXIMO_VECES = 2

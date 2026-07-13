@@ -649,18 +649,19 @@ export default function TerminosYCondicionesPage() {
                       <Clock className="size-4 text-gym-logo" />
                     </div>
                     <span className="font-arcade text-[10px] md:text-xs text-white tracking-wide">
-                      CLÁUSULA 18: SUSPENSIÓN TEMPORAL
+                      CLÁUSULA 18: SUSPENSIÓN TEMPORAL (FREEZE)
                     </span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-6 pb-6">
                   <div className="text-zinc-300 space-y-3 text-sm leading-relaxed pl-11">
-                    <p><strong className="text-white">18.1.</strong> EL SOCIO podrá solicitar la <strong className="text-white">suspensión temporal</strong> ante un Recepcionista.</p>
-                    <p><strong className="text-white">18.2.</strong> Cada membresía podrá ser suspendida un <strong className="text-white">máximo de dos (2) veces</strong> durante su vigencia.</p>
-                    <p><strong className="text-white">18.3.</strong> Durante la suspensión: sin acceso a instalaciones, el tiempo no se contabiliza, y la fecha de vencimiento se extiende.</p>
-                    <p><strong className="text-white">18.4.</strong> La solicitud deberá indicar el periodo de inicio y fin.</p>
-                    <p><strong className="text-white">18.5.</strong> Si se supera el límite, no se podrá solicitar una nueva hasta la renovación.</p>
-                    <p><strong className="text-white">18.6.</strong> FULLFORMA podrá rechazar solicitudes sin justificación válida.</p>
+                    <p><strong className="text-white">18.1.</strong> EL SOCIO podrá solicitar la <strong className="text-white">suspensión temporal (Freeze)</strong> de su membresía, ya sea presencial ante un Recepcionista o a través de su portal de socio.</p>
+                    <p><strong className="text-white">18.2.</strong> Cada membresía podrá ser suspendida un <strong className="text-white">máximo de dos (2) veces</strong> durante su vigencia. Las suspensiones no utilizadas se reinician al renovar.</p>
+                    <p><strong className="text-white">18.3.</strong> La duración máxima por freeze depende del plan: Mensual 5 días, Trimestral 30 días, Anual 60 días. Al alcanzar el límite, la membresía se <strong className="text-white">reactiva automáticamente</strong>.</p>
+                    <p><strong className="text-white">18.4.</strong> Durante la suspensión: sin acceso a instalaciones, el tiempo no se contabiliza, y la fecha de vencimiento se extiende.</p>
+                    <p><strong className="text-white">18.5.</strong> EL SOCIO podrá reactivar su membresía de forma anticipada en cualquier momento.</p>
+                    <p><strong className="text-white">18.6.</strong> Si se supera el límite de dos suspensiones, no se podrá solicitar una nueva hasta la renovación.</p>
+                    <p><strong className="text-white">18.7.</strong> FULLFORMA podrá rechazar solicitudes sin justificación válida y modificar los plazos máximos de freeze.</p>
                   </div>
                 </AccordionContent>
               </AccordionItem>

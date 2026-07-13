@@ -87,7 +87,7 @@
 - [x] Los beneficios varían según el plan:
   - **Mensual**: Acceso a todas las sedes, Área de pesas y máquinas, Vestuarios y locker, App de seguimiento
   - **Trimestral**: todos los anteriores + Clases grupales ilimitadas, Evaluación corporal mensual
-  - **Anual**: todos los anteriores + 2 días de freeze, Acceso prioritario a eventos
+  - **Anual**: todos los anteriores + Hasta 2 suspensiones temporales (Freeze), Acceso prioritario a eventos
 
 **Botón "Elegir Plan":**
 - [x] Botón completo que ocupa todo el ancho de la tarjeta

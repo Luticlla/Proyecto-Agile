@@ -67,13 +67,31 @@ export function FormularioSede({ isOpen, onClose, onSuccess, sede }: FormularioS
   }
 
   const validateHorarios = (): boolean => {
-    if (formData.apertura_lv && formData.cierre_lv && formData.apertura_lv >= formData.cierre_lv) {
-      setError('El horario de apertura de lunes a viernes debe ser anterior al de cierre')
-      return false
+    const toMin = (t: string) => {
+      const [h, m] = t.split(':').map(Number)
+      return h * 60 + m
     }
-    if (formData.apertura_sab && formData.cierre_sab && formData.apertura_sab >= formData.cierre_sab) {
-      setError('El horario de apertura del sábado debe ser anterior al de cierre')
-      return false
+
+    if (formData.apertura_lv && formData.cierre_lv) {
+      const diff = toMin(formData.cierre_lv) - toMin(formData.apertura_lv)
+      if (diff < 60) {
+        setError('El horario de Lunes a Viernes debe tener al menos 1 hora de diferencia entre apertura y cierre')
+        return false
+      }
+    }
+    if (formData.apertura_sab && formData.cierre_sab) {
+      const diff = toMin(formData.cierre_sab) - toMin(formData.apertura_sab)
+      if (diff < 60) {
+        setError('El horario de Sábados debe tener al menos 1 hora de diferencia entre apertura y cierre')
+        return false
+      }
+    }
+    if (formData.apertura_dom && formData.cierre_dom) {
+      const diff = toMin(formData.cierre_dom) - toMin(formData.apertura_dom)
+      if (diff < 60) {
+        setError('El horario de Domingos debe tener al menos 1 hora de diferencia entre apertura y cierre')
+        return false
+      }
     }
     return true
   }

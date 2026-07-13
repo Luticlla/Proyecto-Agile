@@ -31,6 +31,10 @@ export type MembresiaConCliente = {
   fecha_fin: string
   dias_restantes: number
   creado_en: string
+  freeze_inicio: string | null
+  freeze_fin: string | null
+  veces_pausada: number
+  dias_freeze_maximo: number
 }
 
 export type RegistrarMembresiaDTO = {

@@ -33,14 +33,17 @@ export function mapRowToMembresiaConCliente(
     fecha_inicio: row.fecha_inicio as string,
     fecha_fin: fechaFin,
     dias_restantes: Math.max(0, calcularDiasRestantes(fechaFin, hoy)),
-    creado_en: row.creado_en as string
+    creado_en: row.creado_en as string,
+    freeze_inicio: (row.freeze_inicio as string) || null,
+    freeze_fin: (row.freeze_fin as string) || null,
+    veces_pausada: (row.veces_pausada as number) ?? 0,
+    dias_freeze_maximo: (plan?.dias_freeze_maximo as number) || 0,
   }
 }
 
 /**
  * Select clause compartido para queries de membresías con joins.
  */
-// membresias.helpers.ts
 export const MEMBRESIA_SELECT_WITH_JOINS = `
   id,
   usuario_id,
@@ -49,8 +52,11 @@ export const MEMBRESIA_SELECT_WITH_JOINS = `
   fecha_fin,
   estado,
   creado_en,
+  veces_pausada,
+  freeze_inicio,
+  freeze_fin,
   profiles!suscripciones_usuario_id_fkey!inner (nombre, apellido, dni),
-  planes_membresia!suscripciones_plan_id_fkey (nombre, precio, duracion_dias)
+  planes_membresia!suscripciones_plan_id_fkey (nombre, precio, duracion_dias, dias_freeze_maximo)
 `
 
 /**

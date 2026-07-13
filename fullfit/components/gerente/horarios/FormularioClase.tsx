@@ -152,6 +152,16 @@ const [clase, setClase] = useState({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    // Validación client-side: hora fin debe ser posterior a hora inicio
+    for (const h of horarios) {
+      if (timeToMinutes(h.hora_fin) <= timeToMinutes(h.hora_inicio)) {
+        toast.error('Horario inválido', {
+          description: `La hora de fin debe ser posterior a la de inicio el ${DIAS_NOMBRES[h.dia_semana]}`
+        })
+        return
+      }
+    }
+
     // Validación client-side: horarios dentro del horario del gym
     if (horarios.length > 0 && sede) {
       const error = validarHorariosDentroDelGymClient(horarios, sede)

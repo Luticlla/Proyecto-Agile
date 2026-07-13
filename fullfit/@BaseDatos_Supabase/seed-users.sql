@@ -16,16 +16,16 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM public.planes_membresia WHERE nombre = 'Mensual') THEN
-    INSERT INTO public.planes_membresia (nombre, descripcion, precio, duracion_dias, activo)
-    VALUES ('Mensual', 'Acceso completo por 30 días a todas las sedes', 89.90, 30, true);
+    INSERT INTO public.planes_membresia (nombre, descripcion, precio, duracion_dias, activo, dias_freeze_maximo)
+    VALUES ('Mensual', 'Acceso completo por 30 días a todas las sedes', 89.90, 30, true, 5);
   END IF;
   IF NOT EXISTS (SELECT 1 FROM public.planes_membresia WHERE nombre = 'Trimestral') THEN
-    INSERT INTO public.planes_membresia (nombre, descripcion, precio, duracion_dias, activo)
-    VALUES ('Trimestral', 'Acceso completo por 90 días con beneficios extras', 239.90, 90, true);
+    INSERT INTO public.planes_membresia (nombre, descripcion, precio, duracion_dias, activo, dias_freeze_maximo)
+    VALUES ('Trimestral', 'Acceso completo por 90 días con beneficios extras', 239.90, 90, true, 30);
   END IF;
   IF NOT EXISTS (SELECT 1 FROM public.planes_membresia WHERE nombre = 'Anual') THEN
-    INSERT INTO public.planes_membresia (nombre, descripcion, precio, duracion_dias, activo)
-    VALUES ('Anual', 'Acceso completo por 365 días con todos los beneficios', 899.90, 365, true);
+    INSERT INTO public.planes_membresia (nombre, descripcion, precio, duracion_dias, activo, dias_freeze_maximo)
+    VALUES ('Anual', 'Acceso completo por 365 días con todos los beneficios', 899.90, 365, true, 60);
   END IF;
 END $$;
 
