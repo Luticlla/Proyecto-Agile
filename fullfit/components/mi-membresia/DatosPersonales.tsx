@@ -24,7 +24,6 @@ function formatGenero(genero: string | null | undefined): string {
     masculino: 'Masculino',
     femenino: 'Femenino',
     otro: 'Otro',
-    otro: 'Otro',
   }
   return map[genero.toLowerCase()] || genero
 }

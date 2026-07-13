@@ -403,7 +403,7 @@ export default function MiMembresiaPage() {
       {data?.membresiaActiva && (
         <>
           <TarjetaMembresiaArcade membresia={data.membresiaActiva} estado="activa" />
-          <DatosPersonales profile={profile!} />
+          <DatosPersonales />
           <HistorialPagos pagos={historialPagos} />
         </>
       )}
@@ -412,7 +412,7 @@ export default function MiMembresiaPage() {
       {!data?.membresiaActiva && data?.membresiaVencida && (
         <>
           <TarjetaMembresiaArcade membresia={data.membresiaVencida} estado="vencida" />
-          <DatosPersonales profile={profile!} />
+          <DatosPersonales />
           <HistorialPagos pagos={historialPagos} />
         </>
       )}
@@ -431,7 +431,7 @@ export default function MiMembresiaPage() {
               Comunícate con el recepcionista para más información.
             </p>
           </div>
-          <DatosPersonales profile={profile!} />
+          <DatosPersonales />
           {historialPagos.length > 0 && <HistorialPagos pagos={historialPagos} />}
         </>
       )}
@@ -448,7 +448,7 @@ export default function MiMembresiaPage() {
               }))}
             />
           </section>
-          <DatosPersonales profile={profile!} />
+          <DatosPersonales />
           {historialPagos.length > 0 && <HistorialPagos pagos={historialPagos} />}
         </>
       )}
