@@ -82,17 +82,10 @@ const Home = async () => {
               <span className="text-gym-logo/80">Tu membresía, tu sede.</span>
             </p>
 
-            <div className="flex items-center gap-8 md:gap-16 mt-4 pt-4 border-t border-white/10 w-full max-w-sm md:max-w-md justify-center">
-              <div className="flex flex-col items-center gap-1">
-                <span className="font-arcade text-gym-logo text-lg md:text-2xl">{sedes.length}</span>
-                <span className="text-white/40 text-[8px] md:text-[10px] font-arcade uppercase tracking-wider">Sede</span>
-              </div>
-              <div className="h-8 w-px bg-white/10" />
-              <div className="flex flex-col items-center gap-1">
-                <span className="font-arcade text-gym-logo text-lg md:text-2xl">24/7</span>
-                <span className="text-white/40 text-[8px] md:text-[10px] font-arcade uppercase tracking-wider">Soporte</span>
-              </div>
-              <div className="h-8 w-px bg-white/10" />
+            <div className="mt-4 pt-4 border-t border-white/10 w-full max-w-sm md:max-w-md">
+              <p className="font-arcade text-gym-logo text-[8px] md:text-xs tracking-widest uppercase text-center">
+                Te ayudamos en nuestros horarios
+              </p>
             </div>
           </div>
         </Container>
