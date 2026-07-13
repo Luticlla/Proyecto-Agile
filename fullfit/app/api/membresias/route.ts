@@ -143,9 +143,9 @@ export async function POST(request: NextRequest) {
 
     const result = await registrarMembresia(dto, user.id, supabase)
 
-    if (result.error) {
+    if (result.error || !result.pago) {
       return NextResponse.json(
-        { error: result.error },
+        { error: result.error || 'Error al registrar el pago' },
         { status: 400 }
       )
     }
