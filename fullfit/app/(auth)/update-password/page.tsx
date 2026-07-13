@@ -75,17 +75,15 @@ function UpdatePasswordForm() {
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-950 px-4">
-        <Card className="w-full max-w-md bg-zinc-900 border-zinc-800">
-          <CardHeader className="text-center">
-            <div className="flex justify-center mb-4">
-              <Lock className="size-12 text-green-400" />
-            </div>
-            <CardTitle className="text-2xl font-bold text-white">Contraseña Actualizada</CardTitle>
-            <CardDescription className="text-zinc-400">
-              Tu contraseña se ha actualizado correctamente. Serás redirigido al inicio de sesión en unos segundos...
-            </CardDescription>
-          </CardHeader>
-        </Card>
+        <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-xl p-6 text-center space-y-4">
+          <div className="flex justify-center">
+            <Lock className="size-12 text-green-400" />
+          </div>
+          <h2 className="text-2xl font-bold text-white">Contraseña Actualizada</h2>
+          <p className="text-zinc-400">
+            Tu contraseña se ha actualizado correctamente. Serás redirigido al inicio de sesión en unos segundos...
+          </p>
+        </div>
       </div>
     )
   }
