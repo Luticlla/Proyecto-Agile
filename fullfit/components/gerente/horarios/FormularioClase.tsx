@@ -100,10 +100,10 @@ export default function FormularioClase({ claseExistente, onClose, onSuccess }: 
         throw new Error(text || 'Error al guardar')
       }
 
-      toast({ title: `Clase ${claseExistente ? 'actualizada' : 'creada'} exitosamente` })
+      toast.success(`Clase ${claseExistente ? 'actualizada' : 'creada'} exitosamente`)
       onSuccess()
     } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' })
+      toast.error('Error', { description: error.message })
     } finally {
       setLoading(false)
     }

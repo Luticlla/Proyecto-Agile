@@ -1,5 +1,4 @@
 import { SupabaseClient } from '@supabase/supabase-js'
-import { Database } from '@/lib/supabase/types'
 import {
   ClaseConHorarios,
   ClaseGrupal,
@@ -9,7 +8,10 @@ import {
   HorarioClaseInsert
 } from './clases.types'
 
-export async function getClasesConHorarios(client: SupabaseClient<Database>): Promise<ClaseConHorarios[]> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnySupabase = SupabaseClient<any>
+
+export async function getClasesConHorarios(client: AnySupabase): Promise<ClaseConHorarios[]> {
   const { data, error } = await client
     .from('clases_grupales')
     .select(`
@@ -38,7 +40,7 @@ export async function getClasesConHorarios(client: SupabaseClient<Database>): Pr
 }
 
 export async function createClaseConHorarios(
-  client: SupabaseClient<Database>,
+  client: AnySupabase,
   clase: ClaseGrupalInsert,
   horarios: Omit<HorarioClaseInsert, 'clase_id'>[]
 ): Promise<ClaseConHorarios | null> {
@@ -81,7 +83,7 @@ export async function createClaseConHorarios(
 }
 
 export async function updateClaseConHorarios(
-  client: SupabaseClient<Database>,
+  client: AnySupabase,
   claseId: number,
   clase: ClaseGrupalUpdate,
   horarios: Omit<HorarioClaseInsert, 'clase_id'>[]
@@ -135,7 +137,7 @@ export async function updateClaseConHorarios(
   }
 }
 
-export async function deleteClase(client: SupabaseClient<Database>, claseId: number): Promise<boolean> {
+export async function deleteClase(client: AnySupabase, claseId: number): Promise<boolean> {
   // horarios_clases tiene ON DELETE CASCADE, así que solo borramos la clase
   const { error } = await client
     .from('clases_grupales')
