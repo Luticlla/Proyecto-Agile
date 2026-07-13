@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { requireAuthenticatedRecepcionista } from '@/lib/auth/api-guard'
 
@@ -34,6 +35,7 @@ export async function PUT(request: NextRequest) {
       return new NextResponse('Error al actualizar horarios', { status: 500 })
     }
 
+    revalidatePath('/')
     return NextResponse.json(data)
   } catch (error: any) {
     console.error('API Error PUT /sedes/horarios:', error)

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { updateClaseConHorarios, deleteClase } from '@/lib/supabase/queries/clases'
 import { requireAuthenticatedRecepcionista } from '@/lib/auth/api-guard'
@@ -20,6 +21,7 @@ export async function PUT(
     const { clase, horarios } = body
 
     const updatedClase = await updateClaseConHorarios(supabase, id, clase, horarios || [])
+    revalidatePath('/')
     return NextResponse.json(updatedClase)
   } catch (error: any) {
     console.error(`API Error PUT /clases:`, error)
@@ -45,6 +47,7 @@ export async function DELETE(
       return new NextResponse('Error deleting clase', { status: 500 })
     }
 
+    revalidatePath('/')
     return NextResponse.json({ success: true })
   } catch (error: any) {
     console.error(`API Error DELETE /clases:`, error)

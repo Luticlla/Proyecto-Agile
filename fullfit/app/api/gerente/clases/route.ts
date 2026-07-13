@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { getClasesConHorarios, createClaseConHorarios } from '@/lib/supabase/queries/clases'
 import { requireAuthenticatedRecepcionista } from '@/lib/auth/api-guard'
@@ -25,6 +26,7 @@ export async function POST(request: NextRequest) {
     }
 
     const newClase = await createClaseConHorarios(supabase, clase, horarios || [])
+    revalidatePath('/')
     return NextResponse.json(newClase)
   } catch (error: any) {
     console.error('API Error POST /clases:', error)
