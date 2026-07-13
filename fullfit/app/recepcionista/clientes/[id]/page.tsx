@@ -129,9 +129,12 @@ const params = useParams()
     }
 
     if (paymentStatus === 'failed') {
-      alert('Transacción no completada - El pago no fue procesado')
-      router.replace(`/recepcionista/clientes/${params.id}`)
-      await fetchCliente()
+      const manejarFallo = async () => {
+        alert('Transacción no completada - El pago no fue procesado')
+        router.replace(`/recepcionista/clientes/${params.id}`)
+        await fetchCliente()
+      }
+      manejarFallo()
     }
   }, [paymentStatus, paymentId, params.id, cliente, router, fetchCliente])
 
