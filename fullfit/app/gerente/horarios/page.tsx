@@ -15,8 +15,8 @@ export default function HorariosPage() {
     setLoading(true)
     try {
       const [resSedes, resClases] = await Promise.all([
-        fetch('/api/sedes', { credentials: 'include' }),
-        fetch('/api/gerente/clases')
+        fetch('/api/sedes', { credentials: 'include', cache: 'no-store' }),
+        fetch('/api/gerente/clases', { cache: 'no-store' })
       ])
       
       const sedesData = await resSedes.json()

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks'
 import { HistorialPagos, type PagoHistorial } from '@/components/mi-membresia/HistorialPagos'
+import { DatosPersonales } from '@/components/mi-membresia'
 import { ListaPlanesMembresia } from '@/components/membresias/ListaPlanesMembresia'
 import type { MiMembresiaData } from '@/lib/supabase/queries/mi-membresia'
 import type { PlanMembresia } from '@/lib/supabase/types'
@@ -402,6 +403,7 @@ export default function MiMembresiaPage() {
       {data?.membresiaActiva && (
         <>
           <TarjetaMembresiaArcade membresia={data.membresiaActiva} estado="activa" />
+          <DatosPersonales profile={profile!} />
           <HistorialPagos pagos={historialPagos} />
         </>
       )}
@@ -410,6 +412,7 @@ export default function MiMembresiaPage() {
       {!data?.membresiaActiva && data?.membresiaVencida && (
         <>
           <TarjetaMembresiaArcade membresia={data.membresiaVencida} estado="vencida" />
+          <DatosPersonales profile={profile!} />
           <HistorialPagos pagos={historialPagos} />
         </>
       )}
@@ -428,6 +431,7 @@ export default function MiMembresiaPage() {
               Comunícate con el recepcionista para más información.
             </p>
           </div>
+          <DatosPersonales profile={profile!} />
           {historialPagos.length > 0 && <HistorialPagos pagos={historialPagos} />}
         </>
       )}
@@ -444,6 +448,7 @@ export default function MiMembresiaPage() {
               }))}
             />
           </section>
+          <DatosPersonales profile={profile!} />
           {historialPagos.length > 0 && <HistorialPagos pagos={historialPagos} />}
         </>
       )}

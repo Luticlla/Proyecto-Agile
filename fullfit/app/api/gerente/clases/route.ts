@@ -6,7 +6,9 @@ import { requireAuthenticatedRecepcionista } from '@/lib/auth/api-guard'
 export async function GET() {
   const supabase = createServiceRoleClient()
   const clases = await getClasesConHorarios(supabase)
-  return NextResponse.json(clases)
+  return NextResponse.json(clases, {
+    headers: { 'Cache-Control': 'no-store, must-revalidate' }
+  })
 }
 
 export async function POST(request: NextRequest) {

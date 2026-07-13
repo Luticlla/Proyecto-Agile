@@ -49,6 +49,8 @@ export async function GET(request: NextRequest) {
       count: count || 0,
       page,
       totalPages: Math.ceil((count || 0) / limit)
+    }, {
+      headers: { 'Cache-Control': 'no-store, must-revalidate' }
     })
   } catch (error: any) {
     console.error('Error en GET /api/sedes:', error)
