@@ -72,6 +72,57 @@ function formatTime(time: string): string {
   return time.substring(0, 5)
 }
 
+/**
+ * Valida que los horarios nuevos no se crucen con horarios existentes de OTRAS clases.
+ * dia_semana: 0=Domingo, 1-5=Lunes-Viernes, 6=Sábado
+ * excludeClaseId: ID de clase a excluir (para edición)
+ */
+export async function validarSolapamientoHorarios(
+  client: AnySupabase,
+  horarios: Omit<HorarioClaseInsert, 'clase_id'>[],
+  excludeClaseId?: number
+): Promise<void> {
+  // Obtener todos los horarios existentes con el nombre de la clase
+  let query = client
+    .from('horarios_clases')
+    .select('dia_semana, hora_inicio, hora_fin, clase_id, clases_grupales(nombre)')
+
+  if (excludeClaseId) {
+    query = query.neq('clase_id', excludeClaseId)
+  }
+
+  const { data: existentes, error } = await query
+
+  if (error) {
+    console.error('Error al validar solapamiento:', error)
+    throw new Error('Error al validar horarios')
+  }
+
+  const DIAS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+
+  for (const nuevo of horarios) {
+    const nuevoInicio = timeStringToMinutes(nuevo.hora_inicio)
+    const nuevoFin = timeStringToMinutes(nuevo.hora_fin)
+
+    for (const existente of existentes || []) {
+      // Solo comparar si es el mismo día de la semana
+      if (existente.dia_semana !== nuevo.dia_semana) continue
+
+      const exInicio = timeStringToMinutes(existente.hora_inicio)
+      const exFin = timeStringToMinutes(existente.hora_fin)
+
+      // Dos rangos se cruzan si: inicio1 < fin2 Y inicio2 < fin1
+      if (nuevoInicio < exFin && exInicio < nuevoFin) {
+        const nombreClase = (existente.clases_grupales as any)?.nombre || 'Otra clase'
+        const dia = DIAS[nuevo.dia_semana]
+        throw new Error(
+          `El horario ${dia} de ${formatTime(nuevo.hora_inicio)} a ${formatTime(nuevo.hora_fin)} se cruza con "${nombreClase}" (${dia} ${formatTime(existente.hora_inicio)} - ${formatTime(existente.hora_fin)})`
+        )
+      }
+    }
+  }
+}
+
 export async function getClasesConHorarios(client: AnySupabase): Promise<ClaseConHorarios[]> {
   const { data, error } = await client
     .from('clases_grupales')
@@ -115,6 +166,11 @@ export async function createClaseConHorarios(
   if (claseError) {
     console.error('Error al crear clase:', claseError)
     throw new Error(claseError.message || 'Error al crear clase')
+  }
+
+  // Validar solapamiento con horarios de otras clases
+  if (horarios.length > 0) {
+    await validarSolapamientoHorarios(client, horarios)
   }
 
   // 2. Crear horarios si los hay
@@ -163,6 +219,11 @@ export async function updateClaseConHorarios(
   if (claseError) {
     console.error('Error al actualizar clase:', claseError)
     throw new Error(claseError.message || 'Error al actualizar clase')
+  }
+
+  // Validar solapamiento con horarios de otras clases (excluyendo la actual)
+  if (horarios.length > 0) {
+    await validarSolapamientoHorarios(client, horarios, claseId)
   }
 
   // 2. Actualizar horarios (borrar todos y recrear para más simpleza)

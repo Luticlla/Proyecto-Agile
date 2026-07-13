@@ -141,6 +141,7 @@ export default function GestorClases({ clases, sede }: GestorClasesProps) {
           claseExistente={claseEditar}
           onClose={() => setIsFormOpen(false)}
           sede={sede}
+          clases={clases}
         />
       )}
     </div>

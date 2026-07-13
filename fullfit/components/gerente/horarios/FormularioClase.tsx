@@ -13,6 +13,7 @@ interface FormularioClaseProps {
   claseExistente: any | null
   onClose: () => void
   sede: any | null
+  clases: any[]
 }
 
 const DIAS = [
@@ -74,7 +75,38 @@ function validarHorariosDentroDelGymClient(
   return null
 }
 
-export default function FormularioClase({ claseExistente, onClose, sede }: FormularioClaseProps) {
+function validarSolapamientoClient(
+  horarios: { dia_semana: number; hora_inicio: string; hora_fin: string }[],
+  clases: any[],
+  claseExistenteId?: number
+): string | null {
+  for (const h of horarios) {
+    const nuevoInicio = timeToMinutes(h.hora_inicio)
+    const nuevoFin = timeToMinutes(h.hora_fin)
+
+    for (const clase of clases) {
+      // Excluir la clase que se está editando
+      if (claseExistenteId && clase.id === claseExistenteId) continue
+
+      for (const hc of clase.horarios || []) {
+        // Solo comparar si es el mismo día de la semana
+        if (hc.dia_semana !== h.dia_semana) continue
+
+        const exInicio = timeToMinutes(hc.hora_inicio.substring(0, 5))
+        const exFin = timeToMinutes(hc.hora_fin.substring(0, 5))
+
+        // Dos rangos se cruzan si: inicio1 < fin2 Y inicio2 < fin1
+        if (nuevoInicio < exFin && exInicio < nuevoFin) {
+          const dia = DIAS_NOMBRES[h.dia_semana]
+          return `El horario ${dia} de ${h.hora_inicio} a ${h.hora_fin} se cruza con "${clase.nombre}" (${dia} ${hc.hora_inicio.substring(0, 5)} - ${hc.hora_fin.substring(0, 5)})`
+        }
+      }
+    }
+  }
+  return null
+}
+
+export default function FormularioClase({ claseExistente, onClose, sede, clases }: FormularioClaseProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   
@@ -125,6 +157,15 @@ const [clase, setClase] = useState({
       const error = validarHorariosDentroDelGymClient(horarios, sede)
       if (error) {
         toast.error('Horario inválido', { description: error })
+        return
+      }
+    }
+
+    // Validación client-side: solapamiento con otras clases
+    if (horarios.length > 0 && clases.length > 0) {
+      const error = validarSolapamientoClient(horarios, clases, claseExistente?.id)
+      if (error) {
+        toast.error('Choque de horarios', { description: error })
         return
       }
     }
