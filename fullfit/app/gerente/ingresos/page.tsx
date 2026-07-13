@@ -20,8 +20,6 @@ type PagoItem = {
   hora: string
   monto: number
   metodo: string
-  cliente: string
-  recepcionista: string
 }
 
 const FILTROS: { value: FiltroPeriodo; label: string }[] = [
@@ -316,10 +314,8 @@ export default function IngresosPage() {
                   <TableRow className="bg-zinc-900">
                     <TableHead className="text-zinc-300">Fecha</TableHead>
                     <TableHead className="text-zinc-300 hidden sm:table-cell">Hora</TableHead>
-                    <TableHead className="text-zinc-300">Cliente</TableHead>
                     <TableHead className="text-zinc-300 text-right">Monto</TableHead>
                     <TableHead className="text-zinc-300 hidden md:table-cell">Método</TableHead>
-                    <TableHead className="text-zinc-300 hidden lg:table-cell">Recepcionista</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -331,27 +327,20 @@ export default function IngresosPage() {
                       <TableCell className="text-zinc-400 font-mono text-sm hidden sm:table-cell">
                         {p.hora}
                       </TableCell>
-                      <TableCell className="text-zinc-200">
-                        {p.cliente}
-                      </TableCell>
                       <TableCell className="text-right font-mono text-yellow-400">
                         {formatCurrency(p.monto)}
                       </TableCell>
                       <TableCell className="text-zinc-400 text-sm hidden md:table-cell">
                         {metodoLabel(p.metodo)}
                       </TableCell>
-                      <TableCell className="text-zinc-400 text-sm hidden lg:table-cell">
-                        {p.recepcionista}
-                      </TableCell>
                     </TableRow>
                   ))}
                   <TableRow className="border-zinc-800 bg-zinc-900/80 font-bold">
-                    <TableCell className="text-white" colSpan={3}>Total</TableCell>
+                    <TableCell className="text-white" colSpan={2}>Total</TableCell>
                     <TableCell className="text-right font-mono text-yellow-400">
                       {formatCurrency(totalGeneral)}
                     </TableCell>
                     <TableCell className="hidden md:table-cell" />
-                    <TableCell className="hidden lg:table-cell" />
                   </TableRow>
                 </TableBody>
               </Table>
