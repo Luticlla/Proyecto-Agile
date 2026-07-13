@@ -23,10 +23,7 @@ AS $$
   JOIN public.planes_membresia pm ON pm.id = s.plan_id
   WHERE s.estado = 'activa'
     AND s.fecha_fin >= CURRENT_DATE
-    AND (
-      pm.features @> '["Clases grupales ilimitadas"]'::jsonb
-      OR pm.features @> '["Clases grupales"]'::jsonb
-    );
+    AND pm.id IN (2, 3);
 $$;
 
 -- Otorgar permisos de ejecucion a authenticated

@@ -24,8 +24,8 @@ export type ClienteCoachListResult = {
 }
 
 /**
- * Lista clientes (rol_id = 3) cuya membresía activa tenga "Clases grupales" o "Clases grupales ilimitadas"
- * Pensado para ser ejecutado por un usuario con rol coach (rol_id = 4)
+ * Lista clientes (rol_id = 3) con membresía trimestral o anual activa
+ * Son los únicos que pueden acceder a clases grupales
  */
 export async function listarClientesCoach(
   filtros: {
@@ -41,32 +41,23 @@ export async function listarClientesCoach(
   const from = (page - 1) * limit
   const to = from + limit - 1
 
-  // Primero obtenemos los IDs de clientes con membresía activa de clases grupales
+  const hoy = new Date().toISOString().split('T')[0]
+
   const { data: subs } = await client
     .from('suscripciones')
-    .select('usuario_id, fecha_fin, estado, planes_membresia!inner(nombre, features)')
+    .select('usuario_id, fecha_fin, estado, planes_membresia!inner(nombre)')
     .eq('estado', 'activa')
-    .gte('fecha_fin', new Date().toISOString().split('T')[0])
+    .gte('fecha_fin', hoy)
+    .in('plan_id', [2, 3])
 
   if (!subs || subs.length === 0) {
     return { data: [], count: 0, page, totalPages: 0 }
   }
 
-  // Filtrar por feature de clases grupales
-  const subsConClases = subs.filter((s: any) => {
-    const features: string[] = s.planes_membresia?.features || []
-    return features.includes('Clases grupales ilimitadas') || features.includes('Clases grupales')
-  })
+  const usuarioIds = [...new Set(subs.map((s: any) => s.usuario_id))]
 
-  if (subsConClases.length === 0) {
-    return { data: [], count: 0, page, totalPages: 0 }
-  }
-
-  const usuarioIds = [...new Set(subsConClases.map((s: any) => s.usuario_id))]
-
-  // Construir mapa de plan info por usuario
   const planPorUsuario: Record<string, { plan_nombre: string; fecha_fin: string; estado: string }> = {}
-  subsConClases.forEach((s: any) => {
+  subs.forEach((s: any) => {
     if (!planPorUsuario[s.usuario_id]) {
       planPorUsuario[s.usuario_id] = {
         plan_nombre: s.planes_membresia?.nombre || '',
@@ -76,7 +67,6 @@ export async function listarClientesCoach(
     }
   })
 
-  // Consultar perfiles filtrados por esos IDs
   let query = client
     .from('profiles')
     .select('*', { count: 'exact' })
