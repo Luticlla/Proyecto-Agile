@@ -114,8 +114,8 @@ export async function GET(request: NextRequest) {
         suscripcion_id,
         usuario_id,
         registrado_por,
-        profiles!pagos_usuario_id_fkey(nombre, apellido),
-        profiles!pagos_registrado_por_fkey!inner(id, nombre, apellido)
+        cliente:profiles!pagos_usuario_id_fkey(nombre, apellido),
+        recepcionista:profiles!pagos_registrado_por_fkey!inner(id, nombre, apellido)
       `)
       .eq('estado', 'completado')
       .gte('fecha_pago', inicio)
@@ -154,8 +154,8 @@ export async function GET(request: NextRequest) {
       const fechaLocal = fechaDate.toLocaleDateString('es-PE', { timeZone: 'America/Lima', day: '2-digit', month: '2-digit', year: 'numeric' })
       const horaLocal = fechaDate.toLocaleTimeString('es-PE', { timeZone: 'America/Lima', hour: '2-digit', minute: '2-digit', hour12: false })
 
-      const cliente = pago.profiles as Record<string, string> | null
-      const recepcionista = pago.profiles as Record<string, string> | null
+      const clienteData = (pago as any).cliente as Record<string, string> | null
+      const recepcionistaData = (pago as any).recepcionista as Record<string, string> | null
 
       pagos.push({
         id: pago.id as number,
@@ -163,8 +163,8 @@ export async function GET(request: NextRequest) {
         hora: horaLocal,
         monto,
         metodo: pago.metodo_pago as string,
-        cliente: cliente ? `${cliente.nombre || ''} ${cliente.apellido || ''}`.trim() : '-',
-        recepcionista: recepcionista ? `${recepcionista.nombre || ''} ${recepcionista.apellido || ''}`.trim() : '-',
+        cliente: clienteData ? `${clienteData.nombre || ''} ${clienteData.apellido || ''}`.trim() : '-',
+        recepcionista: recepcionistaData ? `${recepcionistaData.nombre || ''} ${recepcionistaData.apellido || ''}`.trim() : '-',
       })
 
       const periodoIdx = extraerPeriodoKey(fechaPago, filtro)
